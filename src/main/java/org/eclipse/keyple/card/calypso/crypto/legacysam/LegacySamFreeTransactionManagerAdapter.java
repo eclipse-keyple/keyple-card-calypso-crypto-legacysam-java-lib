@@ -42,6 +42,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Adapter of {@link LegacySamFreeTransactionManager}.
+ *
  * @since 0.1.0
  */
 class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransactionManager {
