@@ -29,6 +29,6 @@ public final class LegacySamTransactionManagerFactoryProvider {
    * @since 0.1.0
    */
   public static LegacySamTransactionManagerFactory getFactory() {
-    return new LegacySamTransactionMangerFactoryAdapter();
+    return new LegacySamTransactionManagerFactoryAdapter();
   }
 }

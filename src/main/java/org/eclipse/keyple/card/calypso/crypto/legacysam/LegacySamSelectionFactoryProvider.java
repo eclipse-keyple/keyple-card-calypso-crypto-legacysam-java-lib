@@ -11,23 +11,24 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.CardSelectionFactory;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelection;
+import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelectionFactory;
 
 /**
- * Adapter of {@link CardSelectionFactory}.
+ * Provides an implementation of {@link LegacySamSelectionFactory}.
  *
  * @since 0.1.0
  */
-class CardSelectionFactoryAdapter implements CardSelectionFactory {
+public final class LegacySamSelectionFactoryProvider {
+
+  private LegacySamSelectionFactoryProvider() {}
 
   /**
-   * {@inheritDoc}
+   * Returns a {@link LegacySamSelectionFactory}.
    *
+   * @return A not null reference.
    * @since 0.1.0
    */
-  @Override
-  public LegacySamSelection createSamSelection() {
-    return new LegacySamSelectionAdapter();
+  public static LegacySamSelectionFactory getFactory() {
+    return new LegacySamSelectionFactoryAdapter();
   }
 }

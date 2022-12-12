@@ -22,7 +22,7 @@ import org.calypsonet.terminal.reader.CardReader;
  *
  * @since 0.1.0
  */
-class LegacySamTransactionMangerFactoryAdapter implements LegacySamTransactionManagerFactory {
+class LegacySamTransactionManagerFactoryAdapter implements LegacySamTransactionManagerFactory {
 
   /**
    * {@inheritDoc}
