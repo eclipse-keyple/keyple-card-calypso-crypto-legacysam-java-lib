@@ -20,7 +20,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignat
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InconsistentDataException;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamFreeTransactionManager;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.ReaderIOException;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamIOException;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamRevokedException;
@@ -41,14 +41,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Adapter of {@link LegacySamFreeTransactionManager}.
+ * Adapter of {@link LSFreeTransactionManager}.
  *
  * @since 0.1.0
  */
-class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransactionManager {
+class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(LegacySamFreeTransactionManagerAdapter.class);
+      LoggerFactory.getLogger(LSFreeTransactionManagerAdapter.class);
 
   /* Prefix/suffix used to compose exception messages */
   private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
@@ -86,7 +86,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
   /* Dynamic fields */
   private byte[] currentKeyDiversifier;
 
-  LegacySamFreeTransactionManagerAdapter(ProxyReaderApi samReader, LegacySamAdapter sam) {
+  LSFreeTransactionManagerAdapter(ProxyReaderApi samReader, LegacySamAdapter sam) {
     this.samReader = samReader;
     this.sam = sam;
     this.samKeyDiversifier = sam.getSerialNumber();
@@ -98,8 +98,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareComputeSignature(
-      CommonSignatureComputationData<?> data) {
+  public LSFreeTransactionManager prepareComputeSignature(CommonSignatureComputationData<?> data) {
 
     if (data instanceof BasicSignatureComputationDataAdapter) {
       // Basic signature
@@ -168,8 +167,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareVerifySignature(
-      CommonSignatureVerificationData<?> data) {
+  public LSFreeTransactionManager prepareVerifySignature(CommonSignatureVerificationData<?> data) {
     if (data instanceof BasicSignatureVerificationDataAdapter) {
       // Basic signature
       BasicSignatureVerificationDataAdapter dataAdapter =
@@ -268,7 +266,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareReadEventCounter(int eventCounterNumber) {
+  public LSFreeTransactionManager prepareReadEventCounter(int eventCounterNumber) {
 
     Assert.getInstance()
         .isInRange(
@@ -291,7 +289,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareReadEventCounters(
+  public LSFreeTransactionManager prepareReadEventCounters(
       int fromEventCounterNumber, int toEventCounterNumber) {
 
     Assert.getInstance()
@@ -337,7 +335,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareReadEventCeiling(int eventCeilingNumber) {
+  public LSFreeTransactionManager prepareReadEventCeiling(int eventCeilingNumber) {
 
     Assert.getInstance()
         .isInRange(
@@ -360,7 +358,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager prepareReadEventCeilings(
+  public LSFreeTransactionManager prepareReadEventCeilings(
       int fromEventCeilingNumber, int toEventCeilingNumber) {
 
     Assert.getInstance()
@@ -406,7 +404,7 @@ class LegacySamFreeTransactionManagerAdapter implements LegacySamFreeTransaction
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager processCommands() {
+  public LSFreeTransactionManager processCommands() {
     if (commands.isEmpty()) {
       return this;
     }

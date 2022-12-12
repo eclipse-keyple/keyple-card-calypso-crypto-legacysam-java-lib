@@ -15,16 +15,16 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamCommandDataFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
 
 /**
- * Adapter of {@link LegacySamCommandDataFactory}.
+ * Adapter of {@link LSCommandDataFactory}.
  *
  * @since 0.1.0
  */
-class LegacySamCommandDataFactoryAdapter implements LegacySamCommandDataFactory {
+class LSCommandDataFactoryAdapter implements LSCommandDataFactory {
 
   /**
    * {@inheritDoc}

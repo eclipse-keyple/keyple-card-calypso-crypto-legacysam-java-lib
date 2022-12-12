@@ -12,17 +12,17 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamFreeTransactionManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamTransactionManagerFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
 import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.calypsonet.terminal.reader.CardReader;
 
 /**
- * Adapter of {@link LegacySamTransactionManagerFactory}.
+ * Adapter of {@link LSTransactionManagerFactory}.
  *
  * @since 0.1.0
  */
-class LegacySamTransactionManagerFactoryAdapter implements LegacySamTransactionManagerFactory {
+class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory {
 
   /**
    * {@inheritDoc}
@@ -30,7 +30,7 @@ class LegacySamTransactionManagerFactoryAdapter implements LegacySamTransactionM
    * @since 0.1.0
    */
   @Override
-  public LegacySamFreeTransactionManager createFreeTransactionManager(
+  public LSFreeTransactionManager createFreeTransactionManager(
       CardReader samReader, LegacySam sam) {
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
@@ -40,7 +40,6 @@ class LegacySamTransactionManagerFactoryAdapter implements LegacySamTransactionM
       throw new IllegalArgumentException(
           "The provided 'sam' must be an instance of 'LegacySamAdapter'");
     }
-    return new LegacySamFreeTransactionManagerAdapter(
-        (ProxyReaderApi) samReader, (LegacySamAdapter) sam);
+    return new LSFreeTransactionManagerAdapter((ProxyReaderApi) samReader, (LegacySamAdapter) sam);
   }
 }

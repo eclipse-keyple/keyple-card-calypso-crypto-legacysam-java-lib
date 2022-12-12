@@ -30,7 +30,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LegacySamRevocationS
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamFreeTransactionManager;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamRevokedException;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
@@ -49,7 +49,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 
-public class LegacySamFreeTransactionManagerAdapterTest {
+public class LSFreeTransactionManagerAdapterTest {
 
   private static final String SAM_SERIAL_NUMBER = "11223344";
   private static final String CIPHER_MESSAGE = "A1A2A3A4A5A6A7A8";
@@ -93,7 +93,7 @@ public class LegacySamFreeTransactionManagerAdapterTest {
   private static final String C_PSO_VERIFY_SIGNATURE_SAM_TRACEABILITY_FULL =
       "802A00A818FF0102680001" + PSO_MESSAGE_SAM_TRACEABILITY + PSO_MESSAGE_SIGNATURE;
 
-  private LegacySamFreeTransactionManager samTransactionManager;
+  private LSFreeTransactionManager samTransactionManager;
   private ReaderMock samReader;
 
   interface ReaderMock extends CardReader, ProxyReaderApi {}
@@ -113,7 +113,7 @@ public class LegacySamFreeTransactionManagerAdapterTest {
     LegacySam controlSam = new LegacySamAdapter(samCardSelectionResponse);
 
     samTransactionManager =
-        LegacySamTransactionManagerFactoryProvider.getFactory()
+        LSTransactionManagerFactoryProvider.getFactory()
             .createFreeTransactionManager(samReader, sam);
   }
 

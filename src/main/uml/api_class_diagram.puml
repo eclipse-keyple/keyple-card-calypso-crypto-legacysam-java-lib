@@ -62,11 +62,11 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
     +class "**final** LegacySamSelectionFactoryProvider" as LegacySamSelectionFactoryProvider {
         +{static} <back:lightgreen>LegacySamSelectionFactory</back> getFactory ()
     }
-    +class "**final** LegacySamTransactionManagerFactoryProvider" as LegacySamTransactionManagerFactoryProvider {
-        +{static} <back:lightgreen>LegacySamTransactionManagerFactory</back> getFactory ()
+    +class "**final** LSTransactionManagerFactoryProvider" as LSTransactionManagerFactoryProvider {
+        +{static} <back:lightgreen>LSTransactionManagerFactory</back> getFactory ()
     }
-    +class "**final** LegacySamCommandDataFactoryProvider" as LegacySamCommandDataFactoryProvider {
-        +{static} <back:lightgreen>LegacySamCommandDataFactory</back> getFactory ()
+    +class "**final** LSCommandDataFactoryProvider" as LSCommandDataFactoryProvider {
+        +{static} <back:lightgreen>LSCommandDataFactory</back> getFactory ()
     }
     +class "**final** LegacySamResourceProfileExtensionProvider" as LegacySamResourceProfileExtensionProvider {
         +{static} <back:orange>CardResourceProfileExtension</back> getSamProfileExtension (<back:lightgreen>LegacySamSelection</back> samSelection)

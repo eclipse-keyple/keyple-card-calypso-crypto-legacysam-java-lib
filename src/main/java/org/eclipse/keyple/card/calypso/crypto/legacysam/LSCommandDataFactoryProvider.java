@@ -11,24 +11,24 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LegacySamTransactionManagerFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
 
 /**
- * Provides an implementation of {@link LegacySamTransactionManagerFactory}.
+ * Provides an implementation of {@link LSCommandDataFactory}.
  *
  * @since 0.1.0
  */
-public final class LegacySamTransactionManagerFactoryProvider {
+public final class LSCommandDataFactoryProvider {
 
-  private LegacySamTransactionManagerFactoryProvider() {}
+  private LSCommandDataFactoryProvider() {}
 
   /**
-   * Returns a {@link LegacySamTransactionManagerFactory}.
+   * Returns a {@link LSCommandDataFactory}.
    *
    * @return A not null reference.
    * @since 0.1.0
    */
-  public static LegacySamTransactionManagerFactory getFactory() {
-    return new LegacySamTransactionManagerFactoryAdapter();
+  public static LSCommandDataFactory getFactory() {
+    return new LSCommandDataFactoryAdapter();
   }
 }
