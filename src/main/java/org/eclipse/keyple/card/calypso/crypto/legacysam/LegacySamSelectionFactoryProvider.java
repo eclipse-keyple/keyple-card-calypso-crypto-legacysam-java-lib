@@ -14,7 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelectionFactory;
 
 /**
- * Provides an implementation of {@link LegacySamSelectionFactory}.
+ * Provides an adapter of {@link LegacySamSelectionFactory}.
  *
  * @since 0.1.0
  */

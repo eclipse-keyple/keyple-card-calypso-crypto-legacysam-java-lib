@@ -15,7 +15,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
+import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureComputationData;
@@ -41,7 +41,7 @@ final class DtoAdapters {
   private DtoAdapters() {}
 
   /**
-   * Implementation of {@link CommonSignatureComputationData}.
+   * Adapter of {@link CommonSignatureComputationData}.
    *
    * @param <T> The type of the lowest level child object.
    * @since 0.1.0
@@ -158,7 +158,7 @@ final class DtoAdapters {
   }
 
   /**
-   * Implementation of {@link CommonSignatureVerificationData}.
+   * Adapter of {@link CommonSignatureVerificationData}.
    *
    * @param <T> The type of the lowest level child object.
    * @since 0.1.0
@@ -266,7 +266,7 @@ final class DtoAdapters {
   }
 
   /**
-   * Implementation of {@link BasicSignatureComputationData}.
+   * Adapter of {@link BasicSignatureComputationData}.
    *
    * @since 0.1.0
    */
@@ -275,7 +275,7 @@ final class DtoAdapters {
       implements BasicSignatureComputationData {}
 
   /**
-   * Implementation of {@link BasicSignatureVerificationData}.
+   * Adapter of {@link BasicSignatureVerificationData}.
    *
    * @since 0.1.0
    */
@@ -284,7 +284,7 @@ final class DtoAdapters {
       implements BasicSignatureVerificationData {}
 
   /**
-   * Implementation of {@link TraceableSignatureComputationData}.
+   * Adapter of {@link TraceableSignatureComputationData}.
    *
    * @since 0.1.0
    */
@@ -383,7 +383,7 @@ final class DtoAdapters {
   }
 
   /**
-   * Implementation of {@link TraceableSignatureVerificationData}.
+   * Adapter of {@link TraceableSignatureVerificationData}.
    *
    * @since 0.1.0
    */
@@ -394,7 +394,7 @@ final class DtoAdapters {
     private boolean isSamTraceabilityMode;
     private int traceabilityOffset;
     private boolean isPartialSamSerialNumber;
-    private LegacySamRevocationServiceSpi samRevocationService;
+    private LSRevocationServiceSpi samRevocationService;
     private boolean isBusyMode = true;
 
     /**
@@ -404,9 +404,7 @@ final class DtoAdapters {
      */
     @Override
     public TraceableSignatureVerificationData withSamTraceabilityMode(
-        int offset,
-        boolean isPartialSamSerialNumber,
-        LegacySamRevocationServiceSpi samRevocationService) {
+        int offset, boolean isPartialSamSerialNumber, LSRevocationServiceSpi samRevocationService) {
       this.isSamTraceabilityMode = true;
       this.traceabilityOffset = offset;
       this.isPartialSamSerialNumber = isPartialSamSerialNumber;
@@ -458,7 +456,7 @@ final class DtoAdapters {
      *     first.
      * @since 0.1.0
      */
-    LegacySamRevocationServiceSpi getSamRevocationService() {
+    LSRevocationServiceSpi getSamRevocationService() {
       return samRevocationService;
     }
 
@@ -639,7 +637,7 @@ final class DtoAdapters {
   }
 
   /**
-   * Implementation of {@link CardSelectorSpi}.
+   * Adapter of {@link CardSelectorSpi}.
    *
    * @since 0.1.0
    */

@@ -26,7 +26,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
+import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
@@ -1169,8 +1169,7 @@ public class LSFreeTransactionManagerAdapterTest {
 
   @Test
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusOK_shouldBeSuccessful() {
-    LegacySamRevocationServiceSpi samRevocationServiceSpi =
-        mock(LegacySamRevocationServiceSpi.class);
+    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4"), 0xC5C6C7))
         .thenReturn(false);
     TraceableSignatureVerificationData data =
@@ -1183,8 +1182,7 @@ public class LSFreeTransactionManagerAdapterTest {
 
   @Test(expected = SamRevokedException.class)
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusKOPartial_shouldThrowSRE() {
-    LegacySamRevocationServiceSpi samRevocationServiceSpi =
-        mock(LegacySamRevocationServiceSpi.class);
+    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4"), 0xB5B6B7))
         .thenReturn(true);
     TraceableSignatureVerificationData data =
@@ -1197,8 +1195,7 @@ public class LSFreeTransactionManagerAdapterTest {
 
   @Test(expected = SamRevokedException.class)
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusKOFull_shouldThrowSRE() {
-    LegacySamRevocationServiceSpi samRevocationServiceSpi =
-        mock(LegacySamRevocationServiceSpi.class);
+    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4B5"), 0xB6B7B8))
         .thenReturn(true);
     TraceableSignatureVerificationData data =

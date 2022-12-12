@@ -14,7 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
 
 /**
- * Provides an implementation of {@link LSCommandDataFactory}.
+ * Provides an adapter of {@link LSCommandDataFactory}.
  *
  * @since 0.1.0
  */

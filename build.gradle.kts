@@ -32,7 +32,7 @@ repositories {
 dependencies {
     implementation("org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.1.0")
     implementation("org.calypsonet.terminal:calypsonet-terminal-card-java-api:1.0.0")
-    implementation("org.calypsonet.terminal:calypsonet-terminal-calypso-crypto-legacysam-java-api:0.1.0-SNAPSHOT") { isChanging = true }
+    implementation("org.calypsonet.terminal:calypsonet-terminal-calypso-crypto-legacysam-java-api:0.1.0")
     implementation("org.eclipse.keyple:keyple-service-resource-java-lib:2.0.2")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.3.0")
     implementation("org.slf4j:slf4j-api:1.7.32")

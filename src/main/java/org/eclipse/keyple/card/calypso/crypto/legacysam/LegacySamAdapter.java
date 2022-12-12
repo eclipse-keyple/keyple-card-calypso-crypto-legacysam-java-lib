@@ -24,7 +24,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link LegacySam}.
+ * Adapter of {@link LegacySam}.
  *
  * @since 0.1.0
  */

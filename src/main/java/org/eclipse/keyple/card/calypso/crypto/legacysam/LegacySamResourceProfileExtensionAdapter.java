@@ -21,21 +21,23 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Implementation of {@link CardResourceProfileExtension} dedicated to SAM identification.
+ * Adapter of {@link CardResourceProfileExtension} dedicated to SAM identification.
  *
  * @since 0.1.0
  */
-class CardResourceProfileExtensionAdapter implements CardResourceProfileExtension {
+class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExtension {
+
   private static final Logger logger =
-      LoggerFactory.getLogger(CardResourceProfileExtensionAdapter.class);
+      LoggerFactory.getLogger(LegacySamResourceProfileExtensionAdapter.class);
+
   private final LegacySamSelection legacySamSelection;
 
   /**
-   * @param legacySamSelection The {@link LegacySamSelection}.
+   * @param samSelection The {@link LegacySamSelection}.
    * @since 0.1.0
    */
-  CardResourceProfileExtensionAdapter(LegacySamSelection legacySamSelection) {
-    this.legacySamSelection = legacySamSelection;
+  LegacySamResourceProfileExtensionAdapter(LegacySamSelection samSelection) {
+    this.legacySamSelection = samSelection;
   }
 
   /**

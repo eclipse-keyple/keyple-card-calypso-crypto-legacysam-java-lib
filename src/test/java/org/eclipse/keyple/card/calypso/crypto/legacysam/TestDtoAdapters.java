@@ -21,7 +21,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
 class TestDtoAdapters {
   private TestDtoAdapters() {}
 
-  /** Implementation of {@link ApduResponseApi}. */
+  /** Adapter of {@link ApduResponseApi}. */
   static class ApduResponseAdapter implements ApduResponseApi {
 
     private final byte[] apdu;

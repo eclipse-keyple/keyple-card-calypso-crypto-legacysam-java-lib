@@ -14,7 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
 
 /**
- * Provides an implementation of {@link LSTransactionManagerFactory}.
+ * Provides an adapter of {@link LSTransactionManagerFactory}.
  *
  * @since 0.1.0
  */

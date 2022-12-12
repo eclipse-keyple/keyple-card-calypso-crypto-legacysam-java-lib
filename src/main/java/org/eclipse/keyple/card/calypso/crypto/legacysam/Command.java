@@ -162,17 +162,6 @@ abstract class Command {
   }
 
   /**
-   * Sets the Calypso legacy SAM and invoke the {@link #parseApduResponse(ApduResponseApi)} method.
-   *
-   * @since 0.1.0
-   */
-  void parseApduResponse(ApduResponseApi apduResponse, LegacySamAdapter legacySam)
-      throws CommandException {
-    this.legacySam = legacySam;
-    parseApduResponse(apduResponse);
-  }
-
-  /**
    * Returns the internal status table
    *
    * @return A not null reference
