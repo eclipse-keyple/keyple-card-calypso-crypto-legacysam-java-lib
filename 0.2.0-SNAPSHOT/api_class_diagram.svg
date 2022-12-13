@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" contentStyleType="text/css" height="524px" preserveAspectRatio="none" style="width:821px;height:524px;background:#FFFFFF;" version="1.1" viewBox="0 0 821 524" width="821px" zoomAndPan="magnify"><defs><filter height="1" id="bpxzoyrj2w4ze0" width="1" x="0" y="0"><feFlood flood-color="#90EE90" result="flood"/><feComposite in="SourceGraphic" in2="flood" operator="over"/></filter><filter height="1" id="bpxzoyrj2w4ze1" width="1" x="0" y="0"><feFlood flood-color="#00FFFF" result="flood"/><feComposite in="SourceGraphic" in2="flood" operator="over"/></filter><filter height="1" id="bpxzoyrj2w4ze2" width="1" x="0" y="0"><feFlood flood-color="#FFA500" result="flood"/><feComposite in="SourceGraphic" in2="flood" operator="over"/></filter></defs><g><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="517" x="145" y="25.1074">Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.2.+ (2022-12-13)</text><rect fill="#DDDDDD" height="103.1055" id="_legend" rx="7.5" ry="7.5" style="stroke:#000000;stroke-width:1.0;" width="409" x="199" y="51.6211"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" text-decoration="underline" textLength="88" x="204" y="71.7285">Colors legend</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="296" y="71.7285">:</text><ellipse cx="209.5" cy="86.3633" fill="#000000" rx="2.5" ry="2.5" style="stroke:#000000;stroke-width:0.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" text-decoration="underline" textLength="148" x="216" y="90.3496">External API references</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="368" y="90.3496">:</text><rect fill="#000000" height="3.5" style="stroke:#000000;stroke-width:0.0;" width="3.5" x="213" y="102.4844"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze0)" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="383" x="220" y="108.9707">calypsonet-terminal-calypso-crypto-legacysam-java-api</text><rect fill="#000000" height="3.5" style="stroke:#000000;stroke-width:0.0;" width="3.5" x="213" y="121.1055"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze1)" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="170" x="220" y="127.5918">keyple-common-java-api</text><rect fill="#000000" height="3.5" style="stroke:#000000;stroke-width:0.0;" width="3.5" x="213" y="139.7266"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze2)" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="229" x="220" y="146.2129">keyple-service-resource-java-lib</text><!--MD5=[d69a78b92018503d3be26d6e6dea574e]
+cluster legacysam--><g id="cluster_legacysam"><path d="M8.5,173.7402 L355.5,173.7402 A3.75,3.75 0 0 1 358,176.2402 L365,198.3613 L811.5,198.3613 A2.5,2.5 0 0 1 814,200.8613 L814,515.2402 A2.5,2.5 0 0 1 811.5,517.7402 L8.5,517.7402 A2.5,2.5 0 0 1 6,515.2402 L6,176.2402 A2.5,2.5 0 0 1 8.5,173.7402 " fill="#F8F9F9" style="stroke:#000000;stroke-width:1.5;"/><line style="stroke:#000000;stroke-width:1.5;" x1="6" x2="365" y1="198.3613" y2="198.3613"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="346" x="10" y="190.8477">org.eclipse.keyple.card.calypso.crypto.legacysam</text></g><!--MD5=[d2e27c3a8427c36251d600b1d6458e5c]
+class LegacySamCardExtensionService--><g id="elem_LegacySamCardExtensionService"><rect codeLine="62" fill="#FEFECE" height="290.6953" id="LegacySamCardExtensionService" rx="2.5" ry="2.5" style="stroke:#D4AC0D;stroke-width:2.0;" width="776" x="22" y="210.7402"/><ellipse cx="276.75" cy="234.3613" fill="#ADD1B2" rx="11" ry="11" style="stroke:#181818;stroke-width:1.0;"/><path d="M279.5156,230.2363 Q279.6719,230.0176 279.8594,229.9082 Q280.0469,229.7988 280.2656,229.7988 Q280.6406,229.7988 280.875,230.0645 Q281.1094,230.3145 281.1094,230.9238 L281.1094,232.377 Q281.1094,232.9863 280.875,233.252 Q280.6406,233.5176 280.2656,233.5176 Q279.9219,233.5176 279.7188,233.3145 Q279.5156,233.127 279.4063,232.6113 Q279.3594,232.252 279.1719,232.0645 Q278.8438,231.6895 278.2344,231.4707 Q277.625,231.252 277,231.252 Q276.2344,231.252 275.5938,231.5801 Q274.9688,231.9082 274.4688,232.6582 Q273.9844,233.4082 273.9844,234.4395 L273.9844,235.5332 Q273.9844,236.7676 274.875,237.5957 Q275.7656,238.4082 277.3594,238.4082 Q278.2969,238.4082 278.9531,238.1582 Q279.3438,238.002 279.7656,237.5645 Q280.0313,237.2988 280.1719,237.2207 Q280.3281,237.1426 280.5313,237.1426 Q280.8594,237.1426 281.1094,237.4082 Q281.375,237.6582 281.375,238.002 Q281.375,238.3457 281.0313,238.752 Q280.5313,239.3301 279.7344,239.6582 Q278.6563,240.1113 277.3594,240.1113 Q275.8438,240.1113 274.6406,239.4863 Q273.6563,238.9863 272.9688,237.9238 Q272.2813,236.8457 272.2813,235.5645 L272.2813,234.4082 Q272.2813,233.0801 272.8906,231.9395 Q273.5156,230.7832 274.6094,230.1738 Q275.7031,229.5488 276.9375,229.5488 Q277.6719,229.5488 278.3125,229.7207 Q278.9688,229.877 279.5156,230.2363 Z " fill="#000000"/><ellipse cx="302.25" cy="233.8613" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="16" x="348.25" y="230.8477">&lt;&lt;</text><text fill="#000000" filter="url(#bpxzoyrj2w4ze1)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="135" x="364.25" y="230.8477">KeypleCardExtension</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="16" x="499.25" y="230.8477">&gt;&gt;</text><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="30" x="308.25" y="249.4688">final</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="213" x="342.25" y="249.4688">LegacySamCardExtensionService</text><line style="stroke:#D4AC0D;stroke-width:2.0;" x1="23" x2="797" y1="257.9824" y2="257.9824"/><line style="stroke:#D4AC0D;stroke-width:1.0;" x1="23" x2="797" y1="265.9824" y2="265.9824"/><ellipse cx="33" cy="280.793" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" text-decoration="underline" textLength="304" x="42" y="285.0898">LegacySamCardExtensionService getInstance ()</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="42" y="303.7109"> </text><ellipse cx="33" cy="318.0352" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze0)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="180" x="42" y="322.332">LegacySamSelectionFactory</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="214" x="226" y="322.332">getLegacySamSelectionFactory ()</text><ellipse cx="33" cy="336.6563" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze2)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="193" x="42" y="340.9531">CardResourceProfileExtension</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="285" x="239" y="340.9531">createLegacySamResourceProfileExtension (</text><text fill="#000000" filter="url(#bpxzoyrj2w4ze0)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="132" x="524" y="340.9531">LegacySamSelection</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="132" x="660" y="340.9531">legacySamSelection)</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="42" y="359.5742"> </text><ellipse cx="33" cy="373.8984" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze0)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="196" x="42" y="378.1953">LSTransactionManagerFactory</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="213" x="242" y="378.1953">getTransactionManagerFactory ()</text><ellipse cx="33" cy="392.5195" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" filter="url(#bpxzoyrj2w4ze0)" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="159" x="42" y="396.8164">LSCommandDataFactory</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="176" x="205" y="396.8164">getCommandDataFactory ()</text><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="4" x="42" y="415.4375"> </text><ellipse cx="33" cy="452.3828" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="199" x="42" y="456.6797">String getCommonApiVersion ()</text><ellipse cx="33" cy="471.0039" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="190" x="42" y="475.3008">String getReaderApiVersion ()</text><ellipse cx="33" cy="489.625" fill="#84BE84" rx="3" ry="3" style="stroke:#038048;stroke-width:1.0;"/><text fill="#000000" font-family="sans-serif" font-size="14" lengthAdjust="spacing" textLength="174" x="42" y="493.9219">String getCardApiVersion ()</text><line style="stroke:#D4AC0D;stroke-width:1.0;" x1="23" x2="334.5" y1="432.2617" y2="432.2617"/><text fill="#000000" font-family="sans-serif" font-size="14" font-weight="bold" lengthAdjust="spacing" textLength="151" x="334.5" y="437.5586">KeypleCardExtension</text><line style="stroke:#D4AC0D;stroke-width:1.0;" x1="485.5" x2="797" y1="432.2617" y2="432.2617"/></g><!--MD5=[188e7a6c908f0a89a5c3b813fde056a0]
+@startuml
+title
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.2.+ (2022-12-13)
+end title
+
+' == THEME ==
+
+'Couleurs issues de : https://htmlcolorcodes.com/fr/tableau-de-couleur/tableau-de-couleur-design-plat/
+!define C_GREY1 F8F9F9
+!define C_GREY2 F2F3F4
+!define C_GREY3 E5E7E9
+!define C_GREY4 D7DBDD
+!define C_GREY5 CACFD2
+!define C_GREY6 BDC3C7
+!define C_LINK 3498DB
+!define C_USE 27AE60
+
+' - - Styles that don't work with new version of plantuml - -
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+' - - END - -
+
+skinparam ClassBorderThickness 2
+skinparam ArrowThickness 2
+
+' Yellow
+skinparam ClassBackgroundColor #FEFECE
+skinparam ClassBorderColor #D4AC0D
+' Red
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+' Purple
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+' blue
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+' Green
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+' Grey
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+' == CONTENT ==
+
+legend top
+    __Colors legend__ :
+    * __External API references__ :
+    ** <back:lightgreen>**calypsonet-terminal-calypso-crypto-legacysam-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
+    ** <back:orange>**keyple-service-resource-java-lib**</back>
+end legend
+
+package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService {
+        - -
+        +{static} LegacySamCardExtensionService getInstance ()
+
+        +<back:lightgreen>LegacySamSelectionFactory</back> getLegacySamSelectionFactory ()
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelection</back> legacySamSelection)
+
+        +<back:lightgreen>LSTransactionManagerFactory</back> getTransactionManagerFactory ()
+        +<back:lightgreen>LSCommandDataFactory</back> getCommandDataFactory ()
+
+        - - **KeypleCardExtension** - -
+        +String getCommonApiVersion ()  
+        +String getReaderApiVersion ()
+        +String getCardApiVersion ()
+    }
+}
+
+' Associations
+
+' == LAYOUT ==
+
+' == STYLE ==
+
+package legacysam #C_GREY1 {}
+
+@enduml
+
+@startuml
+title
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.2.+ (2022-12-13)
+end title
+
+
+
+skinparam stereotypeABorderColor #A9DCDF
+skinparam stereotypeIBorderColor #B4A7E5
+skinparam stereotypeCBorderColor #ADD1B2
+skinparam stereotypeEBorderColor #EB93DF
+
+skinparam ClassBorderThickness 2
+skinparam ArrowThickness 2
+
+skinparam ClassBackgroundColor #FEFECE
+skinparam ClassBorderColor #D4AC0D
+skinparam ClassBackgroundColor<<red>> #FDEDEC
+skinparam ClassBorderColor<<red>> #E74C3C
+hide <<red>> stereotype
+skinparam ClassBackgroundColor<<purple>> #F4ECF7
+skinparam ClassBorderColor<<purple>> #8E44AD
+hide <<purple>> stereotype
+skinparam ClassBackgroundColor<<blue>> #EBF5FB
+skinparam ClassBorderColor<<blue>> #3498DB
+hide <<blue>> stereotype
+skinparam ClassBackgroundColor<<green>> #E9F7EF
+skinparam ClassBorderColor<<green>> #27AE60
+hide <<green>> stereotype
+skinparam ClassBackgroundColor<<grey>> #EAECEE
+skinparam ClassBorderColor<<grey>> #2C3E50
+hide <<grey>> stereotype
+
+
+legend top
+    __Colors legend__ :
+    * __External API references__ :
+    ** <back:lightgreen>**calypsonet-terminal-calypso-crypto-legacysam-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
+    ** <back:orange>**keyple-service-resource-java-lib**</back>
+end legend
+
+package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService {
+        - -
+        +{static} LegacySamCardExtensionService getInstance ()
+
+        +<back:lightgreen>LegacySamSelectionFactory</back> getLegacySamSelectionFactory ()
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelection</back> legacySamSelection)
+
+        +<back:lightgreen>LSTransactionManagerFactory</back> getTransactionManagerFactory ()
+        +<back:lightgreen>LSCommandDataFactory</back> getCommandDataFactory ()
+
+        - - **KeypleCardExtension** - -
+        +String getCommonApiVersion ()  
+        +String getReaderApiVersion ()
+        +String getCardApiVersion ()
+    }
+}
+
+
+
+
+package legacysam #F8F9F9 {}
+
+@enduml
+
+PlantUML version 1.2022.13(Sat Nov 19 14:22:17 CET 2022)
+(GPL source distribution)
+Java Runtime: OpenJDK Runtime Environment
+JVM: OpenJDK 64-Bit Server VM
+Default Encoding: Cp1252
+Language: fr
+Country: FR
+--></g></svg>
