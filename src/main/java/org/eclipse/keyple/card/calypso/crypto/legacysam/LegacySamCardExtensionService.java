@@ -79,7 +79,7 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    * Returns a {@link LegacySamSelectionFactory}.
    *
    * @return A not null reference.
-   * @since 0.1.0
+   * @since 0.2.0
    */
   public LegacySamSelectionFactory getLegacySamSelectionFactory() {
     return new LegacySamSelectionFactoryAdapter();
@@ -91,7 +91,7 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    * @param legacySamSelection The legacy SAM selection to use.
    * @return A not null reference.
    * @throws IllegalArgumentException If no SAM selection is provided.
-   * @since 0.1.0
+   * @since 0.2.0
    */
   public CardResourceProfileExtension createLegacySamResourceProfileExtension(
       LegacySamSelection legacySamSelection) {
@@ -103,7 +103,7 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    * Returns a {@link LSTransactionManagerFactory}.
    *
    * @return A not null reference.
-   * @since 0.1.0
+   * @since 0.2.0
    */
   public LSTransactionManagerFactory getTransactionManagerFactory() {
     return new LSTransactionManagerFactoryAdapter();
@@ -113,7 +113,7 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    * Returns a {@link LSCommandDataFactory}.
    *
    * @return A not null reference.
-   * @since 0.1.0
+   * @since 0.2.0
    */
   public LSCommandDataFactory getCommandDataFactory() {
     return new LSCommandDataFactoryAdapter();
