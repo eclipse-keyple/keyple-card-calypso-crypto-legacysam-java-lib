@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.1.+ (2022-12-12)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.2.+ (2022-12-13)
 end title
 
 ' == THEME ==
@@ -55,21 +55,25 @@ legend top
     __Colors legend__ :
     * __External API references__ :
     ** <back:lightgreen>**calypsonet-terminal-calypso-crypto-legacysam-java-api**</back>
+    ** <back:cyan>**keyple-common-java-api**</back>
     ** <back:orange>**keyple-service-resource-java-lib**</back>
 end legend
 
 package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
-    +class "**final** LegacySamSelectionFactoryProvider" as LegacySamSelectionFactoryProvider {
-        +{static} <back:lightgreen>LegacySamSelectionFactory</back> getFactory ()
-    }
-    +class "**final** LSTransactionManagerFactoryProvider" as LSTransactionManagerFactoryProvider {
-        +{static} <back:lightgreen>LSTransactionManagerFactory</back> getFactory ()
-    }
-    +class "**final** LSCommandDataFactoryProvider" as LSCommandDataFactoryProvider {
-        +{static} <back:lightgreen>LSCommandDataFactory</back> getFactory ()
-    }
-    +class "**final** LegacySamResourceProfileExtensionProvider" as LegacySamResourceProfileExtensionProvider {
-        +{static} <back:orange>CardResourceProfileExtension</back> getSamProfileExtension (<back:lightgreen>LegacySamSelection</back> samSelection)
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService {
+        --
+        +{static} LegacySamCardExtensionService getInstance ()
+
+        +<back:lightgreen>LegacySamSelectionFactory</back> getLegacySamSelectionFactory ()
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelection</back> legacySamSelection)
+
+        +<back:lightgreen>LSTransactionManagerFactory</back> getTransactionManagerFactory ()
+        +<back:lightgreen>LSCommandDataFactory</back> getCommandDataFactory ()
+
+        -- **KeypleCardExtension** --
+        +String getCommonApiVersion ()
+        +String getReaderApiVersion ()
+        +String getCardApiVersion ()
     }
 }
 

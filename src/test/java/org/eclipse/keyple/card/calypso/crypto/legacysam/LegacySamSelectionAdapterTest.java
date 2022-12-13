@@ -37,7 +37,9 @@ public class LegacySamSelectionAdapterTest {
   public void setUp() {
     samSelection =
         (LegacySamSelectionAdapter)
-            LegacySamSelectionFactoryProvider.getFactory().createSamSelection();
+            LegacySamCardExtensionService.getInstance()
+                .getLegacySamSelectionFactory()
+                .createSamSelection();
   }
 
   @Test(expected = IllegalArgumentException.class)

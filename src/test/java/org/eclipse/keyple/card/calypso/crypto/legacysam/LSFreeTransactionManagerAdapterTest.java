@@ -113,7 +113,8 @@ public class LSFreeTransactionManagerAdapterTest {
     LegacySam controlSam = new LegacySamAdapter(samCardSelectionResponse);
 
     samTransactionManager =
-        LSTransactionManagerFactoryProvider.getFactory()
+        LegacySamCardExtensionService.getInstance()
+            .getTransactionManagerFactory()
             .createFreeTransactionManager(samReader, sam);
   }
 
