@@ -12,10 +12,10 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.calypsonet.terminal.reader.CardReader;
+import org.eclipse.keyple.core.util.Assert;
 
 /**
  * Adapter of {@link LSTransactionManagerFactory}.
@@ -41,5 +41,30 @@ class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory 
           "The provided 'sam' must be an instance of 'LegacySamAdapter'");
     }
     return new LSFreeTransactionManagerAdapter((ProxyReaderApi) samReader, (LegacySamAdapter) sam);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public LSAsyncTransactionCreatorManager createAsyncTransactionCreatorManager(
+      String targetSamContext, LSSecuritySetting lsSecuritySetting) {
+    Assert.getInstance()
+        .notNull(targetSamContext, "targetSamContext")
+        .notNull(lsSecuritySetting, "lsSecuritySetting");
+    return new LSAsyncTransactionCreatorManagerAdapter(targetSamContext, lsSecuritySetting);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public LSAsyncTransactionExecutorManager createAsyncTransactionExecutorManager(
+      CardReader cardReader, LegacySam legacySam, String s) {
+    return null;
   }
 }

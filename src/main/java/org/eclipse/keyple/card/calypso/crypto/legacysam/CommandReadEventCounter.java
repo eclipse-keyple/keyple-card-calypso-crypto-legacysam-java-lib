@@ -62,7 +62,10 @@ final class CommandReadEventCounter extends Command {
   CommandReadEventCounter(
       LegacySamAdapter legacySam, CounterOperationType counterOperationType, int target) {
 
-    super(CommandRef.READ_EVENT_COUNTER, 48, legacySam);
+    super(
+        CommandRef.READ_EVENT_COUNTER,
+        counterOperationType == CounterOperationType.READ_SINGLE_COUNTER ? 24 : 48,
+        legacySam);
 
     byte cla = legacySam.getClassByte();
     byte p2;
@@ -101,7 +104,8 @@ final class CommandReadEventCounter extends Command {
     super.parseApduResponse(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (counterOperationType == CounterOperationType.READ_SINGLE_COUNTER) {
-      getLegacySam().putEventCounter(dataOut[8], ByteArrayUtil.extractInt(dataOut, 9, 3, false));
+      getLegacySam()
+          .putEventCounter(firstEventCounterNumber, ByteArrayUtil.extractInt(dataOut, 8, 3, false));
     } else {
       for (int i = 0; i < 9; i++) {
         getLegacySam()

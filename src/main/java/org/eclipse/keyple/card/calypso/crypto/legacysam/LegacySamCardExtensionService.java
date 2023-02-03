@@ -14,6 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelection;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelectionFactory;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySettingFactory;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
 import org.calypsonet.terminal.card.CardApiProperties;
 import org.calypsonet.terminal.reader.ReaderApiProperties;
@@ -117,5 +118,15 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    */
   public LSCommandDataFactory getCommandDataFactory() {
     return new LSCommandDataFactoryAdapter();
+  }
+
+  /**
+   * Returns a {@link LSSecuritySettingFactory}.
+   *
+   * @return A not null reference.
+   * @since 0.3.0
+   */
+  public LSSecuritySettingFactory getSecuritySettingFactory() {
+    return new LSSecuritySettingFactoryAdapter();
   }
 }

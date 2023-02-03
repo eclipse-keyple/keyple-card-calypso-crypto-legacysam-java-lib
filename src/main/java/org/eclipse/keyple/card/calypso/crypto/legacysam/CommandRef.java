@@ -39,6 +39,7 @@ enum CommandRef {
   DATA_CIPHER("Data Cipher", (byte) 0x1C),
   PSO_COMPUTE_SIGNATURE("PSO Compute Signature", (byte) 0x2A),
   PSO_VERIFY_SIGNATURE("PSO Verify Signature", (byte) 0x2A),
+  SAM_DATA_CIPHER("SAM Data Cipher", (byte) 0x16),
   ;
 
   /** The name. */

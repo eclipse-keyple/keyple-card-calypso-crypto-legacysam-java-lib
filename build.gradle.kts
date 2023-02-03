@@ -10,7 +10,7 @@ plugins {
 buildscript {
     repositories {
         mavenLocal()
-        maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
+//        maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
         mavenCentral()
     }
     dependencies {
@@ -19,12 +19,16 @@ buildscript {
 }
 apply(plugin = "org.eclipse.keyple")
 
+tasks.withType(JavaCompile::class) {
+    options.compilerArgs = listOf("-Xlint:unchecked", "-Xlint:deprecation")
+}
+
 ///////////////////////////////////////////////////////////////////////////////
 //  APP CONFIGURATION
 ///////////////////////////////////////////////////////////////////////////////
 repositories {
     mavenLocal()
-    maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
+//    maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
@@ -32,7 +36,7 @@ repositories {
 dependencies {
     implementation("org.calypsonet.terminal:calypsonet-terminal-reader-java-api:1.1.0")
     implementation("org.calypsonet.terminal:calypsonet-terminal-card-java-api:1.0.0")
-    implementation("org.calypsonet.terminal:calypsonet-terminal-calypso-crypto-legacysam-java-api:0.1.0")
+    implementation("org.calypsonet.terminal:calypsonet-terminal-calypso-crypto-legacysam-java-api:0.2.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.0")
     implementation("org.eclipse.keyple:keyple-service-resource-java-lib:2.0.2")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.3.0")

@@ -13,18 +13,9 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InconsistentDataException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.ReaderIOException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamIOException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamRevokedException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
+import java.util.*;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.calypsonet.terminal.card.CardBrokenCommunicationException;
 import org.calypsonet.terminal.card.CardResponseApi;
@@ -37,6 +28,7 @@ import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +73,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
   private final ProxyReaderApi samReader;
   private final LegacySamAdapter sam;
   private final byte[] samKeyDiversifier;
-  private final List<Command> commands = new ArrayList<Command>();
+  private final List<Command> userCommands = new ArrayList<Command>();
 
   /* Dynamic fields */
   private byte[] currentKeyDiversifier;
@@ -119,7 +111,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      commands.add(new CommandDataCipher(sam, dataAdapter, null));
+      userCommands.add(new CommandDataCipher(sam, dataAdapter, null));
 
     } else if (data instanceof TraceableSignatureComputationDataAdapter) {
       // Traceable signature
@@ -152,7 +144,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      commands.add(new CommandPsoComputeSignature(sam, dataAdapter));
+      userCommands.add(new CommandPsoComputeSignature(sam, dataAdapter));
 
     } else {
       throw new IllegalArgumentException(
@@ -188,7 +180,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      commands.add(new CommandDataCipher(sam, null, dataAdapter));
+      userCommands.add(new CommandDataCipher(sam, null, dataAdapter));
 
     } else if (data instanceof TraceableSignatureVerificationDataAdapter) {
       // Traceable signature
@@ -251,12 +243,24 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
       }
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      commands.add(new CommandPsoVerifySignature(sam, dataAdapter));
+      userCommands.add(new CommandPsoVerifySignature(sam, dataAdapter));
 
     } else {
       throw new IllegalArgumentException(
           "The provided data must be an instance of 'CommonSignatureVerificationDataAdapter'");
     }
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public LSFreeTransactionManager prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
+    Assert.getInstance().notNull(systemKeyType, "systemKeyType");
+    userCommands.add(new CommandReadKeyParameters(sam, systemKeyType));
     return this;
   }
 
@@ -275,7 +279,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
             MAX_EVENT_COUNTER_NUMBER,
             "eventCounterNumber");
 
-    commands.add(
+    userCommands.add(
         new CommandReadEventCounter(
             sam,
             CommandReadEventCounter.CounterOperationType.READ_SINGLE_COUNTER,
@@ -310,19 +314,19 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
 
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC1, LAST_COUNTER_REC1, fromEventCounterNumber, toEventCounterNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadEventCounter(
               sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 1));
     }
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC2, LAST_COUNTER_REC2, fromEventCounterNumber, toEventCounterNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadEventCounter(
               sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 2));
     }
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC3, LAST_COUNTER_REC3, fromEventCounterNumber, toEventCounterNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadEventCounter(
               sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 3));
     }
@@ -344,7 +348,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
             MAX_EVENT_CEILING_NUMBER,
             "eventCeilingNumber");
 
-    commands.add(
+    userCommands.add(
         new CommandReadCeilings(
             sam,
             CommandReadCeilings.CeilingsOperationType.READ_SINGLE_CEILING,
@@ -379,19 +383,19 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
 
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC1, LAST_COUNTER_REC1, fromEventCeilingNumber, toEventCeilingNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadCeilings(
               sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 1));
     }
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC2, LAST_COUNTER_REC2, fromEventCeilingNumber, toEventCeilingNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadCeilings(
               sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 2));
     }
     if (areIntervalsOverlapping(
         FIRST_COUNTER_REC3, LAST_COUNTER_REC3, fromEventCeilingNumber, toEventCeilingNumber)) {
-      commands.add(
+      userCommands.add(
           new CommandReadCeilings(
               sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 3));
     }
@@ -401,10 +405,98 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
   /**
    * {@inheritDoc}
    *
+   * @since 0.3.0
+   */
+  @Override
+  public String exportTargetSamContextForAsyncTransaction() {
+
+    final List<Command> commands = new ArrayList<Command>();
+
+    // read system key parameters if not available
+    if (sam.getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
+      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.PERSONALIZATION));
+    }
+    if (sam.getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
+      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.KEY_MANAGEMENT));
+    }
+    if (sam.getSystemKeyParameter(SystemKeyType.RELOADING) == null) {
+      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.RELOADING));
+    }
+    processCommands(commands);
+
+    // read PAR4
+    int counterPersonalization =
+        sam.getSystemKeyParameter(SystemKeyType.PERSONALIZATION).getParameterValue(4) & 0xFF;
+    int counterKeyManagement =
+        sam.getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT).getParameterValue(4) & 0xFF;
+    int counterReloading =
+        sam.getSystemKeyParameter(SystemKeyType.RELOADING).getParameterValue(4) & 0xFF;
+
+    TargetSamContextDto targetSamContextDto = new TargetSamContextDto(sam.getSerialNumber());
+    if (counterPersonalization != 0) {
+      targetSamContextDto
+          .getSystemKeyTypeToCounterNumberMap()
+          .put(SystemKeyType.PERSONALIZATION, counterPersonalization);
+    }
+    if (counterKeyManagement != 0) {
+      targetSamContextDto
+          .getSystemKeyTypeToCounterNumberMap()
+          .put(SystemKeyType.KEY_MANAGEMENT, counterKeyManagement);
+    }
+    if (counterReloading != 0) {
+      targetSamContextDto
+          .getSystemKeyTypeToCounterNumberMap()
+          .put(SystemKeyType.RELOADING, counterReloading);
+    }
+
+    // compute needed counters
+    Set<Integer> counterNumbers = new HashSet<Integer>(3);
+    if (counterPersonalization != 0) {
+      counterNumbers.add(counterPersonalization);
+    }
+    if (counterKeyManagement != 0) {
+      counterNumbers.add(counterKeyManagement);
+    }
+    if (counterReloading != 0) {
+      counterNumbers.add(counterReloading);
+    }
+
+    // read counters
+    for (Integer counterNumber : counterNumbers) {
+      commands.add(
+          new CommandReadEventCounter(
+              sam,
+              CommandReadEventCounter.CounterOperationType.READ_SINGLE_COUNTER,
+              counterNumber));
+    }
+    processCommands(commands);
+
+    for (int counterNumber : counterNumbers) {
+      targetSamContextDto
+          .getCounterNumberToCounterValueMap()
+          .put(counterNumber, sam.getEventCounter(counterNumber));
+    }
+
+    // export as json
+    return JsonUtil.toJson(targetSamContextDto);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.1.0
    */
   @Override
   public LSFreeTransactionManager processCommands() {
+    return processCommands(userCommands);
+  }
+
+  /**
+   * Processes the list of commands provided in argument as expected by {@link #processCommands()}.
+   *
+   * <p>Note: the list is cleared in all cases.
+   */
+  private LSFreeTransactionManager processCommands(List<Command> commands) {
     if (commands.isEmpty()) {
       return this;
     }
@@ -550,7 +642,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
 
   /** Prepares a "SelectDiversifier" command using the current key diversifier. */
   private void prepareSelectDiversifier() {
-    commands.add(new CommandSelectDiversifier(sam, currentKeyDiversifier));
+    userCommands.add(new CommandSelectDiversifier(sam, currentKeyDiversifier));
   }
 
   /**

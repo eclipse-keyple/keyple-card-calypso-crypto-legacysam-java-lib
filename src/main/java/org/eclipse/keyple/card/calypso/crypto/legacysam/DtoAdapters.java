@@ -11,10 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
 import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
@@ -798,6 +796,52 @@ final class DtoAdapters {
     @Override
     public String toString() {
       return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+    }
+  }
+
+  /**
+   * This POJO contains the target SAM context data used when doing asynchronous transactions.
+   *
+   * @since 0.3.0
+   */
+  static final class TargetSamContextDto {
+
+    private final byte[] serialNumber;
+    private Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
+        new HashMap<SystemKeyType, Integer>(3);
+    private Map<Integer, Integer> counterNumberToCounterValueMap = new HashMap<Integer, Integer>(3);
+
+    TargetSamContextDto(byte[] serialNumber) {
+      this.serialNumber = serialNumber;
+    }
+
+    public byte[] getSerialNumber() {
+      return serialNumber;
+    }
+
+    Map<SystemKeyType, Integer> getSystemKeyTypeToCounterNumberMap() {
+      return systemKeyTypeToCounterNumberMap;
+    }
+
+    Map<Integer, Integer> getCounterNumberToCounterValueMap() {
+      return counterNumberToCounterValueMap;
+    }
+  }
+
+  /**
+   * This POJO contains the commands to be executed by a target SAM in an asynchronous transaction.
+   *
+   * @since 0.3.0
+   */
+  static final class SamCommandsDto {
+    private List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
+
+    void add(ApduRequestSpi apduRequest) {
+      apduRequests.add(apduRequest);
+    }
+
+    public List<ApduRequestSpi> getApduRequests() {
+      return apduRequests;
     }
   }
 }

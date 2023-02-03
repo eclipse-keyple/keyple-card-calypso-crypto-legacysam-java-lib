@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2023 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -15,36 +15,16 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
- * Builds the Read Key Parameters APDU command.
+ * Builds the "Read Key Parameters" SAM command.
  *
- * @since 0.1.0
+ * @since 0.3.0
  */
 final class CommandReadKeyParameters extends Command {
-
-  /** The command reference. */
-  private static final CommandRef commandRef = CommandRef.READ_KEY_PARAMETERS;
-
-  private static final int MAX_WORK_KEY_REC_NUMB = 126;
-
-  /** Source reference */
-  enum SourceRef {
-    /** Work key */
-    WORK_KEY,
-    /** System key */
-    SYSTEM_KEY
-  }
-
-  /** Navigation control */
-  enum NavControl {
-    /** First */
-    FIRST,
-    /** Next */
-    NEXT
-  }
-
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
@@ -63,173 +43,110 @@ final class CommandReadKeyParameters extends Command {
     STATUS_TABLE = m;
   }
 
+  private SystemKeyType systemKeyType;
+
   /**
-   * Instantiates a new CmdSamReadKeyParameters for the null key.
+   * Builds a new instance to read the parameters of a system key.
    *
    * @param legacySam The Calypso legacy SAM.
-   * @since 0.1.0
+   * @param systemKeyType The type of the system key.
+   * @since 0.3.0
    */
-  CommandReadKeyParameters(LegacySamAdapter legacySam) {
+  CommandReadKeyParameters(LegacySamAdapter legacySam, SystemKeyType systemKeyType) {
 
-    super(commandRef, 0, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
 
-    byte cla = legacySam.getClassByte();
+    final byte cla = legacySam.getClassByte();
+    final byte inst = getCommandRef().getInstructionByte();
+    final byte p1 = 0;
+    final byte p2;
+    this.systemKeyType = systemKeyType;
+    switch (this.systemKeyType) {
+      case PERSONALIZATION:
+        p2 = (byte) 0xC1;
+        break;
+      case KEY_MANAGEMENT:
+        p2 = (byte) 0xC2;
+        break;
+      case RELOADING:
+        p2 = (byte) 0xC3;
+        break;
+      case AUTHENTICATION:
+        p2 = (byte) 0xC4;
+        break;
+      default:
+        throw new IllegalStateException("Unexpected value: " + systemKeyType);
+    }
+    final byte[] dataIn = new byte[] {0x00, 0x00};
 
-    byte p2 = (byte) 0xE0;
-    byte[] sourceKeyId = new byte[] {0x00, 0x00};
-
-    setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, commandRef.getInstructionByte(), (byte) 0x00, p2, sourceKeyId, (byte) 0x00)));
+    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
 
   /**
-   * Instantiates a new CmdSamReadKeyParameters for the provided kif.
+   * Builds a new instance to read the parameters of a key identified by its KIF and KVC.
    *
    * @param legacySam The Calypso legacy SAM.
-   * @param kif the kif
-   * @since 0.1.0
-   */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, byte kif) {
-
-    super(commandRef, 0, legacySam);
-
-    byte cla = legacySam.getClassByte();
-
-    byte p2 = (byte) 0xC0;
-    byte[] sourceKeyId = new byte[] {0x00, 0x00};
-
-    sourceKeyId[0] = kif;
-
-    setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, commandRef.getInstructionByte(), (byte) 0x00, p2, sourceKeyId, (byte) 0x00)));
-  }
-
-  /**
-   * Instantiates a new CmdSamReadKeyParameters for the provided kif and kvc.
-   *
-   * @param legacySam The Calypso legacy SAM.
-   * @param kif the kif
-   * @param kvc the kvc
-   * @since 0.1.0
+   * @param kif The KIF of the key.
+   * @param kvc The KIF of the key.
+   * @since 0.3.0
    */
   CommandReadKeyParameters(LegacySamAdapter legacySam, byte kif, byte kvc) {
 
-    super(commandRef, 0, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
 
-    byte cla = legacySam.getClassByte();
+    final byte cla = legacySam.getClassByte();
+    final byte inst = getCommandRef().getInstructionByte();
+    final byte p1 = 0;
+    final byte p2 = (byte) 0xF0;
+    final byte[] dataIn = new byte[] {kif, kvc};
 
-    byte p2 = (byte) 0xF0;
-    byte[] sourceKeyId = new byte[] {0x00, 0x00};
-
-    sourceKeyId[0] = kif;
-    sourceKeyId[1] = kvc;
-
-    setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, commandRef.getInstructionByte(), (byte) 0x00, p2, sourceKeyId, (byte) 0x00)));
+    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
 
   /**
-   * Instantiates a new CmdSamReadKeyParameters for the provided key reference and record number.
+   * Builds a new instance to read the parameters of a key identified by its record number.
    *
    * @param legacySam The Calypso legacy SAM.
-   * @param sourceKeyRef the source key reference
    * @param recordNumber the record number
-   * @since 0.1.0
+   * @since 0.3.0
    */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, SourceRef sourceKeyRef, int recordNumber) {
+  CommandReadKeyParameters(LegacySamAdapter legacySam, int recordNumber) {
 
-    super(commandRef, 0, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
 
-    if (recordNumber < 1 || recordNumber > MAX_WORK_KEY_REC_NUMB) {
-      throw new IllegalArgumentException(
-          "Record Number must be between 1 and " + MAX_WORK_KEY_REC_NUMB + ".");
-    }
+    final byte cla = legacySam.getClassByte();
+    final byte inst = getCommandRef().getInstructionByte();
+    final byte p1 = 0;
+    final byte p2 = (byte) recordNumber;
+    final byte[] dataIn = new byte[] {0x00, 0x00};
 
-    byte cla = legacySam.getClassByte();
-
-    byte p2;
-    byte[] sourceKeyId = new byte[] {0x00, 0x00};
-
-    switch (sourceKeyRef) {
-      case WORK_KEY:
-        p2 = (byte) recordNumber;
-        break;
-
-      case SYSTEM_KEY:
-        p2 = (byte) (0xC0 + (byte) recordNumber);
-        break;
-
-      default:
-        throw new IllegalStateException("Unsupported SourceRef parameter " + sourceKeyRef);
-    }
-
-    setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, commandRef.getInstructionByte(), (byte) 0x00, p2, sourceKeyId, (byte) 0x00)));
-  }
-
-  /**
-   * Instantiates a new CmdSamReadKeyParameters for the provided kif and navigation control flag.
-   *
-   * @param legacySam The Calypso legacy SAM.
-   * @param kif the kif
-   * @param navControl the navigation control flag
-   * @since 0.1.0
-   */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, byte kif, NavControl navControl) {
-
-    super(commandRef, 0, legacySam);
-
-    byte cla = legacySam.getClassByte();
-
-    byte p2;
-    byte[] sourceKeyId = new byte[] {0x00, 0x00};
-
-    switch (navControl) {
-      case FIRST:
-        p2 = (byte) 0xF8;
-        break;
-
-      case NEXT:
-        p2 = (byte) 0xFA;
-        break;
-
-      default:
-        throw new IllegalStateException("Unsupported NavControl parameter " + navControl);
-    }
-
-    sourceKeyId[0] = kif;
-
-    setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, commandRef.getInstructionByte(), (byte) 0x00, p2, sourceKeyId, (byte) 0x00)));
-  }
-
-  /**
-   * Gets the key parameters.
-   *
-   * @return The key parameters
-   * @since 0.1.0
-   */
-  byte[] getKeyParameters() {
-    return isSuccessful() ? getApduResponse().getDataOut() : null;
+    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.3.0
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {
     return STATUS_TABLE;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
+    super.parseApduResponse(apduResponse);
+    if (this.systemKeyType != null) {
+      byte[] keyParameter = new byte[13];
+      System.arraycopy(apduResponse.getApdu(), 8, keyParameter, 0, 13);
+      getLegacySam().setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
+    } else {
+      // TODO: work keys
+    }
   }
 }

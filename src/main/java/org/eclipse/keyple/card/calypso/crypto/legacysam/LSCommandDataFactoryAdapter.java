@@ -13,11 +13,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 
 /**
  * Adapter of {@link LSCommandDataFactory}.

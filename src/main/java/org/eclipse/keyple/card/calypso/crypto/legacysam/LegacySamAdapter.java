@@ -11,10 +11,14 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
+import org.calypsonet.terminal.calypso.crypto.legacysam.sam.KeyParameter;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
 import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.calypsonet.terminal.card.spi.SmartCardSpi;
@@ -44,6 +48,8 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private final byte classByte;
   private final SortedMap<Integer, Integer> eventCounters = new TreeMap<Integer, Integer>();
   private final SortedMap<Integer, Integer> eventCeilings = new TreeMap<Integer, Integer>();
+  private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParamterMap =
+      new HashMap<SystemKeyType, KeyParameterAdapter>();
 
   /**
    * Constructor.
@@ -325,6 +331,27 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   @Override
   public SortedMap<Integer, Integer> getEventCeilings() {
     return eventCeilings;
+  }
+
+  /**
+   * Set the {@link KeyParameter} for specified {@link SystemKeyType}.
+   *
+   * @param systemKeyType The system key type.
+   * @param keyParameter The {@link KeyParameterAdapter}.
+   * @since 0.3.0
+   */
+  void setSystemKeyParameter(SystemKeyType systemKeyType, KeyParameterAdapter keyParameter) {
+    systemKeyParamterMap.put(systemKeyType, keyParameter);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public KeyParameter getSystemKeyParameter(SystemKeyType systemKeyType) {
+    return systemKeyParamterMap.get(systemKeyType);
   }
 
   /**

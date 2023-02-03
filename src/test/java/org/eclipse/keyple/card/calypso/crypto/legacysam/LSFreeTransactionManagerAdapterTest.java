@@ -16,15 +16,10 @@ import static org.assertj.core.api.Assertions.shouldHaveThrown;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
-import static org.mockito.Mockito.inOrder;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
-import java.util.List;
+import java.util.*;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
 import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
@@ -35,15 +30,12 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamRevokedEx
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.ChannelControl;
-import org.calypsonet.terminal.card.ProxyReaderApi;
+import org.calypsonet.terminal.card.*;
 import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -92,9 +84,89 @@ public class LSFreeTransactionManagerAdapterTest {
       "802A00A818FF0102480001" + PSO_MESSAGE_SAM_TRACEABILITY + PSO_MESSAGE_SIGNATURE;
   private static final String C_PSO_VERIFY_SIGNATURE_SAM_TRACEABILITY_FULL =
       "802A00A818FF0102680001" + PSO_MESSAGE_SAM_TRACEABILITY + PSO_MESSAGE_SIGNATURE;
+  private static final String READ_MESSAGE_SIGNATURE = "C1C2C3C4C5C6C7C8";
+  private static final String C_READ_EVENT_COUNTER_1 = "80BE008200";
+  private static final String R_READ_EVENT_COUNTER_1 =
+      READ_MESSAGE_SIGNATURE + "00017981AEC11A5CFAFF4080000000009000";
+  private static final String C_READ_EVENT_COUNTER_2 = "80BE008300";
+  private static final String R_READ_EVENT_COUNTER_2 =
+      READ_MESSAGE_SIGNATURE + "00017A81AEC11A5CFAFF4080000000009000";
+  private static final String C_READ_EVENT_COUNTER_3 = "80BE008400";
+  private static final String R_READ_EVENT_COUNTER_3 =
+      READ_MESSAGE_SIGNATURE + "00017B81AEC11A5CFAFF4080000000009000";
+  private static final String C_READ_EVENT_COUNTER_4 = "80BE008500";
+  private static final String R_READ_EVENT_COUNTER_4 =
+      READ_MESSAGE_SIGNATURE + "00017C81AEC11A5CFAFF4080000000009000";
+  private static final String C_READ_EVENT_COUNTER_0_8 = "80BE00E100";
+  private static final String R_READ_EVENT_COUNTER_0_8 =
+      READ_MESSAGE_SIGNATURE
+          + "1000001111111222221333331444441555551666661777771888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_COUNTER_9_17 = "80BE00E200";
+  private static final String R_READ_EVENT_COUNTER_9_17 =
+      READ_MESSAGE_SIGNATURE
+          + "2000002111111222222333332444442555552666662777772888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_COUNTER_18_26 = "80BE00E300";
+  private static final String R_READ_EVENT_COUNTER_18_26 =
+      READ_MESSAGE_SIGNATURE
+          + "3000003111113222222333333444443555553666663777773888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_CEILING_1 = "80BE01B800";
+  private static final String R_READ_EVENT_CEILING_1 =
+      READ_MESSAGE_SIGNATURE
+          + "0112345600000000000000000000000000000000000000000000000000B8AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_CEILING_2 = "80BE02B800";
+  private static final String R_READ_EVENT_CEILING_2 =
+      READ_MESSAGE_SIGNATURE
+          + "0223456700000000000000000000000000000000000000000000000000B8AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_CEILING_0_8 = "80BE00B100";
+  private static final String R_READ_EVENT_CEILING_0_8 =
+      READ_MESSAGE_SIGNATURE
+          + "1000001111111222221333331444441555551666661777771888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_CEILING_9_17 = "80BE00B200";
+  private static final String R_READ_EVENT_CEILING_9_17 =
+      READ_MESSAGE_SIGNATURE
+          + "2000002111111222222333332444442555552666662777772888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_EVENT_CEILING_18_26 = "80BE00B300";
+  private static final String R_READ_EVENT_CEILING_18_26 =
+      READ_MESSAGE_SIGNATURE
+          + "3000003111113222222333333444443555553666663777773888880000E1AEC11A5CFAFF408000009000";
+  private static final String C_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION = "80BC00C1020000";
+  private static final String C_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT = "80BC00C2020000";
+  private static final String C_READ_SYSTEM_KEY_PARAMETER_RELOADING = "80BC00C3020000";
+  private static final String C_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION = "80BC00C4020000";
+  private static final String R_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION =
+      READ_MESSAGE_SIGNATURE
+          + "E1FF401112130115161718191AC1"
+          + SAM_SERIAL_NUMBER
+          + "FAFF408000009000";
+  private static final String R_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT =
+      READ_MESSAGE_SIGNATURE
+          + "FDFF402122230225262728292AC2"
+          + SAM_SERIAL_NUMBER
+          + "FAFF408000009000";
+  private static final String R_READ_SYSTEM_KEY_PARAMETER_RELOADING =
+      READ_MESSAGE_SIGNATURE
+          + "E7FF403132330335363738393AC3"
+          + SAM_SERIAL_NUMBER
+          + "FAFF408000009000";
+  private static final String R_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION =
+      READ_MESSAGE_SIGNATURE
+          + "FAFF404142430445464748494AC4"
+          + SAM_SERIAL_NUMBER
+          + "FAFF408000009000";
+  private final Map<SystemKeyType, Byte> systemKeyTypeToKifMap =
+      new HashMap<SystemKeyType, Byte>() {
+        {
+          put(SystemKeyType.PERSONALIZATION, (byte) 0xE1);
+          put(SystemKeyType.KEY_MANAGEMENT, (byte) 0xFD);
+          put(SystemKeyType.RELOADING, (byte) 0xE7);
+          put(SystemKeyType.AUTHENTICATION, (byte) 0xFA);
+        }
+      };
+  private final SystemKeyType[] systemKeyTypes = SystemKeyType.values();
 
   private LSFreeTransactionManager samTransactionManager;
   private ReaderMock samReader;
+  private LegacySam sam;
 
   interface ReaderMock extends CardReader, ProxyReaderApi {}
 
@@ -105,7 +177,7 @@ public class LSFreeTransactionManagerAdapterTest {
 
     CardSelectionResponseApi samCardSelectionResponse = mock(CardSelectionResponseApi.class);
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
-    LegacySam sam = new LegacySamAdapter(samCardSelectionResponse);
+    sam = new LegacySamAdapter(samCardSelectionResponse);
 
     ReaderMock controlSamReader = mock(ReaderMock.class);
 
@@ -1727,6 +1799,364 @@ public class LSFreeTransactionManagerAdapterTest {
     } catch (InvalidSignatureException e) {
     }
     assertThat(data.isSignatureValid()).isFalse();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCounter_whenCounterIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCounter(27);
+  }
+
+  @Test
+  public void prepareReadEventCounter_whenCounterIsInRange_shouldBeSuccessful() throws Exception {
+
+    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_COUNTER_1, C_READ_EVENT_COUNTER_4);
+    CardResponseApi cardResponse =
+        createCardResponse(R_READ_EVENT_COUNTER_1, R_READ_EVENT_COUNTER_4);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCounter(1);
+    samTransactionManager.prepareReadEventCounter(4);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCounter(1)).isEqualTo(377);
+    assertThat(sam.getEventCounter(4)).isEqualTo(380);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCounters_whenFromCounterIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCounters(-1, 2);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCounters_whenToCounterIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCounters(20, 27);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCounters_whenToCounterIsLowerThanTo_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCounters(10, 9);
+  }
+
+  @Test
+  public void prepareReadEventCounters_whenCountersAreInTheSameRecord_shouldProduceASingleApdu()
+      throws Exception {
+
+    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_COUNTER_0_8);
+    CardResponseApi cardResponse = createCardResponse(R_READ_EVENT_COUNTER_0_8);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCounters(1, 2);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCounter(1)).isEqualTo(0x111111);
+    assertThat(sam.getEventCounter(2)).isEqualTo(0x122222);
+  }
+
+  @Test
+  public void prepareReadEventCounters_whenCountersAreInTwoDifferentRecords_shouldProduceTwoApdus()
+      throws Exception {
+
+    CardRequestSpi cardRequest =
+        createCardRequest(C_READ_EVENT_COUNTER_0_8, C_READ_EVENT_COUNTER_9_17);
+    CardResponseApi cardResponse =
+        createCardResponse(R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_COUNTER_9_17);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCounters(8, 9);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCounter(8)).isEqualTo(0x188888);
+    assertThat(sam.getEventCounter(9)).isEqualTo(0x200000);
+  }
+
+  @Test
+  public void
+      prepareReadEventCounters_whenCountersAreInThreeDifferentRecords_shouldProduceThreeApdus()
+          throws Exception {
+
+    CardRequestSpi cardRequest =
+        createCardRequest(
+            C_READ_EVENT_COUNTER_0_8, C_READ_EVENT_COUNTER_9_17, C_READ_EVENT_COUNTER_18_26);
+    CardResponseApi cardResponse =
+        createCardResponse(
+            R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_COUNTER_9_17, R_READ_EVENT_COUNTER_18_26);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCounters(7, 19);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCounter(7)).isEqualTo(0x177777);
+    assertThat(sam.getEventCounter(9)).isEqualTo(0x200000);
+    assertThat(sam.getEventCounter(19)).isEqualTo(0x311111);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCeiling_whenCounterIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCeiling(27);
+  }
+
+  @Test
+  public void prepareReadEventCeiling_whenCounterIsInRange_shouldBeSuccessful() throws Exception {
+
+    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_CEILING_1, C_READ_EVENT_CEILING_2);
+    CardResponseApi cardResponse =
+        createCardResponse(R_READ_EVENT_CEILING_1, R_READ_EVENT_CEILING_2);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCeiling(1);
+    samTransactionManager.prepareReadEventCeiling(2);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCeiling(1)).isEqualTo(0x123456);
+    assertThat(sam.getEventCeiling(2)).isEqualTo(0x234567);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCeilings_whenFromCeilingIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCeilings(-1, 2);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCeilings_whenToCeilingIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCeilings(20, 27);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadEventCeilings_whenToCeilingIsLowerThanTo_shouldThrowIAE() {
+    samTransactionManager.prepareReadEventCeilings(10, 9);
+  }
+
+  @Test
+  public void prepareReadEventCeilings_whenCeilingsAreInTheSameRecord_shouldProduceASingleApdu()
+      throws Exception {
+
+    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_CEILING_0_8);
+    CardResponseApi cardResponse = createCardResponse(R_READ_EVENT_CEILING_0_8);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCeilings(1, 2);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCeiling(1)).isEqualTo(0x111111);
+    assertThat(sam.getEventCeiling(2)).isEqualTo(0x122222);
+  }
+
+  @Test
+  public void prepareReadEventCeilings_whenCeilingsAreInTwoDifferentRecords_shouldProduceTwoApdus()
+      throws Exception {
+
+    CardRequestSpi cardRequest =
+        createCardRequest(C_READ_EVENT_CEILING_0_8, C_READ_EVENT_CEILING_9_17);
+    CardResponseApi cardResponse =
+        createCardResponse(R_READ_EVENT_CEILING_0_8, R_READ_EVENT_CEILING_9_17);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCeilings(8, 9);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCeiling(8)).isEqualTo(0x188888);
+    assertThat(sam.getEventCeiling(9)).isEqualTo(0x200000);
+  }
+
+  @Test
+  public void
+      prepareReadEventCeilings_whenCeilingsAreInThreeDifferentRecords_shouldProduceThreeApdus()
+          throws Exception {
+
+    CardRequestSpi cardRequest =
+        createCardRequest(
+            C_READ_EVENT_CEILING_0_8, C_READ_EVENT_CEILING_9_17, C_READ_EVENT_CEILING_18_26);
+    CardResponseApi cardResponse =
+        createCardResponse(
+            R_READ_EVENT_CEILING_0_8, R_READ_EVENT_CEILING_9_17, R_READ_EVENT_CEILING_18_26);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager.prepareReadEventCeilings(7, 19);
+    samTransactionManager.processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    assertThat(sam.getEventCeiling(7)).isEqualTo(0x177777);
+    assertThat(sam.getEventCeiling(9)).isEqualTo(0x200000);
+    assertThat(sam.getEventCeiling(19)).isEqualTo(0x311111);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareReadSystemKeyParameters_whenSystemKeyTypeIsNull_shouldThrowIAE() {
+    samTransactionManager.prepareReadSystemKeyParameters(null);
+  }
+
+  @Test
+  public void prepareReadSystemKeyParameters_whenSystemKeyTypeIsNotNull_shouldBeSuccessful()
+      throws Exception {
+    CardRequestSpi cardRequest =
+        createCardRequest(
+            C_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION,
+            C_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT,
+            C_READ_SYSTEM_KEY_PARAMETER_RELOADING,
+            C_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION);
+    CardResponseApi cardResponse =
+        createCardResponse(
+            R_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION,
+            R_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT,
+            R_READ_SYSTEM_KEY_PARAMETER_RELOADING,
+            R_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+
+    samTransactionManager
+        .prepareReadSystemKeyParameters(SystemKeyType.PERSONALIZATION)
+        .prepareReadSystemKeyParameters(SystemKeyType.KEY_MANAGEMENT)
+        .prepareReadSystemKeyParameters(SystemKeyType.RELOADING)
+        .prepareReadSystemKeyParameters(SystemKeyType.AUTHENTICATION)
+        .processCommands();
+
+    InOrder inOrder = inOrder(samReader);
+    inOrder
+        .verify(samReader)
+        .transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+    verifyNoMoreInteractions(samReader);
+
+    for (SystemKeyType type : systemKeyTypes) {
+      assertThat(sam.getSystemKeyParameter(type).getKif())
+          .isEqualTo(systemKeyTypeToKifMap.get(type));
+      assertThat(sam.getSystemKeyParameter(type).getKvc()).isEqualTo((byte) 0xFF);
+      assertThat(sam.getSystemKeyParameter(type).getAlgorithm()).isEqualTo((byte) 0x40);
+      for (int i = 1; i <= 10; i++) {
+        if (i == 4) {
+          // don't test PAR4
+          continue;
+        }
+        assertThat(sam.getSystemKeyParameter(type).getParameterValue(i))
+            .isEqualTo((byte) ((type.ordinal() + 1) * 16 + i));
+      }
+    }
+  }
+
+  @Test
+  public void exportTargetSamContextForAsyncTransaction_shouldBeSuccessful() throws Exception {
+    CardRequestSpi cardRequestKeyParam =
+        createCardRequest(
+            C_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION,
+            C_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT,
+            C_READ_SYSTEM_KEY_PARAMETER_RELOADING);
+    CardResponseApi cardResponseKeyParam =
+        createCardResponse(
+            R_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION,
+            R_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT,
+            R_READ_SYSTEM_KEY_PARAMETER_RELOADING);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequestKeyParam)), any(ChannelControl.class)))
+        .thenReturn(cardResponseKeyParam);
+
+    CardRequestSpi cardRequestEventCounter =
+        createCardRequest(C_READ_EVENT_COUNTER_1, C_READ_EVENT_COUNTER_2, C_READ_EVENT_COUNTER_3);
+    CardResponseApi cardResponseEventCounter =
+        createCardResponse(R_READ_EVENT_COUNTER_1, R_READ_EVENT_COUNTER_2, R_READ_EVENT_COUNTER_3);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequestEventCounter)), any(ChannelControl.class)))
+        .thenReturn(cardResponseEventCounter);
+
+    String targetSamContext = samTransactionManager.exportTargetSamContextForAsyncTransaction();
+    TargetSamContextDto expectedTargetSamContextDto =
+        new TargetSamContextDto(sam.getSerialNumber());
+    expectedTargetSamContextDto
+        .getSystemKeyTypeToCounterNumberMap()
+        .put(SystemKeyType.PERSONALIZATION, 1);
+    expectedTargetSamContextDto
+        .getSystemKeyTypeToCounterNumberMap()
+        .put(SystemKeyType.KEY_MANAGEMENT, 2);
+    expectedTargetSamContextDto
+        .getSystemKeyTypeToCounterNumberMap()
+        .put(SystemKeyType.RELOADING, 3);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(1, 377);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(2, 378);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(3, 379);
+    String expectedTargetSamContext = JsonUtil.toJson(expectedTargetSamContextDto);
+    assertThat(targetSamContext).isEqualTo(expectedTargetSamContext);
   }
 
   @Test
