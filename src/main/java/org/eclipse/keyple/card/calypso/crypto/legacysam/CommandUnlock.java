@@ -16,6 +16,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -64,6 +65,34 @@ final class CommandUnlock extends Command {
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, unlockData, null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

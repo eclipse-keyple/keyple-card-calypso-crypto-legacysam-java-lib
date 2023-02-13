@@ -85,18 +85,6 @@ public class LSFreeTransactionManagerAdapterTest {
   private static final String C_PSO_VERIFY_SIGNATURE_SAM_TRACEABILITY_FULL =
       "802A00A818FF0102680001" + PSO_MESSAGE_SAM_TRACEABILITY + PSO_MESSAGE_SIGNATURE;
   private static final String READ_MESSAGE_SIGNATURE = "C1C2C3C4C5C6C7C8";
-  private static final String C_READ_EVENT_COUNTER_1 = "80BE008200";
-  private static final String R_READ_EVENT_COUNTER_1 =
-      READ_MESSAGE_SIGNATURE + "00017981AEC11A5CFAFF4080000000009000";
-  private static final String C_READ_EVENT_COUNTER_2 = "80BE008300";
-  private static final String R_READ_EVENT_COUNTER_2 =
-      READ_MESSAGE_SIGNATURE + "00017A81AEC11A5CFAFF4080000000009000";
-  private static final String C_READ_EVENT_COUNTER_3 = "80BE008400";
-  private static final String R_READ_EVENT_COUNTER_3 =
-      READ_MESSAGE_SIGNATURE + "00017B81AEC11A5CFAFF4080000000009000";
-  private static final String C_READ_EVENT_COUNTER_4 = "80BE008500";
-  private static final String R_READ_EVENT_COUNTER_4 =
-      READ_MESSAGE_SIGNATURE + "00017C81AEC11A5CFAFF4080000000009000";
   private static final String C_READ_EVENT_COUNTER_0_8 = "80BE00E100";
   private static final String R_READ_EVENT_COUNTER_0_8 =
       READ_MESSAGE_SIGNATURE
@@ -109,18 +97,10 @@ public class LSFreeTransactionManagerAdapterTest {
   private static final String R_READ_EVENT_COUNTER_18_26 =
       READ_MESSAGE_SIGNATURE
           + "3000003111113222222333333444443555553666663777773888880000E1AEC11A5CFAFF408000009000";
-  private static final String C_READ_EVENT_CEILING_1 = "80BE01B800";
-  private static final String R_READ_EVENT_CEILING_1 =
-      READ_MESSAGE_SIGNATURE
-          + "0112345600000000000000000000000000000000000000000000000000B8AEC11A5CFAFF408000009000";
-  private static final String C_READ_EVENT_CEILING_2 = "80BE02B800";
-  private static final String R_READ_EVENT_CEILING_2 =
-      READ_MESSAGE_SIGNATURE
-          + "0223456700000000000000000000000000000000000000000000000000B8AEC11A5CFAFF408000009000";
   private static final String C_READ_EVENT_CEILING_0_8 = "80BE00B100";
   private static final String R_READ_EVENT_CEILING_0_8 =
       READ_MESSAGE_SIGNATURE
-          + "1000001111111222221333331444441555551666661777771888880000E1AEC11A5CFAFF408000009000";
+          + "2000002111112222222333332444442555552666662777772888880000E1AEC11A5CFAFF408000009000";
   private static final String C_READ_EVENT_CEILING_9_17 = "80BE00B200";
   private static final String R_READ_EVENT_CEILING_9_17 =
       READ_MESSAGE_SIGNATURE
@@ -1802,90 +1782,23 @@ public class LSFreeTransactionManagerAdapterTest {
   }
 
   @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCounter_whenCounterIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCounter(27);
+  public void prepareReadCounterStatus_whenCounterIsOutOfRange_shouldThrowIAE() {
+    samTransactionManager.prepareReadCounterStatus(27);
   }
 
   @Test
-  public void prepareReadEventCounter_whenCounterIsInRange_shouldBeSuccessful() throws Exception {
-
-    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_COUNTER_1, C_READ_EVENT_COUNTER_4);
-    CardResponseApi cardResponse =
-        createCardResponse(R_READ_EVENT_COUNTER_1, R_READ_EVENT_COUNTER_4);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCounter(1);
-    samTransactionManager.prepareReadEventCounter(4);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCounter(1)).isEqualTo(377);
-    assertThat(sam.getEventCounter(4)).isEqualTo(380);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCounters_whenFromCounterIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCounters(-1, 2);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCounters_whenToCounterIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCounters(20, 27);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCounters_whenToCounterIsLowerThanTo_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCounters(10, 9);
-  }
-
-  @Test
-  public void prepareReadEventCounters_whenCountersAreInTheSameRecord_shouldProduceASingleApdu()
-      throws Exception {
-
-    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_COUNTER_0_8);
-    CardResponseApi cardResponse = createCardResponse(R_READ_EVENT_COUNTER_0_8);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCounters(1, 2);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCounter(1)).isEqualTo(0x111111);
-    assertThat(sam.getEventCounter(2)).isEqualTo(0x122222);
-  }
-
-  @Test
-  public void prepareReadEventCounters_whenCountersAreInTwoDifferentRecords_shouldProduceTwoApdus()
-      throws Exception {
+  public void prepareReadCounterStatus_whenCounterIsInRange_shouldBeSuccessful() throws Exception {
 
     CardRequestSpi cardRequest =
-        createCardRequest(C_READ_EVENT_COUNTER_0_8, C_READ_EVENT_COUNTER_9_17);
+        createCardRequest(C_READ_EVENT_COUNTER_0_8, C_READ_EVENT_CEILING_0_8);
     CardResponseApi cardResponse =
-        createCardResponse(R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_COUNTER_9_17);
+        createCardResponse(R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_CEILING_0_8);
 
     when(samReader.transmitCardRequest(
             argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
         .thenReturn(cardResponse);
 
-    samTransactionManager.prepareReadEventCounters(8, 9);
+    samTransactionManager.prepareReadCounterStatus(4);
     samTransactionManager.processCommands();
 
     InOrder inOrder = inOrder(samReader);
@@ -1895,27 +1808,40 @@ public class LSFreeTransactionManagerAdapterTest {
             argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
-    assertThat(sam.getEventCounter(8)).isEqualTo(0x188888);
-    assertThat(sam.getEventCounter(9)).isEqualTo(0x200000);
+    assertThat(sam.getCounter(4)).isEqualTo(0x144444);
+    assertThat(sam.getCounterCeiling(4)).isEqualTo(0x244444);
   }
 
   @Test
   public void
-      prepareReadEventCounters_whenCountersAreInThreeDifferentRecords_shouldProduceThreeApdus()
+      prepareReadCounterStatus_whenCounterAreInSameRecord_shouldProduceOptimizedApduRequests()
           throws Exception {
 
     CardRequestSpi cardRequest =
         createCardRequest(
-            C_READ_EVENT_COUNTER_0_8, C_READ_EVENT_COUNTER_9_17, C_READ_EVENT_COUNTER_18_26);
+            C_READ_EVENT_COUNTER_0_8,
+            C_READ_EVENT_CEILING_0_8,
+            C_READ_EVENT_COUNTER_9_17,
+            C_READ_EVENT_CEILING_9_17,
+            C_READ_EVENT_COUNTER_18_26,
+            C_READ_EVENT_CEILING_18_26);
     CardResponseApi cardResponse =
         createCardResponse(
-            R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_COUNTER_9_17, R_READ_EVENT_COUNTER_18_26);
+            R_READ_EVENT_COUNTER_0_8,
+            R_READ_EVENT_CEILING_0_8,
+            R_READ_EVENT_COUNTER_9_17,
+            R_READ_EVENT_CEILING_9_17,
+            R_READ_EVENT_COUNTER_18_26,
+            R_READ_EVENT_CEILING_18_26);
 
     when(samReader.transmitCardRequest(
             argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
         .thenReturn(cardResponse);
 
-    samTransactionManager.prepareReadEventCounters(7, 19);
+    samTransactionManager.prepareReadCounterStatus(1);
+    samTransactionManager.prepareReadCounterStatus(4);
+    samTransactionManager.prepareReadCounterStatus(11);
+    samTransactionManager.prepareReadCounterStatus(22);
     samTransactionManager.processCommands();
 
     InOrder inOrder = inOrder(samReader);
@@ -1925,138 +1851,14 @@ public class LSFreeTransactionManagerAdapterTest {
             argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
-    assertThat(sam.getEventCounter(7)).isEqualTo(0x177777);
-    assertThat(sam.getEventCounter(9)).isEqualTo(0x200000);
-    assertThat(sam.getEventCounter(19)).isEqualTo(0x311111);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCeiling_whenCounterIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCeiling(27);
-  }
-
-  @Test
-  public void prepareReadEventCeiling_whenCounterIsInRange_shouldBeSuccessful() throws Exception {
-
-    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_CEILING_1, C_READ_EVENT_CEILING_2);
-    CardResponseApi cardResponse =
-        createCardResponse(R_READ_EVENT_CEILING_1, R_READ_EVENT_CEILING_2);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCeiling(1);
-    samTransactionManager.prepareReadEventCeiling(2);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCeiling(1)).isEqualTo(0x123456);
-    assertThat(sam.getEventCeiling(2)).isEqualTo(0x234567);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCeilings_whenFromCeilingIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCeilings(-1, 2);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCeilings_whenToCeilingIsOutOfRange_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCeilings(20, 27);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void prepareReadEventCeilings_whenToCeilingIsLowerThanTo_shouldThrowIAE() {
-    samTransactionManager.prepareReadEventCeilings(10, 9);
-  }
-
-  @Test
-  public void prepareReadEventCeilings_whenCeilingsAreInTheSameRecord_shouldProduceASingleApdu()
-      throws Exception {
-
-    CardRequestSpi cardRequest = createCardRequest(C_READ_EVENT_CEILING_0_8);
-    CardResponseApi cardResponse = createCardResponse(R_READ_EVENT_CEILING_0_8);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCeilings(1, 2);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCeiling(1)).isEqualTo(0x111111);
-    assertThat(sam.getEventCeiling(2)).isEqualTo(0x122222);
-  }
-
-  @Test
-  public void prepareReadEventCeilings_whenCeilingsAreInTwoDifferentRecords_shouldProduceTwoApdus()
-      throws Exception {
-
-    CardRequestSpi cardRequest =
-        createCardRequest(C_READ_EVENT_CEILING_0_8, C_READ_EVENT_CEILING_9_17);
-    CardResponseApi cardResponse =
-        createCardResponse(R_READ_EVENT_CEILING_0_8, R_READ_EVENT_CEILING_9_17);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCeilings(8, 9);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCeiling(8)).isEqualTo(0x188888);
-    assertThat(sam.getEventCeiling(9)).isEqualTo(0x200000);
-  }
-
-  @Test
-  public void
-      prepareReadEventCeilings_whenCeilingsAreInThreeDifferentRecords_shouldProduceThreeApdus()
-          throws Exception {
-
-    CardRequestSpi cardRequest =
-        createCardRequest(
-            C_READ_EVENT_CEILING_0_8, C_READ_EVENT_CEILING_9_17, C_READ_EVENT_CEILING_18_26);
-    CardResponseApi cardResponse =
-        createCardResponse(
-            R_READ_EVENT_CEILING_0_8, R_READ_EVENT_CEILING_9_17, R_READ_EVENT_CEILING_18_26);
-
-    when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
-        .thenReturn(cardResponse);
-
-    samTransactionManager.prepareReadEventCeilings(7, 19);
-    samTransactionManager.processCommands();
-
-    InOrder inOrder = inOrder(samReader);
-    inOrder
-        .verify(samReader)
-        .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
-    verifyNoMoreInteractions(samReader);
-
-    assertThat(sam.getEventCeiling(7)).isEqualTo(0x177777);
-    assertThat(sam.getEventCeiling(9)).isEqualTo(0x200000);
-    assertThat(sam.getEventCeiling(19)).isEqualTo(0x311111);
+    assertThat(sam.getCounter(1)).isEqualTo(0x111111);
+    assertThat(sam.getCounterCeiling(1)).isEqualTo(0x211111);
+    assertThat(sam.getCounter(4)).isEqualTo(0x144444);
+    assertThat(sam.getCounterCeiling(4)).isEqualTo(0x244444);
+    assertThat(sam.getCounter(11)).isEqualTo(0x122222);
+    assertThat(sam.getCounterCeiling(11)).isEqualTo(0x122222);
+    assertThat(sam.getCounter(22)).isEqualTo(0x344444);
+    assertThat(sam.getCounterCeiling(22)).isEqualTo(0x344444);
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -2131,10 +1933,8 @@ public class LSFreeTransactionManagerAdapterTest {
             argThat(new CardRequestMatcher(cardRequestKeyParam)), any(ChannelControl.class)))
         .thenReturn(cardResponseKeyParam);
 
-    CardRequestSpi cardRequestEventCounter =
-        createCardRequest(C_READ_EVENT_COUNTER_1, C_READ_EVENT_COUNTER_2, C_READ_EVENT_COUNTER_3);
-    CardResponseApi cardResponseEventCounter =
-        createCardResponse(R_READ_EVENT_COUNTER_1, R_READ_EVENT_COUNTER_2, R_READ_EVENT_COUNTER_3);
+    CardRequestSpi cardRequestEventCounter = createCardRequest(C_READ_EVENT_COUNTER_0_8);
+    CardResponseApi cardResponseEventCounter = createCardResponse(R_READ_EVENT_COUNTER_0_8);
 
     when(samReader.transmitCardRequest(
             argThat(new CardRequestMatcher(cardRequestEventCounter)), any(ChannelControl.class)))
@@ -2142,7 +1942,7 @@ public class LSFreeTransactionManagerAdapterTest {
 
     String targetSamContext = samTransactionManager.exportTargetSamContextForAsyncTransaction();
     TargetSamContextDto expectedTargetSamContextDto =
-        new TargetSamContextDto(sam.getSerialNumber());
+        new TargetSamContextDto(sam.getSerialNumber(), false);
     expectedTargetSamContextDto
         .getSystemKeyTypeToCounterNumberMap()
         .put(SystemKeyType.PERSONALIZATION, 1);
@@ -2152,9 +1952,9 @@ public class LSFreeTransactionManagerAdapterTest {
     expectedTargetSamContextDto
         .getSystemKeyTypeToCounterNumberMap()
         .put(SystemKeyType.RELOADING, 3);
-    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(1, 377);
-    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(2, 378);
-    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(3, 379);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(1, 0x111111);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(2, 0x122222);
+    expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(3, 0x133333);
     String expectedTargetSamContext = JsonUtil.toJson(expectedTargetSamContextDto);
     assertThat(targetSamContext).isEqualTo(expectedTargetSamContext);
   }

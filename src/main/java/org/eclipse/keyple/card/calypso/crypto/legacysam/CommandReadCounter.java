@@ -24,7 +24,7 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
  *
  * @since 0.1.0
  */
-final class CommandReadEventCounter extends Command {
+final class CommandReadCounter extends Command {
 
   /** Event counter operation type */
   enum CounterOperationType {
@@ -34,9 +34,7 @@ final class CommandReadEventCounter extends Command {
     READ_COUNTER_RECORD
   }
 
-  private final CounterOperationType counterOperationType;
-  private final int firstEventCounterNumber;
-
+  private final int counterFileRecordNumber;
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
@@ -53,35 +51,25 @@ final class CommandReadEventCounter extends Command {
   /**
    * Instantiate a new CmdSamReadEventCounter
    *
-   * @param legacySam The Calypso legacy SAM.
-   * @param counterOperationType the counter operation type.
-   * @param target the counter index (0-26) if READ_SINGLE_COUNTER, the record index (1-3) if
-   *     READ_COUNTER_RECORD.
+   * @param context The SAM transaction context.
+   * @param counterFileRecordNumber The number of the counter file record to read (in range [0..2].
    * @since 0.1.0
    */
-  CommandReadEventCounter(
-      LegacySamAdapter legacySam, CounterOperationType counterOperationType, int target) {
+  CommandReadCounter(CommandContextDto context, int counterFileRecordNumber) {
 
-    super(
-        CommandRef.READ_EVENT_COUNTER,
-        counterOperationType == CounterOperationType.READ_SINGLE_COUNTER ? 24 : 48,
-        legacySam);
-
-    byte cla = legacySam.getClassByte();
-    byte p2;
-    this.counterOperationType = counterOperationType;
-    if (counterOperationType == CounterOperationType.READ_SINGLE_COUNTER) {
-      this.firstEventCounterNumber = target;
-      p2 = (byte) (0x81 + target);
-    } else {
-      this.firstEventCounterNumber = (target - 1) * 9;
-      p2 = (byte) (0xE0 + target);
-    }
+    super(CommandRef.READ_COUNTER, 48, context);
+    this.counterFileRecordNumber = counterFileRecordNumber;
+    byte cla = context.getTargetSam().getClassByte();
+    byte p2 = (byte) (0xE1 + counterFileRecordNumber);
 
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
                 cla, getCommandRef().getInstructionByte(), (byte) 0x00, p2, null, (byte) 0x00)));
+  }
+
+  public int getCounterFileRecordNumber() {
+    return counterFileRecordNumber;
   }
 
   /**
@@ -97,22 +85,36 @@ final class CommandReadEventCounter extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.parseApduResponse(apduResponse);
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
-    if (counterOperationType == CounterOperationType.READ_SINGLE_COUNTER) {
-      getLegacySam()
-          .putEventCounter(firstEventCounterNumber, ByteArrayUtil.extractInt(dataOut, 8, 3, false));
-    } else {
-      for (int i = 0; i < 9; i++) {
-        getLegacySam()
-            .putEventCounter(
-                firstEventCounterNumber + i,
-                ByteArrayUtil.extractInt(dataOut, 8 + (3 * i), 3, false));
-      }
+    for (int i = 0; i < 9; i++) {
+      getContext()
+          .getTargetSam()
+          .putCounterValue(
+              (this.counterFileRecordNumber * 9) + i,
+              ByteArrayUtil.extractInt(dataOut, 8 + (3 * i), 3, false));
     }
   }
 }

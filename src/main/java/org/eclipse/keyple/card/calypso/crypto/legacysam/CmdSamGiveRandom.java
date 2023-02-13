@@ -15,6 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -33,17 +34,17 @@ final class CmdSamGiveRandom extends Command {
   }
 
   /**
-   * Builds a new instance based on the provided data.
+   * Instantiates a new CmdSamGiveRandom.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param random the random data.
    * @throws IllegalArgumentException If the random data is null or has a length not equal to 8.
    * @since 0.3.0
    */
-  CmdSamGiveRandom(LegacySamAdapter legacySam, byte[] random) {
-    super(CommandRef.GIVE_RANDOM, 0, legacySam);
+  CmdSamGiveRandom(CommandContextDto context, byte[] random) {
+    super(CommandRef.GIVE_RANDOM, 0, context);
 
-    byte cla = legacySam.getClassByte();
+    byte cla = context.getTargetSam().getClassByte();
     byte p1 = (byte) 0x00;
     byte p2 = (byte) 0x00;
 
@@ -53,6 +54,34 @@ final class CmdSamGiveRandom extends Command {
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, random, null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

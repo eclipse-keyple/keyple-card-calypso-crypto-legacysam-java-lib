@@ -64,7 +64,17 @@ class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory 
    */
   @Override
   public LSAsyncTransactionExecutorManager createAsyncTransactionExecutorManager(
-      CardReader cardReader, LegacySam legacySam, String s) {
-    return null;
+      CardReader samReader, LegacySam sam, String samCommands) {
+    if (!(samReader instanceof ProxyReaderApi)) {
+      throw new IllegalArgumentException(
+          "The provided 'samReader' must implement 'ProxyReaderApi'");
+    }
+    if (!(sam instanceof LegacySamAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided 'sam' must be an instance of 'LegacySamAdapter'");
+    }
+    Assert.getInstance().notNull(samCommands, "samCommands");
+    return new LSAsyncTransactionExecutorManagerAdapter(
+        (ProxyReaderApi) samReader, (LegacySamAdapter) sam, samCommands);
   }
 }

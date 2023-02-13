@@ -16,7 +16,6 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.ApduR
 import java.util.HashMap;
 import java.util.Map;
 import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -60,9 +59,9 @@ final class CommandSamDataCipher extends Command {
   private final int recordNumber;
 
   /**
-   * Builds a new instance to cipher a data record.
+   * Instantiates a new instance to cipher a data record.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param recordNumber The targeted record number (in range [1..7], ignored when DataType is
    *     {@link DataType#ONE_CEILING_VALUE} or {@link DataType#PARAMETERS_RECORD}).
    * @param dataType The type of data to be ciphered.
@@ -71,11 +70,14 @@ final class CommandSamDataCipher extends Command {
    * @since 0.3.0
    */
   CommandSamDataCipher(
-      LegacySamAdapter legacySam, int recordNumber, DataType dataType, byte[] plainData) {
+      DtoAdapters.CommandContextDto context,
+      int recordNumber,
+      DataType dataType,
+      byte[] plainData) {
 
-    super(CommandRef.SAM_DATA_CIPHER, 48, legacySam);
+    super(CommandRef.SAM_DATA_CIPHER, 48, context);
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2;
@@ -86,7 +88,7 @@ final class CommandSamDataCipher extends Command {
         p2 = (byte) (0xE7 + recordNumber);
         break;
       case CEILINGS_FILE_RECORD:
-        p2 = (byte) (0xB0 + recordNumber);
+        p2 = (byte) (0xB1 + recordNumber);
         break;
       case ONE_CEILING_VALUE:
         p2 = (byte) 0xB8;
@@ -116,40 +118,31 @@ final class CommandSamDataCipher extends Command {
    * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.parseApduResponse(apduResponse);
-    System.arraycopy(apduResponse.getApdu(), 0, cipheredData, 0, 48);
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
   }
 
   /**
-   * Returns the {@link ApduRequestSpi} to perform the write operation for which the data was
-   * ciphered.
+   * {@inheritDoc}
    *
-   * @return A instance of {@link ApduRequestSpi}.
    * @since 0.3.0
    */
-  ApduRequestSpi getWriteCommandApduRequest() {
-    final byte cla = (byte) 0x80;
-    final byte inst = (byte) 0xD8;
-    final byte p1 = 0;
-    final byte p2;
-    switch (dataType) {
-      case CAAD_RECORD:
-        p2 = (byte) (0xE7 + recordNumber);
-        break;
-      case CEILINGS_FILE_RECORD:
-        p2 = (byte) (0xB0 + recordNumber);
-        break;
-      case ONE_CEILING_VALUE:
-        p2 = (byte) 0xB8;
-        break;
-      case PARAMETERS_RECORD:
-        p2 = (byte) 0xA0;
-        break;
-      default:
-        throw new IllegalArgumentException("Invalid DataType: " + dataType);
-    }
-    return new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, cipheredData, null));
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
+    System.arraycopy(apduResponse.getApdu(), 0, cipheredData, 0, 48);
+  }
+
+  public byte[] getCipheredData() {
+    return cipheredData;
   }
 
   /**

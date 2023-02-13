@@ -16,71 +16,32 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.*;
 import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardBrokenCommunicationException;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.ChannelControl;
 import org.calypsonet.terminal.card.ProxyReaderApi;
-import org.calypsonet.terminal.card.ReaderBrokenCommunicationException;
-import org.calypsonet.terminal.card.UnexpectedStatusWordException;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Adapter of {@link LSFreeTransactionManager}.
  *
  * @since 0.1.0
  */
-class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
-
-  private static final Logger logger =
-      LoggerFactory.getLogger(LSFreeTransactionManagerAdapter.class);
-
-  /* Prefix/suffix used to compose exception messages */
-  private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
-      "A communication error with the SAM reader occurred ";
-  private static final String MSG_SAM_COMMUNICATION_ERROR =
-      "A communication error with the SAM occurred ";
-  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
-  private static final String MSG_SAM_INCONSISTENT_DATA =
-      "The number of SAM commands/responses does not match: nb commands = ";
-  private static final String MSG_SAM_NB_RESPONSES = ", nb responses = ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
+class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
+    implements LSFreeTransactionManager {
   private static final String MSG_INPUT_OUTPUT_DATA = "input/output data";
   private static final String MSG_SIGNATURE_SIZE = "signature size";
   private static final String MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8 =
       "key diversifier size is in range [1..8]";
 
-  /* Constants */
-  private static final int MIN_EVENT_COUNTER_NUMBER = 0;
-  private static final int MAX_EVENT_COUNTER_NUMBER = 26;
-  private static final int MIN_EVENT_CEILING_NUMBER = 0;
-  private static final int MAX_EVENT_CEILING_NUMBER = 26;
-  private static final int FIRST_COUNTER_REC1 = 0;
-  private static final int LAST_COUNTER_REC1 = 8;
-  private static final int FIRST_COUNTER_REC2 = 9;
-  private static final int LAST_COUNTER_REC2 = 17;
-  private static final int FIRST_COUNTER_REC3 = 18;
-  private static final int LAST_COUNTER_REC3 = 26;
-
   /* Final fields */
-  private final ProxyReaderApi samReader;
-  private final LegacySamAdapter sam;
   private final byte[] samKeyDiversifier;
-  private final List<Command> userCommands = new ArrayList<Command>();
 
   /* Dynamic fields */
   private byte[] currentKeyDiversifier;
 
   LSFreeTransactionManagerAdapter(ProxyReaderApi samReader, LegacySamAdapter sam) {
-    this.samReader = samReader;
-    this.sam = sam;
+    super(samReader, sam, null, null);
     this.samKeyDiversifier = sam.getSerialNumber();
   }
 
@@ -111,7 +72,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      userCommands.add(new CommandDataCipher(sam, dataAdapter, null));
+      addTargetSamCommand(new CommandDataCipher(getContext(), dataAdapter, null));
 
     } else if (data instanceof TraceableSignatureComputationDataAdapter) {
       // Traceable signature
@@ -144,7 +105,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      userCommands.add(new CommandPsoComputeSignature(sam, dataAdapter));
+      addTargetSamCommand(new CommandPsoComputeSignature(getContext(), dataAdapter));
 
     } else {
       throw new IllegalArgumentException(
@@ -180,7 +141,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
               MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8);
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      userCommands.add(new CommandDataCipher(sam, null, dataAdapter));
+      addTargetSamCommand(new CommandDataCipher(getContext(), null, dataAdapter));
 
     } else if (data instanceof TraceableSignatureVerificationDataAdapter) {
       // Traceable signature
@@ -243,7 +204,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
       }
 
       prepareSelectDiversifierIfNeeded(dataAdapter.getKeyDiversifier());
-      userCommands.add(new CommandPsoVerifySignature(sam, dataAdapter));
+      addTargetSamCommand(new CommandPsoVerifySignature(getContext(), dataAdapter));
 
     } else {
       throw new IllegalArgumentException(
@@ -260,7 +221,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
   @Override
   public LSFreeTransactionManager prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
-    userCommands.add(new CommandReadKeyParameters(sam, systemKeyType));
+    addTargetSamCommand(new CommandReadKeyParameters(getContext(), systemKeyType));
     return this;
   }
 
@@ -270,20 +231,21 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareReadEventCounter(int eventCounterNumber) {
-
+  public LSFreeTransactionManager prepareReadCounterStatus(int counterNumber) {
     Assert.getInstance()
-        .isInRange(
-            eventCounterNumber,
-            MIN_EVENT_COUNTER_NUMBER,
-            MAX_EVENT_COUNTER_NUMBER,
-            "eventCounterNumber");
+        .isInRange(counterNumber, MIN_COUNTER_NUMBER, MAX_COUNTER_NUMBER, "counterNumber");
+    for (Command command : getTargetSamCommands()) {
+      if (command instanceof CommandReadCounter
+          && ((CommandReadCounter) command).getCounterFileRecordNumber()
+              == counterToRecordLookup[counterNumber]) {
+        // already scheduled
+        return this;
+      }
+    }
+    addTargetSamCommand(new CommandReadCounter(getContext(), counterToRecordLookup[counterNumber]));
+    addTargetSamCommand(
+        new CommandReadCounterCeiling(getContext(), counterToRecordLookup[counterNumber]));
 
-    userCommands.add(
-        new CommandReadEventCounter(
-            sam,
-            CommandReadEventCounter.CounterOperationType.READ_SINGLE_COUNTER,
-            eventCounterNumber));
     return this;
   }
 
@@ -293,111 +255,10 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareReadEventCounters(
-      int fromEventCounterNumber, int toEventCounterNumber) {
-
-    Assert.getInstance()
-        .isInRange(
-            fromEventCounterNumber,
-            MIN_EVENT_COUNTER_NUMBER,
-            MAX_EVENT_COUNTER_NUMBER,
-            "fromEventCounterNumber")
-        .isInRange(
-            toEventCounterNumber,
-            MIN_EVENT_COUNTER_NUMBER,
-            MAX_EVENT_COUNTER_NUMBER,
-            "toEventCounterNumber")
-        .greaterOrEqual(
-            toEventCounterNumber,
-            fromEventCounterNumber,
-            "fromEventCounterNumber/toEventCounterNumber");
-
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC1, LAST_COUNTER_REC1, fromEventCounterNumber, toEventCounterNumber)) {
-      userCommands.add(
-          new CommandReadEventCounter(
-              sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 1));
-    }
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC2, LAST_COUNTER_REC2, fromEventCounterNumber, toEventCounterNumber)) {
-      userCommands.add(
-          new CommandReadEventCounter(
-              sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 2));
-    }
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC3, LAST_COUNTER_REC3, fromEventCounterNumber, toEventCounterNumber)) {
-      userCommands.add(
-          new CommandReadEventCounter(
-              sam, CommandReadEventCounter.CounterOperationType.READ_COUNTER_RECORD, 3));
-    }
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 0.1.0
-   */
-  @Override
-  public LSFreeTransactionManager prepareReadEventCeiling(int eventCeilingNumber) {
-
-    Assert.getInstance()
-        .isInRange(
-            eventCeilingNumber,
-            MIN_EVENT_CEILING_NUMBER,
-            MAX_EVENT_CEILING_NUMBER,
-            "eventCeilingNumber");
-
-    userCommands.add(
-        new CommandReadCeilings(
-            sam,
-            CommandReadCeilings.CeilingsOperationType.READ_SINGLE_CEILING,
-            eventCeilingNumber));
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 0.1.0
-   */
-  @Override
-  public LSFreeTransactionManager prepareReadEventCeilings(
-      int fromEventCeilingNumber, int toEventCeilingNumber) {
-
-    Assert.getInstance()
-        .isInRange(
-            fromEventCeilingNumber,
-            MIN_EVENT_CEILING_NUMBER,
-            MAX_EVENT_CEILING_NUMBER,
-            "fromEventCeilingNumber")
-        .isInRange(
-            toEventCeilingNumber,
-            MIN_EVENT_CEILING_NUMBER,
-            MAX_EVENT_CEILING_NUMBER,
-            "toEventCeilingNumber")
-        .greaterOrEqual(
-            toEventCeilingNumber,
-            fromEventCeilingNumber,
-            "fromEventCeilingNumber/toEventCeilingNumber");
-
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC1, LAST_COUNTER_REC1, fromEventCeilingNumber, toEventCeilingNumber)) {
-      userCommands.add(
-          new CommandReadCeilings(
-              sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 1));
-    }
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC2, LAST_COUNTER_REC2, fromEventCeilingNumber, toEventCeilingNumber)) {
-      userCommands.add(
-          new CommandReadCeilings(
-              sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 2));
-    }
-    if (areIntervalsOverlapping(
-        FIRST_COUNTER_REC3, LAST_COUNTER_REC3, fromEventCeilingNumber, toEventCeilingNumber)) {
-      userCommands.add(
-          new CommandReadCeilings(
-              sam, CommandReadCeilings.CeilingsOperationType.READ_CEILING_RECORD, 3));
+  public LSFreeTransactionManager prepareReadAllCountersStatus() {
+    for (int i = 0; i < 3; i++) {
+      addTargetSamCommand(new CommandReadCounter(getContext(), i));
+      addTargetSamCommand(new CommandReadCounterCeiling(getContext(), i));
     }
     return this;
   }
@@ -413,26 +274,40 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
     final List<Command> commands = new ArrayList<Command>();
 
     // read system key parameters if not available
-    if (sam.getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
-      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.PERSONALIZATION));
+    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
+      commands.add(new CommandReadKeyParameters(getContext(), SystemKeyType.PERSONALIZATION));
     }
-    if (sam.getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
-      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.KEY_MANAGEMENT));
+    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
+      commands.add(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
     }
-    if (sam.getSystemKeyParameter(SystemKeyType.RELOADING) == null) {
-      commands.add(new CommandReadKeyParameters(sam, SystemKeyType.RELOADING));
+    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.RELOADING) == null) {
+      commands.add(new CommandReadKeyParameters(getContext(), SystemKeyType.RELOADING));
     }
-    processCommands(commands);
+    processTargetSamCommands(commands);
+    commands.clear();
 
     // read PAR4
     int counterPersonalization =
-        sam.getSystemKeyParameter(SystemKeyType.PERSONALIZATION).getParameterValue(4) & 0xFF;
+        getContext()
+                .getTargetSam()
+                .getSystemKeyParameter(SystemKeyType.PERSONALIZATION)
+                .getParameterValue(4)
+            & 0xFF;
     int counterKeyManagement =
-        sam.getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT).getParameterValue(4) & 0xFF;
+        getContext()
+                .getTargetSam()
+                .getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT)
+                .getParameterValue(4)
+            & 0xFF;
     int counterReloading =
-        sam.getSystemKeyParameter(SystemKeyType.RELOADING).getParameterValue(4) & 0xFF;
+        getContext()
+                .getTargetSam()
+                .getSystemKeyParameter(SystemKeyType.RELOADING)
+                .getParameterValue(4)
+            & 0xFF;
 
-    TargetSamContextDto targetSamContextDto = new TargetSamContextDto(sam.getSerialNumber());
+    TargetSamContextDto targetSamContextDto =
+        new TargetSamContextDto(getContext().getTargetSam().getSerialNumber(), false);
     if (counterPersonalization != 0) {
       targetSamContextDto
           .getSystemKeyTypeToCounterNumberMap()
@@ -449,32 +324,42 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
           .put(SystemKeyType.RELOADING, counterReloading);
     }
 
-    // compute needed counters
-    Set<Integer> counterNumbers = new HashSet<Integer>(3);
+    // compute needed counter file records
+    Set<Integer> counterFileRecordNumbers = new HashSet<Integer>(3);
     if (counterPersonalization != 0) {
-      counterNumbers.add(counterPersonalization);
+      counterFileRecordNumbers.add(counterToRecordLookup[counterPersonalization]);
     }
     if (counterKeyManagement != 0) {
-      counterNumbers.add(counterKeyManagement);
+      counterFileRecordNumbers.add(counterToRecordLookup[counterKeyManagement]);
     }
     if (counterReloading != 0) {
-      counterNumbers.add(counterReloading);
+      counterFileRecordNumbers.add(counterToRecordLookup[counterReloading]);
     }
 
     // read counters
-    for (Integer counterNumber : counterNumbers) {
-      commands.add(
-          new CommandReadEventCounter(
-              sam,
-              CommandReadEventCounter.CounterOperationType.READ_SINGLE_COUNTER,
-              counterNumber));
+    for (Integer counterFileRecordNumber : counterFileRecordNumbers) {
+      commands.add(new CommandReadCounter(getContext(), counterFileRecordNumber));
     }
-    processCommands(commands);
+    processTargetSamCommands(commands);
 
-    for (int counterNumber : counterNumbers) {
+    if (counterPersonalization != 0) {
       targetSamContextDto
           .getCounterNumberToCounterValueMap()
-          .put(counterNumber, sam.getEventCounter(counterNumber));
+          .put(
+              counterPersonalization,
+              getContext().getTargetSam().getCounter(counterPersonalization));
+    }
+
+    if (counterKeyManagement != 0) {
+      targetSamContextDto
+          .getCounterNumberToCounterValueMap()
+          .put(counterKeyManagement, getContext().getTargetSam().getCounter(counterKeyManagement));
+    }
+
+    if (counterReloading != 0) {
+      targetSamContextDto
+          .getCounterNumberToCounterValueMap()
+          .put(counterReloading, getContext().getTargetSam().getCounter(counterReloading));
     }
 
     // export as json
@@ -488,125 +373,8 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
    */
   @Override
   public LSFreeTransactionManager processCommands() {
-    return processCommands(userCommands);
-  }
-
-  /**
-   * Processes the list of commands provided in argument as expected by {@link #processCommands()}.
-   *
-   * <p>Note: the list is cleared in all cases.
-   */
-  private LSFreeTransactionManager processCommands(List<Command> commands) {
-    if (commands.isEmpty()) {
-      return this;
-    }
-    try {
-      // Get the list of C-APDU to transmit
-      List<ApduRequestSpi> apduRequests = getApduRequests(commands);
-
-      // Wrap the list of C-APDUs into a card request
-      CardRequestSpi cardRequest = new CardRequestAdapter(apduRequests, true);
-
-      // Transmit the commands to the SAM
-      CardResponseApi cardResponse = transmitCardRequest(cardRequest);
-
-      // Retrieve the list of R-APDUs
-      List<ApduResponseApi> apduResponses = cardResponse.getApduResponses();
-
-      // If there are more responses than requests, then we are unable to fill the card image. In
-      // this case we stop processing immediately because it may be a case of fraud, and we throw an
-      // exception.
-      if (apduResponses.size() > apduRequests.size()) {
-        throw new InconsistentDataException(
-            MSG_SAM_INCONSISTENT_DATA
-                + apduRequests.size()
-                + MSG_SAM_NB_RESPONSES
-                + apduResponses.size());
-      }
-
-      // We go through all the responses (and not the requests) because there may be fewer in the
-      // case of an error that occurred in strict mode. In this case the last response will raise an
-      // exception.
-      for (int i = 0; i < apduResponses.size(); i++) {
-        try {
-          commands.get(i).parseApduResponse(apduResponses.get(i));
-        } catch (CommandException e) {
-          CommandRef commandRef = commands.get(i).getCommandRef();
-          if ((commandRef == CommandRef.PSO_VERIFY_SIGNATURE
-                  || commandRef == CommandRef.DATA_CIPHER)
-              && e instanceof SecurityDataException) {
-            throw new InvalidSignatureException("Invalid signature.", e);
-          }
-          String sw =
-              commands.get(i).getApduResponse() != null
-                  ? HexUtil.toHex(commands.get(i).getApduResponse().getStatusWord())
-                  : "null";
-          throw new UnexpectedCommandStatusException(
-              MSG_SAM_COMMAND_ERROR
-                  + "while processing responses to SAM commands: "
-                  + commandRef
-                  + " ["
-                  + sw
-                  + "]",
-              e);
-        }
-      }
-
-      // Finally, if no error has occurred and there are fewer responses than requests, then we
-      // throw an exception.
-      if (apduResponses.size() < apduRequests.size()) {
-        throw new InconsistentDataException(
-            MSG_SAM_INCONSISTENT_DATA
-                + apduRequests.size()
-                + MSG_SAM_NB_RESPONSES
-                + apduResponses.size());
-      }
-    } finally {
-      // Reset the list of commands.
-      commands.clear();
-    }
+    processTargetSamCommands(false);
     return this;
-  }
-
-  /**
-   * Creates a list of {@link ApduRequestSpi} from a list of {@link Command}.
-   *
-   * @param commands The list of commands.
-   * @return An empty list if there is no command.
-   * @since 0.1.0
-   */
-  private List<ApduRequestSpi> getApduRequests(List<Command> commands) {
-    List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
-    if (commands != null) {
-      for (Command command : commands) {
-        apduRequests.add(command.getApduRequest());
-      }
-    }
-    return apduRequests;
-  }
-
-  /**
-   * Transmits a card request, processes and converts any exceptions.
-   *
-   * @param cardRequest The card request to transmit.
-   * @return The card response.
-   */
-  private CardResponseApi transmitCardRequest(CardRequestSpi cardRequest) {
-    CardResponseApi cardResponse;
-    try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
-    } catch (ReaderBrokenCommunicationException e) {
-      throw new ReaderIOException(
-          MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
-    } catch (CardBrokenCommunicationException e) {
-      throw new SamIOException(MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
-    } catch (UnexpectedStatusWordException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("A SAM command has failed: {}", e.getMessage());
-      }
-      cardResponse = e.getCardResponse();
-    }
-    return cardResponse;
   }
 
   /**
@@ -642,7 +410,7 @@ class LSFreeTransactionManagerAdapter implements LSFreeTransactionManager {
 
   /** Prepares a "SelectDiversifier" command using the current key diversifier. */
   private void prepareSelectDiversifier() {
-    userCommands.add(new CommandSelectDiversifier(sam, currentKeyDiversifier));
+    addTargetSamCommand(new CommandSelectDiversifier(getContext(), currentKeyDiversifier));
   }
 
   /**

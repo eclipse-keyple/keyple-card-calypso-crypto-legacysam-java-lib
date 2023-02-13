@@ -13,9 +13,11 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import org.calypsonet.terminal.card.ApduResponseApi;
+import org.calypsonet.terminal.card.*;
 
 /**
  * Superclass for all SAM commands.
@@ -54,22 +56,22 @@ abstract class Command {
   private String name;
   private ApduRequestAdapter apduRequest;
   private ApduResponseApi apduResponse;
-  private LegacySamAdapter legacySam;
+  private transient CommandContextDto context;
+  private transient List<Command> controlSamCommands = new ArrayList<Command>(2);
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands
    *
    * @param commandRef A command reference from the Calypso command table.
    * @param le The value of the LE field.
-   * @param legacySam The Calypso legacy SAM (it may be null if the SAM selection has not yet been
-   *     made).
+   * @param context The SAM transaction context.
    * @since 0.1.0
    */
-  Command(CommandRef commandRef, int le, LegacySamAdapter legacySam) {
+  Command(CommandRef commandRef, int le, CommandContextDto context) {
     this.commandRef = commandRef;
     this.name = commandRef.getName();
     this.le = le;
-    this.legacySam = legacySam;
+    this.context = context;
   }
 
   /**
@@ -144,19 +146,43 @@ abstract class Command {
    * @return Null if the SAM selection has not yet been made.
    * @since 0.1.0
    */
-  final LegacySamAdapter getLegacySam() {
-    return legacySam;
+  final CommandContextDto getContext() {
+    return context;
+  }
+
+  final void addControlSamCommand(Command samCommand) {
+    controlSamCommands.add(samCommand);
   }
 
   /**
-   * Parses the response {@link ApduResponseApi} and checks the status word.
+   * Finalize the construction of the APDU request if needed.
+   *
+   * @since 0.3.0
+   */
+  abstract void finalizeRequest();
+
+  abstract boolean isControlSamRequiredToFinalizeRequest();
+
+  /**
+   * Parses the APDU response, updates the card image and synchronize the crypto service if it is
+   * involved in the process.
+   *
+   * @param apduResponse The APDU response.
+   * @throws CommandException if status is not successful or if the length of the response is not
+   *     equal to the LE field in the request.
+   * @since 0.3.0
+   */
+  abstract void parseResponse(ApduResponseApi apduResponse) throws CommandException;
+
+  /**
+   * Sets the response {@link ApduResponseApi} and checks the status word.
    *
    * @param apduResponse The APDU response.
    * @throws CommandException if status is not successful or if the length of the response is not
    *     equal to the LE field in the request.
    * @since 0.1.0
    */
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
+  final void setResponseAndCheckStatus(ApduResponseApi apduResponse) throws CommandException {
     this.apduResponse = apduResponse;
     checkStatus();
   }
@@ -268,6 +294,23 @@ abstract class Command {
       e = new UnknownStatusException(message);
     }
     return e;
+  }
+
+  void processControlSamCommand() {
+    try {
+      CommandExecutor.processCommands(controlSamCommands, context.getControlSamReader(), false);
+    } catch (RuntimeException e) {
+      resetState();
+      throw e;
+    } finally {
+      cleanState();
+    }
+  }
+
+  void resetState() {}
+
+  void cleanState() {
+    controlSamCommands.clear();
   }
 
   /**

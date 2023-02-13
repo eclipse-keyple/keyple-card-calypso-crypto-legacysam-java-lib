@@ -20,6 +20,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignat
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
+import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
@@ -807,16 +808,22 @@ final class DtoAdapters {
   static final class TargetSamContextDto {
 
     private final byte[] serialNumber;
+    private final boolean isDynamicMode;
     private Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
         new HashMap<SystemKeyType, Integer>(3);
     private Map<Integer, Integer> counterNumberToCounterValueMap = new HashMap<Integer, Integer>(3);
 
-    TargetSamContextDto(byte[] serialNumber) {
+    TargetSamContextDto(byte[] serialNumber, boolean dynamicMode) {
       this.serialNumber = serialNumber;
+      this.isDynamicMode = dynamicMode;
     }
 
-    public byte[] getSerialNumber() {
+    byte[] getSerialNumber() {
       return serialNumber;
+    }
+
+    public boolean isDynamicMode() {
+      return isDynamicMode;
     }
 
     Map<SystemKeyType, Integer> getSystemKeyTypeToCounterNumberMap() {
@@ -828,20 +835,29 @@ final class DtoAdapters {
     }
   }
 
-  /**
-   * This POJO contains the commands to be executed by a target SAM in an asynchronous transaction.
-   *
-   * @since 0.3.0
-   */
-  static final class SamCommandsDto {
-    private List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
+  static class CommandContextDto {
 
-    void add(ApduRequestSpi apduRequest) {
-      apduRequests.add(apduRequest);
+    private LegacySamAdapter targetSam;
+    private ProxyReaderApi controlSamReader;
+    private LegacySamAdapter controlSam;
+
+    public CommandContextDto(
+        LegacySamAdapter targetSam, ProxyReaderApi controlSamReader, LegacySamAdapter controlSam) {
+      this.targetSam = targetSam;
+      this.controlSamReader = controlSamReader;
+      this.controlSam = controlSam;
     }
 
-    public List<ApduRequestSpi> getApduRequests() {
-      return apduRequests;
+    LegacySamAdapter getTargetSam() {
+      return targetSam;
+    }
+
+    ProxyReaderApi getControlSamReader() {
+      return controlSamReader;
+    }
+
+    LegacySamAdapter getControlSam() {
+      return controlSam;
     }
   }
 }

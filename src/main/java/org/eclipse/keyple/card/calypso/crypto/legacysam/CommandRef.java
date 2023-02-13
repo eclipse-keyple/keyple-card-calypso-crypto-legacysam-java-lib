@@ -30,7 +30,7 @@ enum CommandRef {
   UNLOCK("Unlock", (byte) 0x20),
   WRITE_KEY("Write Key", (byte) 0x1A),
   READ_KEY_PARAMETERS("Read Key Parameters", (byte) 0xBC),
-  READ_EVENT_COUNTER("Read Event Counter", (byte) 0xBE),
+  READ_COUNTER("Read Event Counter", (byte) 0xBE),
   READ_CEILINGS("Read Ceilings", (byte) 0xBE),
   SV_CHECK("SV Check", (byte) 0x58),
   SV_PREPARE_DEBIT("SV Prepare Debit", (byte) 0x54),
@@ -40,6 +40,7 @@ enum CommandRef {
   PSO_COMPUTE_SIGNATURE("PSO Compute Signature", (byte) 0x2A),
   PSO_VERIFY_SIGNATURE("PSO Verify Signature", (byte) 0x2A),
   SAM_DATA_CIPHER("SAM Data Cipher", (byte) 0x16),
+  WRITE_CEILINGS("Write Ceilings", (byte) 0xD8),
   ;
 
   /** The name. */

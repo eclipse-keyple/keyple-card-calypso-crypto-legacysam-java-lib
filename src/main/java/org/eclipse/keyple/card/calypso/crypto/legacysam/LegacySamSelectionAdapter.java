@@ -96,7 +96,7 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
       ApduResponseApi apduResponse =
           cardSelectionResponse.getCardResponse().getApduResponses().get(0);
       try {
-        unlockCommand.parseApduResponse(apduResponse);
+        unlockCommand.setResponseAndCheckStatus(apduResponse);
       } catch (AccessForbiddenException e) {
         logger.warn("SAM not locked or already unlocked");
       } catch (CommandException e) {

@@ -46,10 +46,12 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private final byte softwareVersion;
   private final byte softwareRevision;
   private final byte classByte;
-  private final SortedMap<Integer, Integer> eventCounters = new TreeMap<Integer, Integer>();
-  private final SortedMap<Integer, Integer> eventCeilings = new TreeMap<Integer, Integer>();
+  private final SortedMap<Integer, Integer> counters = new TreeMap<Integer, Integer>();
+  private final Map<Integer, Boolean> countersIncrementConfig = new HashMap<Integer, Boolean>();
+  private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<Integer, Integer>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParamterMap =
       new HashMap<SystemKeyType, KeyParameterAdapter>();
+  private byte[] challenge;
 
   /**
    * Constructor.
@@ -272,45 +274,36 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Adds or replace an event counter.
+   * Adds or replace a counter value.
    *
-   * @param eventCounterNumber The number of the counter.
-   * @param eventCounterValue The counter value.
+   * @param counterNumber The number of the counter.
+   * @param value The counter value.
    * @since 0.1.0
    */
-  void putEventCounter(int eventCounterNumber, int eventCounterValue) {
-    this.eventCounters.put(eventCounterNumber, eventCounterValue);
+  void putCounterValue(int counterNumber, int value) {
+    this.counters.put(counterNumber, value);
   }
 
   /**
-   * Adds or replace an event counter.
+   * Adds or replace a counter ceiling value.
    *
-   * @param eventCeilingNumber The number of the ceiling.
-   * @param eventCeilingValue The ceiling value.
+   * @param counterNumber The number of the counter.
+   * @param value The counter ceiling value.
    * @since 0.1.0
    */
-  void putEventCeiling(int eventCeilingNumber, int eventCeilingValue) {
-    this.eventCeilings.put(eventCeilingNumber, eventCeilingValue);
+  void putCounterCeilingValue(int counterNumber, int value) {
+    this.counterCeilings.put(counterNumber, value);
   }
 
   /**
-   * {@inheritDoc}
+   * Adds or replace a counter increment configuration.
    *
-   * @since 0.1.0
+   * @param counterNumber The number of the counter.
+   * @param incrementingState The incrementing state.
+   * @since 0.2.0
    */
-  @Override
-  public Integer getEventCounter(int eventCounterNumber) {
-    return eventCounters.get(eventCounterNumber);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 0.1.0
-   */
-  @Override
-  public SortedMap<Integer, Integer> getEventCounters() {
-    return eventCounters;
+  void putCounterIncrementConfiguration(int counterNumber, boolean incrementingState) {
+    countersIncrementConfig.put(counterNumber, incrementingState);
   }
 
   /**
@@ -319,8 +312,8 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.1.0
    */
   @Override
-  public Integer getEventCeiling(int eventCeilingNumber) {
-    return eventCeilings.get(eventCeilingNumber);
+  public Integer getCounter(int counterNumber) {
+    return counters.get(counterNumber);
   }
 
   /**
@@ -329,8 +322,38 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.1.0
    */
   @Override
-  public SortedMap<Integer, Integer> getEventCeilings() {
-    return eventCeilings;
+  public SortedMap<Integer, Integer> getCounters() {
+    return counters;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.2.0
+   */
+  @Override
+  public Boolean isManualCounterIncrementAuthorized(int counterNumber) {
+    return countersIncrementConfig.get(counterNumber);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.1.0
+   */
+  @Override
+  public Integer getCounterCeiling(int counterNumber) {
+    return counterCeilings.get(counterNumber);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.1.0
+   */
+  @Override
+  public SortedMap<Integer, Integer> getCounterCeilings() {
+    return counterCeilings;
   }
 
   /**
@@ -363,5 +386,24 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   @Override
   public String toString() {
     return JsonUtil.toJson(this);
+  }
+
+  /**
+   * Sets the challenge.
+   *
+   * @since 0.3.0
+   */
+  void setChallenge(byte[] challenge) {
+    this.challenge = challenge;
+  }
+
+  /**
+   * Gets the challenge.
+   *
+   * @return null if no challenge is available.
+   * @since 0.3.0
+   */
+  byte[] getChallenge() {
+    return this.challenge;
   }
 }

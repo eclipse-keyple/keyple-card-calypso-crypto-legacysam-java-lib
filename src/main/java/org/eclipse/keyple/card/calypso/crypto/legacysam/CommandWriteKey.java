@@ -15,6 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -53,19 +54,19 @@ final class CommandWriteKey extends Command {
   }
 
   /**
-   * LegacySamCardSelectorBuilder constructor
+   * Instantiates a new CommandWriteKey.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param writingMode the writing mode (P1).
    * @param keyReference the key reference (P2).
    * @param keyData the key data.
    * @since 0.1.0
    */
-  CommandWriteKey(LegacySamAdapter legacySam, byte writingMode, byte keyReference, byte[] keyData) {
+  CommandWriteKey(CommandContextDto context, byte writingMode, byte keyReference, byte[] keyData) {
 
-    super(CommandRef.WRITE_KEY, 0, legacySam);
+    super(CommandRef.WRITE_KEY, 0, context);
 
-    byte cla = legacySam.getClassByte();
+    byte cla = context.getTargetSam().getClassByte();
 
     if (keyData == null) {
       throw new IllegalArgumentException("Key data null!");
@@ -84,6 +85,34 @@ final class CommandWriteKey extends Command {
                 keyReference,
                 keyData,
                 null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

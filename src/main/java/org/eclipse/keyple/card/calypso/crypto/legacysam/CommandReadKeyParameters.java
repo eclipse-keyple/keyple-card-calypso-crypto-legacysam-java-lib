@@ -46,17 +46,17 @@ final class CommandReadKeyParameters extends Command {
   private SystemKeyType systemKeyType;
 
   /**
-   * Builds a new instance to read the parameters of a system key.
+   * Instantiates a new instance to read the parameters of a system key.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param systemKeyType The type of the system key.
    * @since 0.3.0
    */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, SystemKeyType systemKeyType) {
+  CommandReadKeyParameters(CommandContextDto context, SystemKeyType systemKeyType) {
 
-    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2;
@@ -83,18 +83,18 @@ final class CommandReadKeyParameters extends Command {
   }
 
   /**
-   * Builds a new instance to read the parameters of a key identified by its KIF and KVC.
+   * Instantiates a new instance to read the parameters of a key identified by its KIF and KVC.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param kif The KIF of the key.
    * @param kvc The KIF of the key.
    * @since 0.3.0
    */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, byte kif, byte kvc) {
+  CommandReadKeyParameters(CommandContextDto context, byte kif, byte kvc) {
 
-    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2 = (byte) 0xF0;
@@ -104,17 +104,17 @@ final class CommandReadKeyParameters extends Command {
   }
 
   /**
-   * Builds a new instance to read the parameters of a key identified by its record number.
+   * Instantiates a new instance to read the parameters of a key identified by its record number.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param recordNumber the record number
    * @since 0.3.0
    */
-  CommandReadKeyParameters(LegacySamAdapter legacySam, int recordNumber) {
+  CommandReadKeyParameters(CommandContextDto context, int recordNumber) {
 
-    super(CommandRef.READ_KEY_PARAMETERS, 32, legacySam);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2 = (byte) recordNumber;
@@ -139,12 +139,32 @@ final class CommandReadKeyParameters extends Command {
    * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.parseApduResponse(apduResponse);
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
     if (this.systemKeyType != null) {
       byte[] keyParameter = new byte[13];
       System.arraycopy(apduResponse.getApdu(), 8, keyParameter, 0, 13);
-      getLegacySam().setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
+      getContext()
+          .getTargetSam()
+          .setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
     } else {
       // TODO: work keys
     }

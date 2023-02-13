@@ -54,19 +54,19 @@ final class CommandPsoComputeSignature extends Command {
   private final TraceableSignatureComputationDataAdapter data;
 
   /**
-   * Builds a new instance based on the provided signature computation data.
+   * Instantiates a new instance based on the provided signature computation data.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The SAM transaction context.
    * @param data The signature computation data.
    * @since 0.1.0
    */
   CommandPsoComputeSignature(
-      LegacySamAdapter legacySam, TraceableSignatureComputationDataAdapter data) {
+      CommandContextDto context, TraceableSignatureComputationDataAdapter data) {
 
-    super(CommandRef.PSO_COMPUTE_SIGNATURE, 0, legacySam);
+    super(CommandRef.PSO_COMPUTE_SIGNATURE, 0, context);
     this.data = data;
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = (byte) 0x9E;
     final byte p2 = (byte) 0x9A;
@@ -125,11 +125,29 @@ final class CommandPsoComputeSignature extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.parseApduResponse(apduResponse);
+  void finalizeRequest() {}
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
     if (apduResponse.getDataOut().length > 0) {
       if (data.isSamTraceabilityMode()) {
         data.setSignedData(Arrays.copyOf(apduResponse.getDataOut(), data.getData().length));
