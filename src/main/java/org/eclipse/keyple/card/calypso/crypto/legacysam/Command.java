@@ -55,7 +55,7 @@ abstract class Command {
   private final int le;
   private String name;
   private ApduRequestAdapter apduRequest;
-  private ApduResponseApi apduResponse;
+  private transient ApduResponseApi apduResponse;
   private final transient CommandContextDto context;
   private final transient List<Command> controlSamCommands = new ArrayList<Command>(2);
 
