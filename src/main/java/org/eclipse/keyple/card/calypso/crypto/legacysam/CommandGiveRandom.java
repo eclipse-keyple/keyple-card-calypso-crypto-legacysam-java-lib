@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2023 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -19,7 +19,7 @@ import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
- * Builds the Give Random APDU command.
+ * Builds the "Give Random" APDU command.
  *
  * @since 0.1.0
  */
@@ -34,10 +34,10 @@ final class CommandGiveRandom extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamDigestUpdate.
+   * Instantiates a new CommandGiveRandom.
    *
    * @param context The SAM transaction context.
-   * @param random the random data.
+   * @param random The random data.
    * @throws IllegalArgumentException If the random data is null or has a length not equal to 8.
    * @since 0.1.0
    */
@@ -51,7 +51,6 @@ final class CommandGiveRandom extends Command {
     if (random == null || random.length != 8) {
       throw new IllegalArgumentException("Random value should be an 8 bytes long");
     }
-
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, random, null)));
@@ -65,11 +64,21 @@ final class CommandGiveRandom extends Command {
   @Override
   void finalizeRequest() {}
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
     return false;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     super.setResponseAndCheckStatus(apduResponse);

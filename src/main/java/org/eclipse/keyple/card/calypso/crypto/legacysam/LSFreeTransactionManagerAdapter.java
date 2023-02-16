@@ -40,9 +40,16 @@ class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
   /* Dynamic fields */
   private byte[] currentKeyDiversifier;
 
-  LSFreeTransactionManagerAdapter(ProxyReaderApi samReader, LegacySamAdapter sam) {
-    super(samReader, sam, null, null);
-    this.samKeyDiversifier = sam.getSerialNumber();
+  /**
+   * Constructs a new instance with the specified target SAM context and security settings.
+   *
+   * @param targetSamReader The reader through which the target SAM communicates.
+   * @param targetSam The target legacy SAM.
+   * @since 0.3.0
+   */
+  LSFreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
+    super(targetSamReader, targetSam, null, null);
+    this.samKeyDiversifier = targetSam.getSerialNumber();
   }
 
   /**
@@ -286,7 +293,8 @@ class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
     processTargetSamCommands(commands);
     commands.clear();
 
-    // read PAR4
+    // The parameter PAR4 of each key contains the associated counter number (if a key has no
+    // associated counter, the value of its PAR4 is set to 0)
     int counterPersonalization =
         getContext()
                 .getTargetSam()
@@ -306,8 +314,30 @@ class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
                 .getParameterValue(4)
             & 0xFF;
 
+    // store serial number, KVCs and counter number if any in the target SAM context
     TargetSamContextDto targetSamContextDto =
         new TargetSamContextDto(getContext().getTargetSam().getSerialNumber(), false);
+    targetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(
+            SystemKeyType.PERSONALIZATION,
+            getContext()
+                .getTargetSam()
+                .getSystemKeyParameter(SystemKeyType.PERSONALIZATION)
+                .getKvc());
+    targetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(
+            SystemKeyType.KEY_MANAGEMENT,
+            getContext()
+                .getTargetSam()
+                .getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT)
+                .getKvc());
+    targetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(
+            SystemKeyType.RELOADING,
+            getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.RELOADING).getKvc());
     if (counterPersonalization != 0) {
       targetSamContextDto
           .getSystemKeyTypeToCounterNumberMap()
@@ -411,18 +441,5 @@ class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
   /** Prepares a "SelectDiversifier" command using the current key diversifier. */
   private void prepareSelectDiversifier() {
     addTargetSamCommand(new CommandSelectDiversifier(getContext(), currentKeyDiversifier));
-  }
-
-  /**
-   * Overlapping interval test
-   *
-   * @param startA beginning of the A interval.
-   * @param endA end of the A interval.
-   * @param startB beginning of the B interval.
-   * @param endB end of the B interval.
-   * @return true if the intervals A and B overlap.
-   */
-  private boolean areIntervalsOverlapping(int startA, int endA, int startB, int endB) {
-    return startA <= endB && endA >= startB;
   }
 }

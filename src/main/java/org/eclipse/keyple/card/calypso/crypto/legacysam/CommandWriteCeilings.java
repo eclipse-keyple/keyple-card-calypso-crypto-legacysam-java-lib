@@ -27,11 +27,11 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
  * @since 0.1.0
  */
 final class CommandWriteCeilings extends Command {
-  private final TargetSamContextDto targetSamContext;
-  private final byte[] plainData = new byte[29];
-  private final Map<Integer, Boolean> counterNumberToManualCounterIncrementAuthorizedMap =
-      new HashMap<Integer, Boolean>();
-  private final int counterFileRecordNumber;
+  private final transient TargetSamContextDto targetSamContext; // NOSONAR
+  private final transient byte[] plainData = new byte[30]; // NOSONAR
+  private final transient Map<Integer, Boolean> counterNumberToManualCounterIncrementAuthorizedMap =
+      new HashMap<Integer, Boolean>(); // NOSONAR
+  private final transient int counterFileRecordNumber; // NOSONAR
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
@@ -85,14 +85,15 @@ final class CommandWriteCeilings extends Command {
       int counterNumber,
       int ceilingValue) {
 
-    super(CommandRef.WRITE_CEILINGS, 48, context);
+    super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
     this.counterFileRecordNumber = -1;
 
     // build the plain data block to be ciphered later
-    this.plainData[0] = (byte) counterNumber;
-    ByteArrayUtil.copyBytes(ceilingValue, this.plainData, 1, 3);
+    this.plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+    this.plainData[1] = (byte) counterNumber;
+    ByteArrayUtil.copyBytes(ceilingValue, this.plainData, 2, 3);
   }
 
   /**
@@ -112,18 +113,31 @@ final class CommandWriteCeilings extends Command {
       int counterNumber,
       int ceilingValue,
       boolean isManualCounterIncrementAuthorized) {
-    super(CommandRef.WRITE_CEILINGS, 48, context);
+    super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
     this.counterFileRecordNumber =
         CommonTransactionManagerAdapter.counterToRecordLookup[counterNumber];
 
+    this.plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
     addCounter(counterNumber, ceilingValue, isManualCounterIncrementAuthorized);
   }
 
+  /**
+   * Add a counter to be updated.
+   *
+   * <p>This command allows the upper layer to create a unique command when counters belongs to the
+   * same record into the SAM.
+   *
+   * @param counterNumber The counter number (in range [0..26]).
+   * @param ceilingValue The ceiling value to be written (in range [0..16777210]).
+   * @param isManualCounterIncrementAuthorized True if free incrementing of the counter should be
+   *     allowed.
+   * @since 0.3.0
+   */
   void addCounter(int counterNumber, int ceilingValue, boolean isManualCounterIncrementAuthorized) {
     // update the plain data block to be ciphered later
-    ByteArrayUtil.copyBytes(ceilingValue, plainData, (counterNumber % 9) * 3, 3);
+    ByteArrayUtil.copyBytes(ceilingValue, plainData, (counterNumber % 9) * 3 + 1, 3);
     // keep the config into a map
     counterNumberToManualCounterIncrementAuthorizedMap.put(
         counterNumber % 9, isManualCounterIncrementAuthorized);
@@ -161,9 +175,9 @@ final class CommandWriteCeilings extends Command {
     // add commands
     addControlSamCommand(
         new CommandSelectDiversifier(controlSamContext, targetSamContext.getSerialNumber()));
-    addControlSamCommand(new CmdSamGiveRandom(controlSamContext, computeChallenge()));
+    addControlSamCommand(new CommandGiveRandom(controlSamContext, computeChallenge()));
     if (this.counterFileRecordNumber != -1) {
-      completePlainData();
+      computePlainData();
     }
     CommandSamDataCipher commandSamDataCipher =
         new CommandSamDataCipher(
@@ -177,7 +191,7 @@ final class CommandWriteCeilings extends Command {
     processControlSamCommand();
     final byte cla = (byte) 0x80;
     final byte inst = (byte) 0xD8;
-    final byte p1 = 0;
+    final byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
@@ -191,7 +205,8 @@ final class CommandWriteCeilings extends Command {
                 null)));
   }
 
-  private void completePlainData() {
+  /** Computes the plain data block in the case of a multiple counter writing. */
+  private void computePlainData() {
     short configBits = 0;
     for (int i = 0; i < 9; i++) {
       Boolean config = counterNumberToManualCounterIncrementAuthorizedMap.get(i);
@@ -212,6 +227,7 @@ final class CommandWriteCeilings extends Command {
     ByteArrayUtil.copyBytes(configBits, plainData, 27, 2);
   }
 
+  /** Computes the challenge to be sent to the control SAM from the target SAM context. */
   private byte[] computeChallenge() {
 
     // compute the challenge
@@ -244,7 +260,7 @@ final class CommandWriteCeilings extends Command {
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
-    return false;
+    return true;
   }
 
   /**

@@ -23,6 +23,11 @@ import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Utility class to factorize command management.
+ *
+ * @since 0.3.0
+ */
 class CommandExecutor {
   private static final Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
   private static final String MSG_CARD_READER_COMMUNICATION_ERROR =
@@ -34,7 +39,14 @@ class CommandExecutor {
 
   private CommandExecutor() {}
 
-  /** @since 0.3.0 */
+  /**
+   * Requests the execution of all commands provided by the SAM inserted in the supplied card
+   * reader, and finalizes any commands that require it.
+   *
+   * @param commands A non-null list of {@link Command}.
+   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
+   * @since 0.3.0
+   */
   static void processCommands(
       List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
     if (commands.isEmpty()) {
@@ -53,10 +65,26 @@ class CommandExecutor {
   }
 
   /**
+   * Requests the execution of all commands provided by the SAM inserted in the supplied card reader
+   * without finalizing it.
+   *
+   * @param commands A non-null list of {@link Command}.
+   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
+   * @since 0.3.0
+   */
+  static void processCommandsAlreadyFinalized(
+      List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+    if (commands.isEmpty()) {
+      return;
+    }
+    executeCommands(commands, samReader, closePhysicalChannel);
+  }
+
+  /**
    * Executes the provided commands.
    *
    * @param commands The commands.
-   * @param closePhysicalChannel "true" if the physical channel must be closed after the operation.
+   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
    */
   private static void executeCommands(
       List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {

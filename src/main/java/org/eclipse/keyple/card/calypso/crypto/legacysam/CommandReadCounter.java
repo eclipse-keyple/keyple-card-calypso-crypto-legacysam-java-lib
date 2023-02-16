@@ -68,7 +68,13 @@ final class CommandReadCounter extends Command {
                 cla, getCommandRef().getInstructionByte(), (byte) 0x00, p2, null, (byte) 0x00)));
   }
 
-  public int getCounterFileRecordNumber() {
+  /**
+   * Retrieves the record number of the counter file that will be modified by this command.
+   *
+   * @return An int.
+   * @since 0.3.0
+   */
+  int getCounterFileRecordNumber() {
     return counterFileRecordNumber;
   }
 

@@ -56,8 +56,8 @@ abstract class Command {
   private String name;
   private ApduRequestAdapter apduRequest;
   private ApduResponseApi apduResponse;
-  private transient CommandContextDto context;
-  private transient List<Command> controlSamCommands = new ArrayList<Command>(2);
+  private final transient CommandContextDto context;
+  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2);
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands
@@ -150,6 +150,12 @@ abstract class Command {
     return context;
   }
 
+  /**
+   * Adds a control SAM command to be executed when finalizing.
+   *
+   * @param samCommand The command to be added.
+   * @since 0.3.0
+   */
   final void addControlSamCommand(Command samCommand) {
     controlSamCommands.add(samCommand);
   }
@@ -161,6 +167,12 @@ abstract class Command {
    */
   abstract void finalizeRequest();
 
+  /**
+   * Indicates the need for a control SAM to compute the data used to finalize the command.
+   *
+   * @return true if a control SAM is required.
+   * @since 0.3.0
+   */
   abstract boolean isControlSamRequiredToFinalizeRequest();
 
   /**
@@ -296,6 +308,11 @@ abstract class Command {
     return e;
   }
 
+  /**
+   * Executes all previously added commands for the control SAM.
+   *
+   * @since 0.3.0
+   */
   void processControlSamCommand() {
     try {
       CommandExecutor.processCommands(controlSamCommands, context.getControlSamReader(), false);
@@ -307,8 +324,18 @@ abstract class Command {
     }
   }
 
+  /**
+   * Resets any variables in the class.
+   *
+   * @since 0.3.0
+   */
   void resetState() {}
 
+  /**
+   * Clears the list of control SAM commands.
+   *
+   * @since 0.3.0
+   */
   void cleanState() {
     controlSamCommands.clear();
   }

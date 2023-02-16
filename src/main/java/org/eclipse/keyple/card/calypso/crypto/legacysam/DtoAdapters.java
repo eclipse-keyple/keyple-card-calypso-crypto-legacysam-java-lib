@@ -811,36 +811,91 @@ final class DtoAdapters {
     private final boolean isDynamicMode;
     private Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
         new HashMap<SystemKeyType, Integer>(3);
+    private Map<SystemKeyType, Byte> systemKeyTypeToKvcMap = new HashMap<SystemKeyType, Byte>(3);
     private Map<Integer, Integer> counterNumberToCounterValueMap = new HashMap<Integer, Integer>(3);
 
+    /**
+     * Constructs a new instance with the specified serial number and dynamic mode flag.
+     *
+     * @param serialNumber The serial number of the target SAM.
+     * @param dynamicMode A boolean indicating whether the target SAM is operating in dynamic mode.
+     * @since 0.3.0
+     */
     TargetSamContextDto(byte[] serialNumber, boolean dynamicMode) {
       this.serialNumber = serialNumber;
       this.isDynamicMode = dynamicMode;
     }
 
+    /**
+     * Returns the serial number of the target SAM.
+     *
+     * @return a byte array containing the serial number of the target SAM.
+     * @since 0.3.0
+     */
     byte[] getSerialNumber() {
       return serialNumber;
     }
 
-    public boolean isDynamicMode() {
+    /**
+     * Returns a boolean indicating whether the target SAM is operating in dynamic mode.
+     *
+     * @return True if the target SAM is operating in dynamic mode, otherwise false.
+     * @since 0.3.0
+     */
+    boolean isDynamicMode() {
       return isDynamicMode;
     }
 
+    /**
+     * Returns a map containing the system key types and their corresponding counter numbers.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
     Map<SystemKeyType, Integer> getSystemKeyTypeToCounterNumberMap() {
       return systemKeyTypeToCounterNumberMap;
     }
 
+    /**
+     * Returns a map containing the system key types and their corresponding KVCs.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
+    Map<SystemKeyType, Byte> getSystemKeyTypeToKvcMap() {
+      return systemKeyTypeToKvcMap;
+    }
+
+    /**
+     * Returns a map containing the counter numbers and their corresponding counter values.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
     Map<Integer, Integer> getCounterNumberToCounterValueMap() {
       return counterNumberToCounterValueMap;
     }
   }
 
+  /**
+   * This POJO contains the command context for a SAM transaction and its related SAM commands.
+   *
+   * @since 0.3.0
+   */
   static class CommandContextDto {
 
-    private LegacySamAdapter targetSam;
-    private ProxyReaderApi controlSamReader;
-    private LegacySamAdapter controlSam;
+    private final LegacySamAdapter targetSam;
+    private final ProxyReaderApi controlSamReader;
+    private final LegacySamAdapter controlSam;
 
+    /**
+     * Constructs a new instance with the specified target SAM, control SAM reader and control SAM.
+     *
+     * @param targetSam The target legacy SAM.
+     * @param controlSamReader The reader through which the control SAM communicates.
+     * @param controlSam The control legacy SAM.
+     * @since 0.3.0
+     */
     public CommandContextDto(
         LegacySamAdapter targetSam, ProxyReaderApi controlSamReader, LegacySamAdapter controlSam) {
       this.targetSam = targetSam;
@@ -848,14 +903,26 @@ final class DtoAdapters {
       this.controlSam = controlSam;
     }
 
+    /**
+     * @return The target SAM.
+     * @since 0.3.0
+     */
     LegacySamAdapter getTargetSam() {
       return targetSam;
     }
 
+    /**
+     * @return The control SAM reader.
+     * @since 0.3.0
+     */
     ProxyReaderApi getControlSamReader() {
       return controlSamReader;
     }
 
+    /**
+     * @return The control SAM.
+     * @since 0.3.0
+     */
     LegacySamAdapter getControlSam() {
       return controlSam;
     }

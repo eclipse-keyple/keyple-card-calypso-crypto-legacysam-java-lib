@@ -19,7 +19,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySe
  *
  * @since 0.3.0
  */
-public class LSSecuritySettingFactoryAdapter implements LSSecuritySettingFactory {
+class LSSecuritySettingFactoryAdapter implements LSSecuritySettingFactory {
 
   /**
    * {@inheritDoc}

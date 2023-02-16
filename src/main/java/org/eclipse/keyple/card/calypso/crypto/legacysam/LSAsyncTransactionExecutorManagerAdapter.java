@@ -23,12 +23,26 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSAsyncTrans
 import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
-public class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
+/**
+ * Adapter of {@link LSAsyncTransactionExecutorManager}.
+ *
+ * @since 0.3.0
+ */
+class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
     implements LSAsyncTransactionExecutorManager {
 
+  /**
+   * Constructs a new instance with the specified target SAM reader, target SAM and commands to be
+   * executed.
+   *
+   * @param targetSamReader The reader through which the target SAM communicates.
+   * @param targetSam The target legacy SAM.
+   * @param samCommands The commands to be executed as a JSon String.
+   * @since 0.3.0
+   */
   LSAsyncTransactionExecutorManagerAdapter(
-      ProxyReaderApi samReader, LegacySamAdapter sam, String samCommands) {
-    super(samReader, sam, null, null);
+      ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommands) {
+    super(targetSamReader, targetSam, null, null);
 
     JsonObject jsonObject = JsonUtil.getParser().fromJson(samCommands, JsonObject.class);
 
@@ -59,7 +73,7 @@ public class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionM
    */
   @Override
   public LSAsyncTransactionExecutorManager processCommands() {
-    processTargetSamCommands(false);
+    processTargetSamCommandsAlreadyFinalized(false);
     return this;
   }
 }

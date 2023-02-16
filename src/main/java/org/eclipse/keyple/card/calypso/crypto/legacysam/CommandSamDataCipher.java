@@ -54,9 +54,7 @@ final class CommandSamDataCipher extends Command {
     STATUS_TABLE = m;
   }
 
-  private final DataType dataType;
   private final byte[] cipheredData = new byte[48];
-  private final int recordNumber;
 
   /**
    * Instantiates a new instance to cipher a data record.
@@ -81,8 +79,6 @@ final class CommandSamDataCipher extends Command {
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2;
-    this.dataType = dataType;
-    this.recordNumber = recordNumber;
     switch (dataType) {
       case CAAD_RECORD:
         p2 = (byte) (0xE7 + recordNumber);
@@ -141,7 +137,12 @@ final class CommandSamDataCipher extends Command {
     System.arraycopy(apduResponse.getApdu(), 0, cipheredData, 0, 48);
   }
 
-  public byte[] getCipheredData() {
+  /**
+   * Retreives the ciphered data resulting of the execution of the command.
+   *
+   * @return A 48-byte byte array.
+   */
+  byte[] getCipheredData() {
     return cipheredData;
   }
 

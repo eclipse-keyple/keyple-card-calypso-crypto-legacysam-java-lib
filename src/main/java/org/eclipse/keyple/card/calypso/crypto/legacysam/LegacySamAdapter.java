@@ -300,7 +300,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    *
    * @param counterNumber The number of the counter.
    * @param incrementingState The incrementing state.
-   * @since 0.2.0
+   * @since 0.3.0
    */
   void putCounterIncrementConfiguration(int counterNumber, boolean incrementingState) {
     countersIncrementConfig.put(counterNumber, incrementingState);
@@ -329,7 +329,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public Boolean isManualCounterIncrementAuthorized(int counterNumber) {

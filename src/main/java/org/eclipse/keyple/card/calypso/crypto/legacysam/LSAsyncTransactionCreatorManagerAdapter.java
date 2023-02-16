@@ -19,12 +19,24 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 
-public class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
+/**
+ * Adapter of {@link LSAsyncTransactionCreatorManager}.
+ *
+ * @since 0.3.0
+ */
+class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
     implements LSAsyncTransactionCreatorManager {
 
   /* Final fields */
   private final TargetSamContextDto targetSamContext;
 
+  /**
+   * Constructs a new instance with the specified target SAM context and security settings.
+   *
+   * @param targetSamContext The target SAM context as a JSon String.
+   * @param lsSecuritySetting An instance of {@link LSSecuritySetting}.
+   * @since 0.3.0
+   */
   LSAsyncTransactionCreatorManagerAdapter(
       String targetSamContext, LSSecuritySetting lsSecuritySetting) {
     super(
@@ -116,9 +128,19 @@ public class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMa
     return jsonObject.toString();
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * <p>This method is part of the implemented interface, but it cannot be executed by this type of
+   * transaction manager, which is not designed to handle target SAM commands. As a result, when
+   * called, this method always throws an exception.
+   *
+   * @throws IllegalStateException Always.
+   * @since 0.3.0
+   */
   @Override
   public LSAsyncTransactionCreatorManager processCommands() {
     throw new IllegalStateException(
-        "processCommands() is not allowed during the creation of an asynchronous transaction. Use exportCommands().");
+        "processCommands() is not allowed during the creation of an asynchronous transaction.");
   }
 }
