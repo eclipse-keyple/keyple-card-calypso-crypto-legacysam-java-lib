@@ -809,10 +809,14 @@ final class DtoAdapters {
 
     private final byte[] serialNumber;
     private final boolean isDynamicMode;
-    private Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
-        new HashMap<SystemKeyType, Integer>(3);
-    private Map<SystemKeyType, Byte> systemKeyTypeToKvcMap = new HashMap<SystemKeyType, Byte>(3);
-    private Map<Integer, Integer> counterNumberToCounterValueMap = new HashMap<Integer, Integer>(3);
+    private final Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
+        new HashMap<SystemKeyType, Integer>(
+            3); // NOSONAR enummap is not suitable for the gson serializer
+    private final Map<SystemKeyType, Byte> systemKeyTypeToKvcMap =
+        new HashMap<SystemKeyType, Byte>(
+            3); // NOSONAR enummap is not suitable for the gson serializer
+    private final Map<Integer, Integer> counterNumberToCounterValueMap =
+        new HashMap<Integer, Integer>(3);
 
     /**
      * Constructs a new instance with the specified serial number and dynamic mode flag.

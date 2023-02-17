@@ -115,22 +115,22 @@ public class LSFreeTransactionManagerAdapterTest {
   private static final String C_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION = "80BC00C4020000";
   private static final String R_READ_SYSTEM_KEY_PARAMETER_PERSONALIZATION =
       READ_MESSAGE_SIGNATURE
-          + "E1FF401112130115161718191AC1"
+          + "E1F1401112130115161718191AC1"
           + SAM_SERIAL_NUMBER
           + "FAFF408000009000";
   private static final String R_READ_SYSTEM_KEY_PARAMETER_KEY_MANAGEMENT =
       READ_MESSAGE_SIGNATURE
-          + "FDFF402122230225262728292AC2"
+          + "FDF2402122230225262728292AC2"
           + SAM_SERIAL_NUMBER
           + "FAFF408000009000";
   private static final String R_READ_SYSTEM_KEY_PARAMETER_RELOADING =
       READ_MESSAGE_SIGNATURE
-          + "E7FF403132330335363738393AC3"
+          + "E7F3403132330335363738393AC3"
           + SAM_SERIAL_NUMBER
           + "FAFF408000009000";
   private static final String R_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION =
       READ_MESSAGE_SIGNATURE
-          + "FAFF404142430445464748494AC4"
+          + "FAF4404142430445464748494AC4"
           + SAM_SERIAL_NUMBER
           + "FAFF408000009000";
   private final Map<SystemKeyType, Byte> systemKeyTypeToKifMap =
@@ -1903,7 +1903,24 @@ public class LSFreeTransactionManagerAdapterTest {
     for (SystemKeyType type : systemKeyTypes) {
       assertThat(sam.getSystemKeyParameter(type).getKif())
           .isEqualTo(systemKeyTypeToKifMap.get(type));
-      assertThat(sam.getSystemKeyParameter(type).getKvc()).isEqualTo((byte) 0xFF);
+      final byte kvc;
+      switch (type) {
+        case PERSONALIZATION:
+          kvc = (byte) 0xF1;
+          break;
+        case KEY_MANAGEMENT:
+          kvc = (byte) 0xF2;
+          break;
+        case RELOADING:
+          kvc = (byte) 0xF3;
+          break;
+        case AUTHENTICATION:
+          kvc = (byte) 0xF4;
+          break;
+        default:
+          throw new IllegalStateException("Unexpected key type");
+      }
+      assertThat(sam.getSystemKeyParameter(type).getKvc()).isEqualTo(kvc);
       assertThat(sam.getSystemKeyParameter(type).getAlgorithm()).isEqualTo((byte) 0x40);
       for (int i = 1; i <= 10; i++) {
         if (i == 4) {
@@ -1947,11 +1964,20 @@ public class LSFreeTransactionManagerAdapterTest {
         .getSystemKeyTypeToCounterNumberMap()
         .put(SystemKeyType.PERSONALIZATION, 1);
     expectedTargetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(SystemKeyType.PERSONALIZATION, (byte) 0xF1);
+    expectedTargetSamContextDto
         .getSystemKeyTypeToCounterNumberMap()
         .put(SystemKeyType.KEY_MANAGEMENT, 2);
     expectedTargetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(SystemKeyType.KEY_MANAGEMENT, (byte) 0xF2);
+    expectedTargetSamContextDto
         .getSystemKeyTypeToCounterNumberMap()
         .put(SystemKeyType.RELOADING, 3);
+    expectedTargetSamContextDto
+        .getSystemKeyTypeToKvcMap()
+        .put(SystemKeyType.RELOADING, (byte) 0xF3);
     expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(1, 0x111111);
     expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(2, 0x122222);
     expectedTargetSamContextDto.getCounterNumberToCounterValueMap().put(3, 0x133333);

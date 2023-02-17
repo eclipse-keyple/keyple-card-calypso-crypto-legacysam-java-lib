@@ -93,7 +93,9 @@ final class CommandWriteKey extends Command {
    * @since 0.3.0
    */
   @Override
-  void finalizeRequest() {}
+  void finalizeRequest() {
+    /* nothing to do */
+  }
 
   /**
    * {@inheritDoc}

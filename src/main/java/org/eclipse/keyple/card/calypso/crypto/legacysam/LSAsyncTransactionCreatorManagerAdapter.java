@@ -33,19 +33,19 @@ class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAd
   /**
    * Constructs a new instance with the specified target SAM context and security settings.
    *
-   * @param targetSamContext The target SAM context as a JSon String.
+   * @param targetSamContextJSon The target SAM context as a JSon String.
    * @param lsSecuritySetting An instance of {@link LSSecuritySetting}.
    * @since 0.3.0
    */
   LSAsyncTransactionCreatorManagerAdapter(
-      String targetSamContext, LSSecuritySetting lsSecuritySetting) {
+      String targetSamContextJSon, LSSecuritySetting lsSecuritySetting) {
     super(
         null,
         null,
         ((LSSecuritySettingAdapter) lsSecuritySetting).getControlSamReader(),
         ((LSSecuritySettingAdapter) lsSecuritySetting).getControlSam());
     this.targetSamContext =
-        JsonUtil.getParser().fromJson(targetSamContext, TargetSamContextDto.class);
+        JsonUtil.getParser().fromJson(targetSamContextJSon, TargetSamContextDto.class);
   }
 
   /**

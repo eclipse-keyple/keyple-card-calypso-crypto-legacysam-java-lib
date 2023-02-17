@@ -11,9 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.CommonTransactionManagerAdapter.SAM_COMMANDS;
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.CommonTransactionManagerAdapter.SAM_COMMANDS_TYPES;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
@@ -37,14 +34,14 @@ class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerA
    *
    * @param targetSamReader The reader through which the target SAM communicates.
    * @param targetSam The target legacy SAM.
-   * @param samCommands The commands to be executed as a JSon String.
+   * @param samCommandsJSon The commands to be executed as a JSon String.
    * @since 0.3.0
    */
   LSAsyncTransactionExecutorManagerAdapter(
-      ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommands) {
+      ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommandsJSon) {
     super(targetSamReader, targetSam, null, null);
 
-    JsonObject jsonObject = JsonUtil.getParser().fromJson(samCommands, JsonObject.class);
+    JsonObject jsonObject = JsonUtil.getParser().fromJson(samCommandsJSon, JsonObject.class);
 
     // extract the type and command lists
     List<String> commandsTypes =

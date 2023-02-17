@@ -224,7 +224,7 @@ final class CommandWriteCeilings extends Command {
         configBits |= 1 << i;
       }
     }
-    ByteArrayUtil.copyBytes(configBits, plainData, 27, 2);
+    ByteArrayUtil.copyBytes(configBits, plainData, 28, 2);
   }
 
   /** Computes the challenge to be sent to the control SAM from the target SAM context. */

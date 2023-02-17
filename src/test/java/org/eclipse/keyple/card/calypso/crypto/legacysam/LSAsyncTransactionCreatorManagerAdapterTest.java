@@ -49,15 +49,15 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
   private static final String C_GIVE_RANDOM_COUNTER_RELOADING_1 = "8086000008000000000000017C";
   private static final String C_GIVE_RANDOM_COUNTER_RELOADING_2 = "8086000008000000000000017D";
   private static final String C_SAM_DATA_CIPHER_CEILING_0 =
-      "801600B81D0000006400000000000000000000000000000000000000000000000000";
+      "801600B81EF20000006400000000000000000000000000000000000000000000000000";
   private static final String C_SAM_DATA_CIPHER_CEILING_3 =
-      "801600B81D0300012C00000000000000000000000000000000000000000000000000";
+      "801600B81EF20300012C00000000000000000000000000000000000000000000000000";
   private static final String C_SAM_DATA_CIPHER_CEILING_RECORD_1 =
-      "801600B11D00000100000200000300000400000500000600000700000800000901FE";
+      "801600B11EF200000100000200000300000400000500000600000700000800000901FE";
   private static final String C_SAM_DATA_CIPHER_CEILING_RECORD_2 =
-      "801600B21D00000A00000B00000C00000D00000E00000F00001000001100001201FF";
+      "801600B21EF200000A00000B00000C00000D00000E00000F00001000001100001201FF";
   private static final String C_SAM_DATA_CIPHER_CEILING_RECORD_3 =
-      "801600B31D00001300001400001500001600001700001800001900001A00001B01FF";
+      "801600B31EF200001300001400001500001600001700001800001900001A00001B01FF";
   private static final String SAM_DATA_CIPHER_CEILING_0 =
       "040990EDF6C0D2F9FEF25629BEB6439B762DDCD97A90AAAD6CAACCFDD75C6209AC7ABCBF6560A7D2ACC1594441B1E32A";
   private static final String SAM_DATA_CIPHER_CEILING_3 =
@@ -76,30 +76,39 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
       SAM_DATA_CIPHER_CEILING_RECORD_2 + R_9000;
   private static final String R_SAM_DATA_CIPHER_RECORD_3 =
       SAM_DATA_CIPHER_CEILING_RECORD_3 + R_9000;
-  private static final String C_WRITE_CEILING_0 = "80D800B830" + SAM_DATA_CIPHER_CEILING_0;
-  private static final String C_WRITE_CEILING_3 = "80D800B830" + SAM_DATA_CIPHER_CEILING_3;
-  private static final String C_WRITE_CEILING_RECORD_1 =
-      "80D800B130" + SAM_DATA_CIPHER_CEILING_RECORD_1;
-  private static final String C_WRITE_CEILING_RECORD_2 =
-      "80D800B230" + SAM_DATA_CIPHER_CEILING_RECORD_2;
-  private static final String C_WRITE_CEILING_RECORD_3 =
-      "80D800B330" + SAM_DATA_CIPHER_CEILING_RECORD_3;
+  private static final String C_STATIC_WRITE_CEILING_0 = "80D808B830" + SAM_DATA_CIPHER_CEILING_0;
+  private static final String C_STATIC_WRITE_CEILING_3 = "80D808B830" + SAM_DATA_CIPHER_CEILING_3;
+  private static final String C_STATIC_WRITE_CEILING_RECORD_1 =
+      "80D808B130" + SAM_DATA_CIPHER_CEILING_RECORD_1;
+  private static final String C_STATIC_WRITE_CEILING_RECORD_2 =
+      "80D808B230" + SAM_DATA_CIPHER_CEILING_RECORD_2;
+  private static final String C_STATIC_WRITE_CEILING_RECORD_3 =
+      "80D808B330" + SAM_DATA_CIPHER_CEILING_RECORD_3;
 
   private static final String TARGET_SAM_CONTEXT =
-      "{\"serialNumber\":\"11223344\","
-          + "\"systemKeyTypeToCounterNumberMap\":"
-          + "{"
-          + "\"PERSONALIZATION\":\"01\","
-          + "\"KEY_MANAGEMENT\":\"02\","
-          + "\"RELOADING\":\"03\""
-          + "},"
-          + "\"counterNumberToCounterValueMap\":"
-          + "{"
-          + "\"01\":\"0179\","
-          + "\"02\":\"017A\","
-          + "\"03\":\"017B\""
-          + "}"
+      "{\n"
+          + "\"serialNumber\": \"11223344\",\n"
+          + "    \"isDynamicMode\": false,\n"
+          + "    \"systemKeyTypeToCounterNumberMap\":\n"
+          + "    {\n"
+          + "        \"PERSONALIZATION\": \"01\",\n"
+          + "        \"KEY_MANAGEMENT\": \"02\",\n"
+          + "        \"RELOADING\": \"03\"\n"
+          + "    },\n"
+          + "    \"systemKeyTypeToKvcMap\":\n"
+          + "    {\n"
+          + "        \"PERSONALIZATION\": \"F1\",\n"
+          + "        \"RELOADING\": \"F2\",\n"
+          + "        \"KEY_MANAGEMENT\": \"F3\"\n"
+          + "    },\n"
+          + "    \"counterNumberToCounterValueMap\":\n"
+          + "    {\n"
+          + "        \"01\": \"0179\",\n"
+          + "        \"02\": \"017A\",\n"
+          + "        \"03\": \"017B\"\n"
+          + "    }\n"
           + "}";
+
   private LSAsyncTransactionCreatorManager samTransactionManager;
   private ReaderMock samReader;
   private LegacySam controlSam;
@@ -271,7 +280,8 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
       // check the embedded command apdu
       byte[] apduC = command.getApduRequest().getApdu();
       assertThat(apduC)
-          .isEqualTo(HexUtil.toByteArray(i == 0 ? C_WRITE_CEILING_0 : C_WRITE_CEILING_3));
+          .isEqualTo(
+              HexUtil.toByteArray(i == 0 ? C_STATIC_WRITE_CEILING_0 : C_STATIC_WRITE_CEILING_3));
     }
   }
 
@@ -344,13 +354,13 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
       byte[] apduC = command.getApduRequest().getApdu();
       switch (i) {
         case 0:
-          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_WRITE_CEILING_RECORD_1));
+          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_STATIC_WRITE_CEILING_RECORD_1));
           break;
         case 1:
-          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_WRITE_CEILING_RECORD_2));
+          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_STATIC_WRITE_CEILING_RECORD_2));
           break;
         case 2:
-          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_WRITE_CEILING_RECORD_3));
+          assertThat(apduC).isEqualTo(HexUtil.toByteArray(C_STATIC_WRITE_CEILING_RECORD_3));
           break;
       }
     }
