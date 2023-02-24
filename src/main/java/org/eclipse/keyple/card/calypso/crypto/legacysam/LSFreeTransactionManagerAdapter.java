@@ -27,7 +27,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  *
  * @since 0.1.0
  */
-class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
+final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
     implements LSFreeTransactionManager {
   private static final String MSG_INPUT_OUTPUT_DATA = "input/output data";
   private static final String MSG_SIGNATURE_SIZE = "signature size";

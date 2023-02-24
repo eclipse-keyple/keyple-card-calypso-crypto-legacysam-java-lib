@@ -58,7 +58,7 @@ final class CommandPsoVerifySignature extends Command {
   /**
    * Instantiates a new instance based on the provided signature verification data.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param data The signature verification data.
    * @since 0.1.0
    */
@@ -156,7 +156,7 @@ final class CommandPsoVerifySignature extends Command {
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     try {
-      super.setResponseAndCheckStatus(apduResponse);
+      setResponseAndCheckStatus(apduResponse);
       data.setSignatureValid(true);
     } catch (SecurityDataException e) {
       data.setSignatureValid(false);

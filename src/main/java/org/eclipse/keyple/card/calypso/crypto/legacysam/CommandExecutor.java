@@ -35,7 +35,7 @@ class CommandExecutor {
   private static final String MSG_CARD_COMMUNICATION_ERROR =
       "A communication error with the card occurred ";
   private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
-  static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
+  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
 
   private CommandExecutor() {}
 

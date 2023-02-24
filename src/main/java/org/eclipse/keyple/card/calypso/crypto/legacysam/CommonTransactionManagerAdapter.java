@@ -30,13 +30,6 @@ abstract class CommonTransactionManagerAdapter {
   static final int MAX_COUNTER_CEILING_NUMBER = 26;
   static final int MIN_COUNTER_CEILING_VALUE = 0;
   static final int MAX_COUNTER_CEILING_VALUE = 0xFFFFFA;
-  static final int NB_COUNTER_CEILING_PER_RECORD = 9;
-  static final int FIRST_COUNTER_REC1 = 0;
-  static final int LAST_COUNTER_REC1 = 8;
-  static final int FIRST_COUNTER_REC2 = 9;
-  static final int LAST_COUNTER_REC2 = 17;
-  static final int FIRST_COUNTER_REC3 = 18;
-  static final int LAST_COUNTER_REC3 = 26;
   /* JSON field names */
   static final String SAM_COMMANDS_TYPES = "samCommandsTypes";
   static final String SAM_COMMANDS = "samCommands";
@@ -66,16 +59,6 @@ abstract class CommonTransactionManagerAdapter {
     this.targetSam = targetSam;
     this.controlSamReader = controlSamReader;
     this.controlSam = controlSam;
-  }
-
-  /**
-   * Gets the target SAM reader.
-   *
-   * @return Null if no target SAM reader is set.
-   * @since 0.3.0
-   */
-  final ProxyReaderApi getTargetSamReader() {
-    return targetSamReader;
   }
 
   /**
@@ -118,11 +101,8 @@ abstract class CommonTransactionManagerAdapter {
   final void processTargetSamCommands(boolean closePhysicalChannel) {
     try {
       CommandExecutor.processCommands(targetSamCommands, targetSamReader, closePhysicalChannel);
-    } catch (RuntimeException e) {
-      resetState();
-      throw e;
     } finally {
-      cleanState();
+      targetSamCommands.clear();
     }
   }
 
@@ -137,28 +117,9 @@ abstract class CommonTransactionManagerAdapter {
     try {
       CommandExecutor.processCommandsAlreadyFinalized(
           targetSamCommands, targetSamReader, closePhysicalChannel);
-    } catch (RuntimeException e) {
-      resetState();
-      throw e;
     } finally {
-      cleanState();
+      targetSamCommands.clear();
     }
-  }
-
-  /**
-   * Resets any variables in the class.
-   *
-   * @since 0.3.0
-   */
-  private void resetState() {}
-
-  /**
-   * Clears the list of target SAM commands.
-   *
-   * @since 0.3.0
-   */
-  private void cleanState() {
-    targetSamCommands.clear();
   }
 
   /**

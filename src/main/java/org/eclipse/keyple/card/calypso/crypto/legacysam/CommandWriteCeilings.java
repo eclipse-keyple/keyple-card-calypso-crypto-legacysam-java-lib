@@ -72,7 +72,7 @@ final class CommandWriteCeilings extends Command {
   /**
    * Instantiates a new CommandWriteCeilings for writing a single ceiling value.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param targetSamContext The target SAM context.
    * @param counterNumber The number of the counter whose ceiling is to be written (in range
    *     [0..26]).
@@ -99,7 +99,7 @@ final class CommandWriteCeilings extends Command {
   /**
    * Instantiates a new CommandWriteCeilings for writing a record of 9 ceiling values.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param targetSamContext The target SAM context.
    * @param counterNumber The number of the counter whose ceiling is to be written (in range
    *     [0..26]).

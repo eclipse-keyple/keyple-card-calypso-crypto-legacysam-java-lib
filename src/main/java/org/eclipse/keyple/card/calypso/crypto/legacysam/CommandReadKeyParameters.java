@@ -48,7 +48,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * Instantiates a new instance to read the parameters of a system key.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param systemKeyType The type of the system key.
    * @since 0.3.0
    */
@@ -85,7 +85,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * Instantiates a new instance to read the parameters of a key identified by its KIF and KVC.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param kif The KIF of the key.
    * @param kvc The KIF of the key.
    * @since 0.3.0
@@ -106,7 +106,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * Instantiates a new instance to read the parameters of a key identified by its record number.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param recordNumber the record number
    * @since 0.3.0
    */

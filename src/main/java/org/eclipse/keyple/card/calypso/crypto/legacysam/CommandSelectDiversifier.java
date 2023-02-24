@@ -40,7 +40,7 @@ final class CommandSelectDiversifier extends Command {
   /**
    * Instantiates a new CommandSelectDiversifier.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param diversifier The key diversifier.
    * @since 0.1.0
    */

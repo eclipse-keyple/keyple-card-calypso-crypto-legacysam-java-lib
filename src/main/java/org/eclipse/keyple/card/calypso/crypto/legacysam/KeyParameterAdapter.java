@@ -29,7 +29,7 @@ final class KeyParameterAdapter implements KeyParameter {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public byte[] getRawData() {
@@ -39,7 +39,7 @@ final class KeyParameterAdapter implements KeyParameter {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public byte getKif() {
@@ -49,7 +49,7 @@ final class KeyParameterAdapter implements KeyParameter {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public byte getKvc() {
@@ -59,7 +59,7 @@ final class KeyParameterAdapter implements KeyParameter {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public byte getAlgorithm() {
@@ -69,7 +69,7 @@ final class KeyParameterAdapter implements KeyParameter {
   /**
    * {@inheritDoc}
    *
-   * @since 0.2.0
+   * @since 0.3.0
    */
   @Override
   public byte getParameterValue(int parameterNumber) {

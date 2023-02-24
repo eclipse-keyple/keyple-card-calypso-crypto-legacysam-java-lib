@@ -24,7 +24,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  *
  * @since 0.3.0
  */
-class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
+final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
     implements LSAsyncTransactionCreatorManager {
 
   /* Final fields */

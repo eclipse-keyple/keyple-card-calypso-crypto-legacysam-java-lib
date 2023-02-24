@@ -59,7 +59,7 @@ final class CommandSamDataCipher extends Command {
   /**
    * Instantiates a new instance to cipher a data record.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param recordNumber The targeted record number (in range [1..7], ignored when DataType is
    *     {@link DataType#ONE_CEILING_VALUE} or {@link DataType#PARAMETERS_RECORD}).
    * @param dataType The type of data to be ciphered.

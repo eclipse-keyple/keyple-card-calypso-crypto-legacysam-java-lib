@@ -10,7 +10,7 @@ plugins {
 buildscript {
     repositories {
         mavenLocal()
-//        maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
+        maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
         mavenCentral()
     }
     dependencies {
@@ -19,16 +19,12 @@ buildscript {
 }
 apply(plugin = "org.eclipse.keyple")
 
-tasks.withType(JavaCompile::class) {
-    options.compilerArgs = listOf("-Xlint:unchecked", "-Xlint:deprecation")
-}
-
 ///////////////////////////////////////////////////////////////////////////////
 //  APP CONFIGURATION
 ///////////////////////////////////////////////////////////////////////////////
 repositories {
     mavenLocal()
-//    maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
+    maven(url = "https://repo.eclipse.org/service/local/repositories/maven_central/content")
     mavenCentral()
     maven(url = "https://oss.sonatype.org/content/repositories/snapshots")
     maven(url = "https://s01.oss.sonatype.org/content/repositories/snapshots")
@@ -41,7 +37,7 @@ dependencies {
     implementation("org.eclipse.keyple:keyple-service-resource-java-lib:2.0.2")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.3.0")
     implementation("org.slf4j:slf4j-api:1.7.32")
-    implementation("com.google.code.gson:gson:2.8.9")
+    implementation("com.google.code.gson:gson:2.10.1")
     testImplementation("org.slf4j:slf4j-simple:1.7.32")
     testImplementation("junit:junit:4.13.2")
     testImplementation("org.assertj:assertj-core:3.15.0")

@@ -822,12 +822,13 @@ final class DtoAdapters {
      * Constructs a new instance with the specified serial number and dynamic mode flag.
      *
      * @param serialNumber The serial number of the target SAM.
-     * @param dynamicMode A boolean indicating whether the target SAM is operating in dynamic mode.
+     * @param isDynamicMode A boolean indicating whether the target SAM is operating in dynamic
+     *     mode.
      * @since 0.3.0
      */
-    TargetSamContextDto(byte[] serialNumber, boolean dynamicMode) {
+    TargetSamContextDto(byte[] serialNumber, boolean isDynamicMode) {
       this.serialNumber = serialNumber;
-      this.isDynamicMode = dynamicMode;
+      this.isDynamicMode = isDynamicMode;
     }
 
     /**

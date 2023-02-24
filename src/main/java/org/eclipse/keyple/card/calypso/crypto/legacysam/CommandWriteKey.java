@@ -56,7 +56,7 @@ final class CommandWriteKey extends Command {
   /**
    * Instantiates a new CommandWriteKey.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param writingMode the writing mode (P1).
    * @param keyReference the key reference (P2).
    * @param keyData the key data.

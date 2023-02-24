@@ -38,7 +38,7 @@ final class LSSecuritySettingAdapter implements LSSecuritySetting {
         .notNull(controlSam, "controlSam")
         .notNull(controlSam.getProductType(), "productType")
         .isTrue(controlSam.getProductType() != LegacySam.ProductType.UNKNOWN, "productType");
-    this.controlSamReader = (ProxyReaderApi) samReader;
+    controlSamReader = (ProxyReaderApi) samReader;
     this.controlSam = (LegacySamAdapter) controlSam;
     return this;
   }
@@ -49,7 +49,7 @@ final class LSSecuritySettingAdapter implements LSSecuritySetting {
    * @return Null if no control SAM reader is set.
    * @since 0.3.0
    */
-  final ProxyReaderApi getControlSamReader() {
+  ProxyReaderApi getControlSamReader() {
     return controlSamReader;
   }
 
@@ -59,7 +59,7 @@ final class LSSecuritySettingAdapter implements LSSecuritySetting {
    * @return Null if no control SAM is set.
    * @since 0.3.0
    */
-  final LegacySamAdapter getControlSam() {
+  LegacySamAdapter getControlSam() {
     return controlSam;
   }
 }

@@ -64,12 +64,12 @@ abstract class Command {
    *
    * @param commandRef A command reference from the Calypso command table.
    * @param le The value of the LE field.
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @since 0.1.0
    */
   Command(CommandRef commandRef, int le, CommandContextDto context) {
     this.commandRef = commandRef;
-    this.name = commandRef.getName();
+    name = commandRef.getName();
     this.le = le;
     this.context = context;
   }
@@ -85,8 +85,8 @@ abstract class Command {
    * @since 0.1.0
    */
   final void addSubName(String subName) {
-    this.name = this.name + " - " + subName;
-    this.apduRequest.setInfo(this.name);
+    name = name + " - " + subName;
+    apduRequest.setInfo(name);
   }
 
   /**
@@ -106,7 +106,7 @@ abstract class Command {
    * @since 0.1.0
    */
   final String getName() {
-    return this.name;
+    return name;
   }
 
   /**
@@ -117,7 +117,7 @@ abstract class Command {
    */
   final void setApduRequest(ApduRequestAdapter apduRequest) {
     this.apduRequest = apduRequest;
-    this.apduRequest.setInfo(this.name);
+    this.apduRequest.setInfo(name);
   }
 
   /**
@@ -131,17 +131,7 @@ abstract class Command {
   }
 
   /**
-   * Gets {@link ApduResponseApi}
-   *
-   * @return Null if the response is not set.
-   * @since 0.1.0
-   */
-  final ApduResponseApi getApduResponse() {
-    return apduResponse;
-  }
-
-  /**
-   * Returns the Calypso card.
+   * Returns the command context.
    *
    * @return Null if the SAM selection has not yet been made.
    * @since 0.1.0
@@ -218,20 +208,6 @@ abstract class Command {
   }
 
   /**
-   * Gets true if the status is successful from the statusTable according to the current status code
-   * and if the length of the response is equal to the LE field in the request.
-   *
-   * @return A value
-   * @since 0.1.0
-   */
-  final boolean isSuccessful() {
-    StatusProperties props = getStatusWordProperties();
-    return props != null
-        && props.isSuccessful()
-        && (le == 0 || apduResponse.getDataOut().length == le); // CL-CSS-RESPLE.1
-  }
-
-  /**
    * This method check the status word and if the length of the response is equal to the LE field in
    * the request.<br>
    * If status word is not referenced, then status is considered unsuccessful.
@@ -264,17 +240,6 @@ abstract class Command {
 
     // Throw the exception
     throw buildCommandException(exceptionClass, message);
-  }
-
-  /**
-   * Gets the ASCII message from the statusTable for the current status word.
-   *
-   * @return A nullable value
-   * @since 0.1.0
-   */
-  final String getStatusInformation() {
-    StatusProperties props = getStatusWordProperties();
-    return props != null ? props.getInformation() : null;
   }
 
   /**
@@ -316,28 +281,9 @@ abstract class Command {
   void processControlSamCommand() {
     try {
       CommandExecutor.processCommands(controlSamCommands, context.getControlSamReader(), false);
-    } catch (RuntimeException e) {
-      resetState();
-      throw e;
     } finally {
-      cleanState();
+      controlSamCommands.clear();
     }
-  }
-
-  /**
-   * Resets any variables in the class.
-   *
-   * @since 0.3.0
-   */
-  void resetState() {}
-
-  /**
-   * Clears the list of control SAM commands.
-   *
-   * @since 0.3.0
-   */
-  void cleanState() {
-    controlSamCommands.clear();
   }
 
   /**

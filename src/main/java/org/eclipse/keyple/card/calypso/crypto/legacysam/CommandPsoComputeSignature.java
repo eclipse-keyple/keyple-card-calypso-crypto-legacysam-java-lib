@@ -56,7 +56,7 @@ final class CommandPsoComputeSignature extends Command {
   /**
    * Instantiates a new instance based on the provided signature computation data.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param data The signature computation data.
    * @since 0.1.0
    */

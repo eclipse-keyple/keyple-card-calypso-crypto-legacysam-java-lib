@@ -36,7 +36,7 @@ final class CommandGiveRandom extends Command {
   /**
    * Instantiates a new CommandGiveRandom.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param random The random data.
    * @throws IllegalArgumentException If the random data is null or has a length not equal to 8.
    * @since 0.1.0
@@ -83,7 +83,7 @@ final class CommandGiveRandom extends Command {
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.setResponseAndCheckStatus(apduResponse);
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

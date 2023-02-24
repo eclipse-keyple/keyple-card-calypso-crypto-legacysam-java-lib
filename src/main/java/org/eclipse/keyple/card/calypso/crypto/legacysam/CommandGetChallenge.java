@@ -36,7 +36,7 @@ final class CommandGetChallenge extends Command {
   /**
    * Instantiates a new CmdSamGetChallenge.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param expectedResponseLength the expected response length.
    * @since 0.1.0
    */
@@ -82,7 +82,7 @@ final class CommandGetChallenge extends Command {
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.setResponseAndCheckStatus(apduResponse);
+    setResponseAndCheckStatus(apduResponse);
     getContext().getTargetSam().setChallenge(apduResponse.getDataOut());
   }
 

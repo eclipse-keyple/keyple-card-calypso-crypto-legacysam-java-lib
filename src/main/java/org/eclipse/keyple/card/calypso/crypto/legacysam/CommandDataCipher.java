@@ -60,7 +60,7 @@ final class CommandDataCipher extends Command {
   /**
    * Instantiates a new instance based on the provided data.
    *
-   * @param context The SAM transaction context.
+   * @param context The command context.
    * @param signatureComputationData The signature computation data (optional).
    * @param signatureVerificationData The signature computation data (optional).
    * @since 0.1.0

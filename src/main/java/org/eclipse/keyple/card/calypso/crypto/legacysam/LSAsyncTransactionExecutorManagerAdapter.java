@@ -25,7 +25,7 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  *
  * @since 0.3.0
  */
-class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
+final class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
     implements LSAsyncTransactionExecutorManager {
 
   /**
@@ -34,14 +34,14 @@ class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerA
    *
    * @param targetSamReader The reader through which the target SAM communicates.
    * @param targetSam The target legacy SAM.
-   * @param samCommandsJSon The commands to be executed as a JSon String.
+   * @param samCommandsJson The commands to be executed as a JSon String.
    * @since 0.3.0
    */
   LSAsyncTransactionExecutorManagerAdapter(
-      ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommandsJSon) {
+      ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommandsJson) {
     super(targetSamReader, targetSam, null, null);
 
-    JsonObject jsonObject = JsonUtil.getParser().fromJson(samCommandsJSon, JsonObject.class);
+    JsonObject jsonObject = JsonUtil.getParser().fromJson(samCommandsJson, JsonObject.class);
 
     // extract the type and command lists
     List<String> commandsTypes =
@@ -58,7 +58,7 @@ class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerA
         addTargetSamCommand(
             (Command) JsonUtil.getParser().fromJson(commands.get(i), classOfCommand));
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Invalid JSON commands object.");
+        throw new IllegalStateException("Invalid JSON commands object.", e);
       }
     }
   }
