@@ -11,10 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import java.util.HashSet;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
 import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
@@ -22,6 +20,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignat
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureVerificationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
 import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
+import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.calypsonet.terminal.card.spi.ApduRequestSpi;
 import org.calypsonet.terminal.card.spi.CardRequestSpi;
 import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
@@ -64,7 +63,7 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public T setData(byte[] data, byte kif, byte kvc) {
+    public final T setData(byte[] data, byte kif, byte kvc) {
       this.data = data;
       this.kif = kif;
       this.kvc = kvc;
@@ -77,8 +76,8 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public T setSignatureSize(int size) {
-      this.signatureSize = size;
+    public final T setSignatureSize(int size) {
+      signatureSize = size;
       return currentInstance;
     }
 
@@ -88,8 +87,8 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public T setKeyDiversifier(byte[] diversifier) {
-      this.keyDiversifier = diversifier;
+    public final T setKeyDiversifier(byte[] diversifier) {
+      keyDiversifier = diversifier;
       return currentInstance;
     }
 
@@ -99,7 +98,7 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public byte[] getSignature() {
+    public final byte[] getSignature() {
       if (signature == null) {
         throw new IllegalStateException(MSG_THE_COMMAND_HAS_NOT_YET_BEEN_PROCESSED);
       }
@@ -110,7 +109,7 @@ final class DtoAdapters {
      * @return A not empty array of data. It is required to check input data first.
      * @since 0.1.0
      */
-    byte[] getData() {
+    final byte[] getData() {
       return data;
     }
 
@@ -118,7 +117,7 @@ final class DtoAdapters {
      * @return The KIF. It is required to check input data first.
      * @since 0.1.0
      */
-    byte getKif() {
+    final byte getKif() {
       return kif;
     }
 
@@ -126,7 +125,7 @@ final class DtoAdapters {
      * @return The KVC. It is required to check input data first.
      * @since 0.1.0
      */
-    byte getKvc() {
+    final byte getKvc() {
       return kvc;
     }
 
@@ -134,7 +133,7 @@ final class DtoAdapters {
      * @return The signature size.
      * @since 0.1.0
      */
-    int getSignatureSize() {
+    final int getSignatureSize() {
       return signatureSize;
     }
 
@@ -142,7 +141,7 @@ final class DtoAdapters {
      * @return Null if the key diversifier is not set.
      * @since 0.1.0
      */
-    byte[] getKeyDiversifier() {
+    final byte[] getKeyDiversifier() {
       return keyDiversifier;
     }
 
@@ -152,7 +151,7 @@ final class DtoAdapters {
      * @param signature The computed signature.
      * @since 0.1.0
      */
-    void setSignature(byte[] signature) {
+    final void setSignature(byte[] signature) {
       this.signature = signature;
     }
   }
@@ -181,7 +180,7 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public T setData(byte[] data, byte[] signature, byte kif, byte kvc) {
+    public final T setData(byte[] data, byte[] signature, byte kif, byte kvc) {
       this.data = data;
       this.signature = signature;
       this.kif = kif;
@@ -195,8 +194,8 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public T setKeyDiversifier(byte[] diversifier) {
-      this.keyDiversifier = diversifier;
+    public final T setKeyDiversifier(byte[] diversifier) {
+      keyDiversifier = diversifier;
       return currentInstance;
     }
 
@@ -206,7 +205,7 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public boolean isSignatureValid() {
+    public final boolean isSignatureValid() {
       if (isSignatureValid == null) {
         throw new IllegalStateException(MSG_THE_COMMAND_HAS_NOT_YET_BEEN_PROCESSED);
       }
@@ -217,7 +216,7 @@ final class DtoAdapters {
      * @return A not empty array of data. It is required to check input data first.
      * @since 0.1.0
      */
-    byte[] getData() {
+    final byte[] getData() {
       return data;
     }
 
@@ -226,7 +225,7 @@ final class DtoAdapters {
      *     first.
      * @since 0.1.0
      */
-    byte[] getSignature() {
+    final byte[] getSignature() {
       return signature;
     }
 
@@ -234,7 +233,7 @@ final class DtoAdapters {
      * @return The KIF. It is required to check input data first.
      * @since 0.1.0
      */
-    byte getKif() {
+    final byte getKif() {
       return kif;
     }
 
@@ -242,7 +241,7 @@ final class DtoAdapters {
      * @return The KVC. It is required to check input data first.
      * @since 0.1.0
      */
-    byte getKvc() {
+    final byte getKvc() {
       return kvc;
     }
 
@@ -250,7 +249,7 @@ final class DtoAdapters {
      * @return Null if the key diversifier is not set.
      * @since 0.1.0
      */
-    byte[] getKeyDiversifier() {
+    final byte[] getKeyDiversifier() {
       return keyDiversifier;
     }
 
@@ -260,7 +259,7 @@ final class DtoAdapters {
      * @param isSignatureValid True if the signature is valid.
      * @since 0.1.0
      */
-    void setSignatureValid(boolean isSignatureValid) {
+    final void setSignatureValid(boolean isSignatureValid) {
       this.isSignatureValid = isSignatureValid;
     }
   }
@@ -306,9 +305,9 @@ final class DtoAdapters {
     @Override
     public TraceableSignatureComputationData withSamTraceabilityMode(
         int offset, boolean usePartialSamSerialNumber) {
-      this.isSamTraceabilityMode = true;
-      this.traceabilityOffset = offset;
-      this.isPartialSamSerialNumber = usePartialSamSerialNumber;
+      isSamTraceabilityMode = true;
+      traceabilityOffset = offset;
+      isPartialSamSerialNumber = usePartialSamSerialNumber;
       return this;
     }
 
@@ -319,7 +318,7 @@ final class DtoAdapters {
      */
     @Override
     public TraceableSignatureComputationData withoutBusyMode() {
-      this.isBusyMode = false;
+      isBusyMode = false;
       return this;
     }
 
@@ -405,8 +404,8 @@ final class DtoAdapters {
     @Override
     public TraceableSignatureVerificationData withSamTraceabilityMode(
         int offset, boolean isPartialSamSerialNumber, LSRevocationServiceSpi samRevocationService) {
-      this.isSamTraceabilityMode = true;
-      this.traceabilityOffset = offset;
+      isSamTraceabilityMode = true;
+      traceabilityOffset = offset;
       this.isPartialSamSerialNumber = isPartialSamSerialNumber;
       this.samRevocationService = samRevocationService;
       return this;
@@ -419,7 +418,7 @@ final class DtoAdapters {
      */
     @Override
     public TraceableSignatureVerificationData withoutBusyMode() {
-      this.isBusyMode = false;
+      isBusyMode = false;
       return this;
     }
 
@@ -501,8 +500,8 @@ final class DtoAdapters {
      */
     ApduRequestAdapter(byte[] apdu) {
       this.apdu = apdu;
-      this.successfulStatusWords = new HashSet<Integer>();
-      this.successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
+      successfulStatusWords = new HashSet<Integer>();
+      successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
     }
 
     /**
@@ -515,7 +514,7 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     ApduRequestAdapter addSuccessfulStatusWord(int successfulStatusWord) {
-      this.successfulStatusWords.add(successfulStatusWord);
+      successfulStatusWords.add(successfulStatusWord);
       return this;
     }
 
@@ -539,7 +538,7 @@ final class DtoAdapters {
      * @return The object instance.
      * @since 0.1.0
      */
-    ApduRequestAdapter setInfo(final String info) {
+    ApduRequestAdapter setInfo(String info) {
       this.info = info;
       return this;
     }
@@ -561,7 +560,7 @@ final class DtoAdapters {
      */
     @Override
     public byte[] getApdu() {
-      return this.apdu;
+      return apdu;
     }
 
     /**
@@ -645,12 +644,11 @@ final class DtoAdapters {
 
     private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
 
-    private String cardProtocol;
     private String powerOnDataRegex;
     private final Set<Integer> successfulSelectionStatusWords;
 
     /**
-     * Created an instance of {@link CardSelectorAdapter}.
+     * Creates a new instance.
      *
      * <p>Initialize default values.
      *
@@ -683,8 +681,8 @@ final class DtoAdapters {
      * @since 0.1.0
      */
     @Override
-    public final String getCardProtocol() {
-      return cardProtocol;
+    public String getCardProtocol() {
+      return null;
     }
 
     /**
@@ -798,6 +796,139 @@ final class DtoAdapters {
     @Override
     public String toString() {
       return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+    }
+  }
+
+  /**
+   * This POJO contains the target SAM context data used when doing asynchronous transactions.
+   *
+   * @since 0.3.0
+   */
+  static final class TargetSamContextDto {
+
+    private final byte[] serialNumber;
+    private final boolean isDynamicMode;
+    private final Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
+        new HashMap<SystemKeyType, Integer>(
+            3); // NOSONAR enummap is not suitable for the gson serializer
+    private final Map<SystemKeyType, Byte> systemKeyTypeToKvcMap =
+        new HashMap<SystemKeyType, Byte>(
+            3); // NOSONAR enummap is not suitable for the gson serializer
+    private final Map<Integer, Integer> counterNumberToCounterValueMap =
+        new HashMap<Integer, Integer>(3);
+
+    /**
+     * Constructs a new instance with the specified serial number and dynamic mode flag.
+     *
+     * @param serialNumber The serial number of the target SAM.
+     * @param isDynamicMode A boolean indicating whether the target SAM is operating in dynamic
+     *     mode.
+     * @since 0.3.0
+     */
+    TargetSamContextDto(byte[] serialNumber, boolean isDynamicMode) {
+      this.serialNumber = serialNumber;
+      this.isDynamicMode = isDynamicMode;
+    }
+
+    /**
+     * Returns the serial number of the target SAM.
+     *
+     * @return a byte array containing the serial number of the target SAM.
+     * @since 0.3.0
+     */
+    byte[] getSerialNumber() {
+      return serialNumber;
+    }
+
+    /**
+     * Returns a boolean indicating whether the target SAM is operating in dynamic mode.
+     *
+     * @return True if the target SAM is operating in dynamic mode, otherwise false.
+     * @since 0.3.0
+     */
+    boolean isDynamicMode() {
+      return isDynamicMode;
+    }
+
+    /**
+     * Returns a map containing the system key types and their corresponding counter numbers.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
+    Map<SystemKeyType, Integer> getSystemKeyTypeToCounterNumberMap() {
+      return systemKeyTypeToCounterNumberMap;
+    }
+
+    /**
+     * Returns a map containing the system key types and their corresponding KVCs.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
+    Map<SystemKeyType, Byte> getSystemKeyTypeToKvcMap() {
+      return systemKeyTypeToKvcMap;
+    }
+
+    /**
+     * Returns a map containing the counter numbers and their corresponding counter values.
+     *
+     * @return A map.
+     * @since 0.3.0
+     */
+    Map<Integer, Integer> getCounterNumberToCounterValueMap() {
+      return counterNumberToCounterValueMap;
+    }
+  }
+
+  /**
+   * This POJO contains the command context for a SAM transaction and its related SAM commands.
+   *
+   * @since 0.3.0
+   */
+  static final class CommandContextDto {
+
+    private final LegacySamAdapter targetSam;
+    private final ProxyReaderApi controlSamReader;
+    private final LegacySamAdapter controlSam;
+
+    /**
+     * Constructs a new instance with the specified target SAM, control SAM reader and control SAM.
+     *
+     * @param targetSam The target legacy SAM.
+     * @param controlSamReader The reader through which the control SAM communicates.
+     * @param controlSam The control legacy SAM.
+     * @since 0.3.0
+     */
+    CommandContextDto(
+        LegacySamAdapter targetSam, ProxyReaderApi controlSamReader, LegacySamAdapter controlSam) {
+      this.targetSam = targetSam;
+      this.controlSamReader = controlSamReader;
+      this.controlSam = controlSam;
+    }
+
+    /**
+     * @return The target SAM.
+     * @since 0.3.0
+     */
+    LegacySamAdapter getTargetSam() {
+      return targetSam;
+    }
+
+    /**
+     * @return The control SAM reader.
+     * @since 0.3.0
+     */
+    ProxyReaderApi getControlSamReader() {
+      return controlSamReader;
+    }
+
+    /**
+     * @return The control SAM.
+     * @since 0.3.0
+     */
+    LegacySamAdapter getControlSam() {
+      return controlSam;
     }
   }
 }

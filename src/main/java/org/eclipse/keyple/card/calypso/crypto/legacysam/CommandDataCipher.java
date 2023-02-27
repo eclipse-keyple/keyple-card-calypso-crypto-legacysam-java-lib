@@ -16,6 +16,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
@@ -57,24 +58,24 @@ final class CommandDataCipher extends Command {
   private final BasicSignatureVerificationDataAdapter signatureVerificationData;
 
   /**
-   * Builds a new instance based on the provided data.
+   * Instantiates a new instance based on the provided data.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The command context.
    * @param signatureComputationData The signature computation data (optional).
    * @param signatureVerificationData The signature computation data (optional).
    * @since 0.1.0
    */
   CommandDataCipher(
-      LegacySamAdapter legacySam,
+      CommandContextDto context,
       BasicSignatureComputationDataAdapter signatureComputationData,
       BasicSignatureVerificationDataAdapter signatureVerificationData) {
 
-    super(CommandRef.DATA_CIPHER, 0, legacySam);
+    super(CommandRef.DATA_CIPHER, 0, context);
 
     this.signatureComputationData = signatureComputationData;
     this.signatureVerificationData = signatureVerificationData;
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = (byte) 0x40; // TODO implement the other modes (cipher, decipher)
     final byte p2 = (byte) 0x00;
@@ -120,11 +121,31 @@ final class CommandDataCipher extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
-    super.parseApduResponse(apduResponse);
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
     if (apduResponse.getDataOut().length > 0) {
       if (signatureComputationData != null) {
         signatureComputationData.setSignature(
@@ -138,7 +159,7 @@ final class CommandDataCipher extends Command {
             Arrays.equals(computedSignature, signatureVerificationData.getSignature()));
       }
       if (signatureVerificationData != null && !signatureVerificationData.isSignatureValid()) {
-        throw new SecurityDataException("Incorrect signature.");
+        throw new InvalidSignatureException("Invalid signature.");
       }
     }
   }

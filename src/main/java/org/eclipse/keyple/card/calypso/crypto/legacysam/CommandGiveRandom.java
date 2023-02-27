@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2023 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -15,10 +15,11 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
- * Builds the Give Random APDU command.
+ * Builds the "Give Random" APDU command.
  *
  * @since 0.1.0
  */
@@ -33,27 +34,56 @@ final class CommandGiveRandom extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamDigestUpdate.
+   * Instantiates a new CommandGiveRandom.
    *
-   * @param legacySam The Calypso legacy SAM.
-   * @param random the random data.
+   * @param context The command context.
+   * @param random The random data.
    * @throws IllegalArgumentException If the random data is null or has a length not equal to 8.
    * @since 0.1.0
    */
-  CommandGiveRandom(LegacySamAdapter legacySam, byte[] random) {
-    super(CommandRef.GIVE_RANDOM, 0, legacySam);
+  CommandGiveRandom(CommandContextDto context, byte[] random) {
+    super(CommandRef.GIVE_RANDOM, 0, context);
 
-    byte cla = legacySam.getClassByte();
-    byte p1 = (byte) 0x00;
-    byte p2 = (byte) 0x00;
+    byte cla = context.getTargetSam().getClassByte();
+    byte p1 = 0x00;
+    byte p2 = 0x00;
 
     if (random == null || random.length != 8) {
       throw new IllegalArgumentException("Random value should be an 8 bytes long");
     }
-
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, random, null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

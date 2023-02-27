@@ -15,6 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -37,15 +38,15 @@ final class CommandSelectDiversifier extends Command {
   }
 
   /**
-   * Creates a new instance.
+   * Instantiates a new CommandSelectDiversifier.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The command context.
    * @param diversifier The key diversifier.
    * @since 0.1.0
    */
-  CommandSelectDiversifier(LegacySamAdapter legacySam, byte[] diversifier) {
+  CommandSelectDiversifier(CommandContextDto context, byte[] diversifier) {
 
-    super(CommandRef.SELECT_DIVERSIFIER, 0, legacySam);
+    super(CommandRef.SELECT_DIVERSIFIER, 0, context);
 
     // Format the diversifier on 4 or 8 bytes if needed.
     if (diversifier.length != 4 && diversifier.length != 8) {
@@ -58,12 +59,42 @@ final class CommandSelectDiversifier extends Command {
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
-                legacySam.getClassByte(),
+                context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
                 (byte) 0,
                 (byte) 0,
                 diversifier,
                 null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

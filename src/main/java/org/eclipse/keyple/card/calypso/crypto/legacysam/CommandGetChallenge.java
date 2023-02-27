@@ -15,6 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -35,18 +36,18 @@ final class CommandGetChallenge extends Command {
   /**
    * Instantiates a new CmdSamGetChallenge.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The command context.
    * @param expectedResponseLength the expected response length.
    * @since 0.1.0
    */
-  CommandGetChallenge(LegacySamAdapter legacySam, int expectedResponseLength) {
+  CommandGetChallenge(CommandContextDto context, int expectedResponseLength) {
 
-    super(CommandRef.GET_CHALLENGE, expectedResponseLength, legacySam);
+    super(CommandRef.GET_CHALLENGE, expectedResponseLength, context);
 
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
-                legacySam.getClassByte(),
+                context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
                 (byte) 0,
                 (byte) 0,
@@ -55,13 +56,34 @@ final class CommandGetChallenge extends Command {
   }
 
   /**
-   * Gets the challenge.
+   * {@inheritDoc}
    *
-   * @return the challenge
-   * @since 0.1.0
+   * @since 0.3.0
    */
-  byte[] getChallenge() {
-    return isSuccessful() ? getApduResponse().getDataOut() : null;
+  @Override
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
+    getContext().getTargetSam().setChallenge(apduResponse.getDataOut());
   }
 
   /**

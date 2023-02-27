@@ -15,6 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
 import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
@@ -55,19 +56,19 @@ final class CommandPsoVerifySignature extends Command {
   private final TraceableSignatureVerificationDataAdapter data;
 
   /**
-   * Builds a new instance based on the provided signature verification data.
+   * Instantiates a new instance based on the provided signature verification data.
    *
-   * @param legacySam The Calypso legacy SAM.
+   * @param context The command context.
    * @param data The signature verification data.
    * @since 0.1.0
    */
   CommandPsoVerifySignature(
-      LegacySamAdapter legacySam, TraceableSignatureVerificationDataAdapter data) {
+      CommandContextDto context, TraceableSignatureVerificationDataAdapter data) {
 
-    super(CommandRef.PSO_VERIFY_SIGNATURE, 0, legacySam);
+    super(CommandRef.PSO_VERIFY_SIGNATURE, 0, context);
     this.data = data;
 
-    final byte cla = legacySam.getClassByte();
+    final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
     final byte p1 = (byte) 0x00;
     final byte p2 = (byte) 0xA8;
@@ -130,16 +131,36 @@ final class CommandPsoVerifySignature extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.3.0
    */
   @Override
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     try {
-      super.parseApduResponse(apduResponse);
+      setResponseAndCheckStatus(apduResponse);
       data.setSignatureValid(true);
     } catch (SecurityDataException e) {
       data.setSignatureValid(false);
-      throw e;
+      throw new InvalidSignatureException("Invalid signature.", e);
     }
   }
 }

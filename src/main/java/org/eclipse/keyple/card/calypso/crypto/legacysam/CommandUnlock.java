@@ -16,6 +16,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.HashMap;
 import java.util.Map;
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
+import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 
 /**
@@ -50,8 +51,8 @@ final class CommandUnlock extends Command {
     super(CommandRef.UNLOCK, 0, null);
 
     byte cla = productType == LegacySam.ProductType.SAM_S1DX ? (byte) 0x94 : (byte) 0x80;
-    byte p1 = (byte) 0x00;
-    byte p2 = (byte) 0x00;
+    byte p1 = 0x00;
+    byte p2 = 0x00;
 
     if (unlockData == null) {
       throw new IllegalArgumentException("Unlock data null!");
@@ -64,6 +65,36 @@ final class CommandUnlock extends Command {
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, unlockData, null)));
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void finalizeRequest() {
+    /* nothing to do */
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  boolean isControlSamRequiredToFinalizeRequest() {
+    return false;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  void parseResponse(ApduResponseApi apduResponse) throws CommandException {
+    setResponseAndCheckStatus(apduResponse);
   }
 
   /**

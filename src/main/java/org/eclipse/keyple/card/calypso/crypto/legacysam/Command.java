@@ -13,9 +13,11 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import org.calypsonet.terminal.card.ApduResponseApi;
+import org.calypsonet.terminal.card.*;
 
 /**
  * Superclass for all SAM commands.
@@ -53,23 +55,23 @@ abstract class Command {
   private final int le;
   private String name;
   private ApduRequestAdapter apduRequest;
-  private ApduResponseApi apduResponse;
-  private LegacySamAdapter legacySam;
+  private transient ApduResponseApi apduResponse;
+  private final transient CommandContextDto context;
+  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2);
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands
    *
    * @param commandRef A command reference from the Calypso command table.
    * @param le The value of the LE field.
-   * @param legacySam The Calypso legacy SAM (it may be null if the SAM selection has not yet been
-   *     made).
+   * @param context The command context.
    * @since 0.1.0
    */
-  Command(CommandRef commandRef, int le, LegacySamAdapter legacySam) {
+  Command(CommandRef commandRef, int le, CommandContextDto context) {
     this.commandRef = commandRef;
-    this.name = commandRef.getName();
+    name = commandRef.getName();
     this.le = le;
-    this.legacySam = legacySam;
+    this.context = context;
   }
 
   /**
@@ -83,8 +85,8 @@ abstract class Command {
    * @since 0.1.0
    */
   final void addSubName(String subName) {
-    this.name = this.name + " - " + subName;
-    this.apduRequest.setInfo(this.name);
+    name = name + " - " + subName;
+    apduRequest.setInfo(name);
   }
 
   /**
@@ -104,7 +106,7 @@ abstract class Command {
    * @since 0.1.0
    */
   final String getName() {
-    return this.name;
+    return name;
   }
 
   /**
@@ -115,7 +117,7 @@ abstract class Command {
    */
   final void setApduRequest(ApduRequestAdapter apduRequest) {
     this.apduRequest = apduRequest;
-    this.apduRequest.setInfo(this.name);
+    this.apduRequest.setInfo(name);
   }
 
   /**
@@ -129,34 +131,60 @@ abstract class Command {
   }
 
   /**
-   * Gets {@link ApduResponseApi}
-   *
-   * @return Null if the response is not set.
-   * @since 0.1.0
-   */
-  final ApduResponseApi getApduResponse() {
-    return apduResponse;
-  }
-
-  /**
-   * Returns the Calypso card.
+   * Returns the command context.
    *
    * @return Null if the SAM selection has not yet been made.
    * @since 0.1.0
    */
-  final LegacySamAdapter getLegacySam() {
-    return legacySam;
+  final CommandContextDto getContext() {
+    return context;
   }
 
   /**
-   * Parses the response {@link ApduResponseApi} and checks the status word.
+   * Adds a control SAM command to be executed when finalizing.
+   *
+   * @param samCommand The command to be added.
+   * @since 0.3.0
+   */
+  final void addControlSamCommand(Command samCommand) {
+    controlSamCommands.add(samCommand);
+  }
+
+  /**
+   * Finalize the construction of the APDU request if needed.
+   *
+   * @since 0.3.0
+   */
+  abstract void finalizeRequest();
+
+  /**
+   * Indicates the need for a control SAM to compute the data used to finalize the command.
+   *
+   * @return true if a control SAM is required.
+   * @since 0.3.0
+   */
+  abstract boolean isControlSamRequiredToFinalizeRequest();
+
+  /**
+   * Parses the APDU response, updates the card image and synchronize the crypto service if it is
+   * involved in the process.
+   *
+   * @param apduResponse The APDU response.
+   * @throws CommandException if status is not successful or if the length of the response is not
+   *     equal to the LE field in the request.
+   * @since 0.3.0
+   */
+  abstract void parseResponse(ApduResponseApi apduResponse) throws CommandException;
+
+  /**
+   * Sets the response {@link ApduResponseApi} and checks the status word.
    *
    * @param apduResponse The APDU response.
    * @throws CommandException if status is not successful or if the length of the response is not
    *     equal to the LE field in the request.
    * @since 0.1.0
    */
-  void parseApduResponse(ApduResponseApi apduResponse) throws CommandException {
+  final void setResponseAndCheckStatus(ApduResponseApi apduResponse) throws CommandException {
     this.apduResponse = apduResponse;
     checkStatus();
   }
@@ -177,20 +205,6 @@ abstract class Command {
    */
   private StatusProperties getStatusWordProperties() {
     return getStatusTable().get(apduResponse.getStatusWord());
-  }
-
-  /**
-   * Gets true if the status is successful from the statusTable according to the current status code
-   * and if the length of the response is equal to the LE field in the request.
-   *
-   * @return A value
-   * @since 0.1.0
-   */
-  final boolean isSuccessful() {
-    StatusProperties props = getStatusWordProperties();
-    return props != null
-        && props.isSuccessful()
-        && (le == 0 || apduResponse.getDataOut().length == le); // CL-CSS-RESPLE.1
   }
 
   /**
@@ -229,17 +243,6 @@ abstract class Command {
   }
 
   /**
-   * Gets the ASCII message from the statusTable for the current status word.
-   *
-   * @return A nullable value
-   * @since 0.1.0
-   */
-  final String getStatusInformation() {
-    StatusProperties props = getStatusWordProperties();
-    return props != null ? props.getInformation() : null;
-  }
-
-  /**
    * Builds a specific APDU command exception.
    *
    * @param exceptionClass the exception class.
@@ -268,6 +271,19 @@ abstract class Command {
       e = new UnknownStatusException(message);
     }
     return e;
+  }
+
+  /**
+   * Executes all previously added commands for the control SAM.
+   *
+   * @since 0.3.0
+   */
+  void processControlSamCommand() {
+    try {
+      CommandExecutor.processCommands(controlSamCommands, context.getControlSamReader(), false);
+    } finally {
+      controlSamCommands.clear();
+    }
   }
 
   /**

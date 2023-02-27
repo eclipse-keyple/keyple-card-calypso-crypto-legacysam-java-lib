@@ -39,7 +39,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 0.1.0
  */
-class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi {
+final class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi {
 
   private static final Logger logger = LoggerFactory.getLogger(LegacySamSelectionAdapter.class);
   private static final int SW_NOT_LOCKED = 0x6985;
@@ -85,18 +85,19 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
    * @since 0.1.0
    */
   @Override
-  public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponse) throws ParseException {
+  public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi)
+      throws ParseException {
     if (unlockCommand != null) {
       // an unlock command has been requested
-      if (cardSelectionResponse.getCardResponse() == null
-          || cardSelectionResponse.getCardResponse().getApduResponses().isEmpty()) {
+      if (cardSelectionResponseApi.getCardResponse() == null
+          || cardSelectionResponseApi.getCardResponse().getApduResponses().isEmpty()) {
         throw new ParseException("Mismatch in the number of requests/responses");
       }
       // check the SAM response to the unlock command
       ApduResponseApi apduResponse =
-          cardSelectionResponse.getCardResponse().getApduResponses().get(0);
+          cardSelectionResponseApi.getCardResponse().getApduResponses().get(0);
       try {
-        unlockCommand.parseApduResponse(apduResponse);
+        unlockCommand.setResponseAndCheckStatus(apduResponse);
       } catch (AccessForbiddenException e) {
         logger.warn("SAM not locked or already unlocked");
       } catch (CommandException e) {
@@ -104,7 +105,7 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
       }
     }
     try {
-      return new LegacySamAdapter(cardSelectionResponse);
+      return new LegacySamAdapter(cardSelectionResponseApi);
     } catch (RuntimeException e) {
       throw new ParseException("An exception occurred while parsing the SAM response.", e);
     }
@@ -136,9 +137,9 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
 
     try {
       Pattern.compile(serialNumberRegex);
-    } catch (PatternSyntaxException exception) {
+    } catch (PatternSyntaxException e) {
       throw new IllegalArgumentException(
-          String.format("Invalid regular expression: '%s'.", serialNumberRegex));
+          String.format("Invalid regular expression: '%s'.", serialNumberRegex), e);
     }
 
     this.serialNumberRegex = serialNumberRegex;
@@ -158,7 +159,7 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
             unlockData.length() == 16 || unlockData.length() == 32,
             "unlock data length == 16 or 32")
         .isHexString(unlockData, "unlockData");
-    this.unlockCommand = new CommandUnlock(productType, HexUtil.toByteArray(unlockData));
+    unlockCommand = new CommandUnlock(productType, HexUtil.toByteArray(unlockData));
     return this;
   }
 
@@ -171,7 +172,8 @@ class LegacySamSelectionAdapter implements LegacySamSelection, CardSelectionSpi 
    * @param samSerialNumberRegex A regular expression matching the SAM serial number.
    * @return A not empty string containing a regular
    */
-  private String buildAtrRegex(LegacySam.ProductType productType, String samSerialNumberRegex) {
+  private static String buildAtrRegex(
+      LegacySam.ProductType productType, String samSerialNumberRegex) {
     String atrRegex;
     String snRegex;
     /* check if serialNumber is defined */

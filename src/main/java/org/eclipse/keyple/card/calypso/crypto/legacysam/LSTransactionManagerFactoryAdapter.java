@@ -12,17 +12,17 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
+import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.calypsonet.terminal.reader.CardReader;
+import org.eclipse.keyple.core.util.Assert;
 
 /**
  * Adapter of {@link LSTransactionManagerFactory}.
  *
  * @since 0.1.0
  */
-class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory {
+final class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory {
 
   /**
    * {@inheritDoc}
@@ -41,5 +41,40 @@ class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory 
           "The provided 'sam' must be an instance of 'LegacySamAdapter'");
     }
     return new LSFreeTransactionManagerAdapter((ProxyReaderApi) samReader, (LegacySamAdapter) sam);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public LSAsyncTransactionCreatorManager createAsyncTransactionCreatorManager(
+      String targetSamContext, LSSecuritySetting securitySetting) {
+    Assert.getInstance()
+        .notNull(targetSamContext, "targetSamContext")
+        .notNull(securitySetting, "securitySetting");
+    return new LSAsyncTransactionCreatorManagerAdapter(targetSamContext, securitySetting);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.3.0
+   */
+  @Override
+  public LSAsyncTransactionExecutorManager createAsyncTransactionExecutorManager(
+      CardReader samReader, LegacySam sam, String samCommands) {
+    if (!(samReader instanceof ProxyReaderApi)) {
+      throw new IllegalArgumentException(
+          "The provided 'samReader' must implement 'ProxyReaderApi'");
+    }
+    if (!(sam instanceof LegacySamAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided 'sam' must be an instance of 'LegacySamAdapter'");
+    }
+    Assert.getInstance().notNull(samCommands, "samCommands");
+    return new LSAsyncTransactionExecutorManagerAdapter(
+        (ProxyReaderApi) samReader, (LegacySamAdapter) sam, samCommands);
   }
 }

@@ -28,9 +28,9 @@ import org.eclipse.keyple.core.util.HexUtil;
 import org.junit.Before;
 import org.junit.Test;
 
-public class LegacySamSelectionAdapterTest {
+public final class LegacySamSelectionAdapterTest {
 
-  public static final String SAM_ATR = "3B3F9600805AAABBC1DDEEFF11223344829000";
+  private static final String SAM_ATR = "3B3F9600805AAABBC1DDEEFF11223344829000";
   private LegacySamSelectionAdapter samSelection;
 
   @Before
