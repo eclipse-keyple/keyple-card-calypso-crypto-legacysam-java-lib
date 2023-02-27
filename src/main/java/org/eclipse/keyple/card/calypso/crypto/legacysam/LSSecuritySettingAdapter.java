@@ -38,6 +38,14 @@ final class LSSecuritySettingAdapter implements LSSecuritySetting {
         .notNull(controlSam, "controlSam")
         .notNull(controlSam.getProductType(), "productType")
         .isTrue(controlSam.getProductType() != LegacySam.ProductType.UNKNOWN, "productType");
+    if (!(samReader instanceof ProxyReaderApi)) {
+      throw new IllegalArgumentException(
+          "The provided 'samReader' must implement 'ProxyReaderApi'");
+    }
+    if (!(controlSam instanceof LegacySamAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided 'controlSam' must be an instance of 'LegacySamAdapter'");
+    }
     controlSamReader = (ProxyReaderApi) samReader;
     this.controlSam = (LegacySamAdapter) controlSam;
     return this;

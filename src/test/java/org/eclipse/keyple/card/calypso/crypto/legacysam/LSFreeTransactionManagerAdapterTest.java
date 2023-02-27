@@ -41,7 +41,7 @@ import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 
-public class LSFreeTransactionManagerAdapterTest {
+public final class LSFreeTransactionManagerAdapterTest {
 
   private static final String SAM_SERIAL_NUMBER = "11223344";
   private static final String CIPHER_MESSAGE = "A1A2A3A4A5A6A7A8";
@@ -159,10 +159,7 @@ public class LSFreeTransactionManagerAdapterTest {
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
     sam = new LegacySamAdapter(samCardSelectionResponse);
 
-    ReaderMock controlSamReader = mock(ReaderMock.class);
-
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
-    LegacySam controlSam = new LegacySamAdapter(samCardSelectionResponse);
 
     samTransactionManager =
         LegacySamCardExtensionService.getInstance()
@@ -170,7 +167,7 @@ public class LSFreeTransactionManagerAdapterTest {
             .createFreeTransactionManager(samReader, sam);
   }
 
-  private CardRequestSpi createCardRequest(String... apduCommands) {
+  private static CardRequestSpi createCardRequest(String... apduCommands) {
     List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
     for (String apduCommand : apduCommands) {
       apduRequests.add(new ApduRequestAdapter(HexUtil.toByteArray(apduCommand)));
@@ -178,7 +175,7 @@ public class LSFreeTransactionManagerAdapterTest {
     return new CardRequestAdapter(apduRequests, false);
   }
 
-  private CardResponseApi createCardResponse(String... apduCommandResponses) {
+  private static CardResponseApi createCardResponse(String... apduCommandResponses) {
     List<ApduResponseApi> apduResponses = new ArrayList<ApduResponseApi>();
     for (String apduResponse : apduCommandResponses) {
       apduResponses.add(new TestDtoAdapters.ApduResponseAdapter(HexUtil.toByteArray(apduResponse)));
@@ -194,11 +191,11 @@ public class LSFreeTransactionManagerAdapterTest {
     }
 
     @Override
-    public boolean matches(CardRequestSpi right) {
-      if (right == null) {
+    public final boolean matches(CardRequestSpi argument) {
+      if (argument == null) {
         return false;
       }
-      List<ApduRequestSpi> rightApduRequests = right.getApduRequests();
+      List<ApduRequestSpi> rightApduRequests = argument.getApduRequests();
       if (leftApduRequests.size() != rightApduRequests.size()) {
         return false;
       }
@@ -1903,7 +1900,7 @@ public class LSFreeTransactionManagerAdapterTest {
     for (SystemKeyType type : systemKeyTypes) {
       assertThat(sam.getSystemKeyParameter(type).getKif())
           .isEqualTo(systemKeyTypeToKifMap.get(type));
-      final byte kvc;
+      byte kvc;
       switch (type) {
         case PERSONALIZATION:
           kvc = (byte) 0xF1;

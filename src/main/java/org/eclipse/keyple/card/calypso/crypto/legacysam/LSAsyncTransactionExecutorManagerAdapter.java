@@ -34,7 +34,7 @@ final class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionMa
    *
    * @param targetSamReader The reader through which the target SAM communicates.
    * @param targetSam The target legacy SAM.
-   * @param samCommandsJson The commands to be executed as a JSon String.
+   * @param samCommandsJson The commands to be executed as a JSON String.
    * @since 0.3.0
    */
   LSAsyncTransactionExecutorManagerAdapter(

@@ -88,12 +88,12 @@ final class CommandWriteCeilings extends Command {
     super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
-    this.counterFileRecordNumber = -1;
+    counterFileRecordNumber = -1;
 
     // build the plain data block to be ciphered later
-    this.plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
-    this.plainData[1] = (byte) counterNumber;
-    ByteArrayUtil.copyBytes(ceilingValue, this.plainData, 2, 3);
+    plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+    plainData[1] = (byte) counterNumber;
+    ByteArrayUtil.copyBytes(ceilingValue, plainData, 2, 3);
   }
 
   /**
@@ -116,10 +116,9 @@ final class CommandWriteCeilings extends Command {
     super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
-    this.counterFileRecordNumber =
-        CommonTransactionManagerAdapter.counterToRecordLookup[counterNumber];
+    counterFileRecordNumber = CommonTransactionManagerAdapter.counterToRecordLookup[counterNumber];
 
-    this.plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+    plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
     addCounter(counterNumber, ceilingValue, isManualCounterIncrementAuthorized);
   }
 
@@ -176,14 +175,14 @@ final class CommandWriteCeilings extends Command {
     addControlSamCommand(
         new CommandSelectDiversifier(controlSamContext, targetSamContext.getSerialNumber()));
     addControlSamCommand(new CommandGiveRandom(controlSamContext, computeChallenge()));
-    if (this.counterFileRecordNumber != -1) {
+    if (counterFileRecordNumber != -1) {
       computePlainData();
     }
     CommandSamDataCipher commandSamDataCipher =
         new CommandSamDataCipher(
             controlSamContext,
-            this.counterFileRecordNumber,
-            this.counterFileRecordNumber == -1
+            counterFileRecordNumber,
+            counterFileRecordNumber == -1
                 ? CommandSamDataCipher.DataType.ONE_CEILING_VALUE
                 : CommandSamDataCipher.DataType.CEILINGS_FILE_RECORD,
             plainData);
@@ -191,16 +190,16 @@ final class CommandWriteCeilings extends Command {
     processControlSamCommand();
     final byte cla = (byte) 0x80;
     final byte inst = (byte) 0xD8;
-    final byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
+    byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
                 cla,
                 inst,
                 p1,
-                this.counterFileRecordNumber == -1
+                counterFileRecordNumber == -1
                     ? (byte) 0xB8
-                    : (byte) (0xB1 + this.counterFileRecordNumber),
+                    : (byte) (0xB1 + counterFileRecordNumber),
                 commandSamDataCipher.getCipheredData(),
                 null)));
   }
@@ -214,7 +213,7 @@ final class CommandWriteCeilings extends Command {
         config =
             getContext()
                 .getTargetSam()
-                .isManualCounterIncrementAuthorized((this.counterFileRecordNumber * 9) + i);
+                .isManualCounterIncrementAuthorized((counterFileRecordNumber * 9) + i);
         if (config == null) {
           throw new IllegalStateException(
               "Unable to determine counter incrementation configuration.");
@@ -231,7 +230,7 @@ final class CommandWriteCeilings extends Command {
   private byte[] computeChallenge() {
 
     // compute the challenge
-    final byte[] challenge = new byte[8];
+    byte[] challenge = new byte[8];
     if (targetSamContext.getSystemKeyTypeToCounterNumberMap() != null) {
       Integer reloadingKeyCounterNumber =
           targetSamContext.getSystemKeyTypeToCounterNumberMap().get(SystemKeyType.RELOADING);

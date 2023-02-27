@@ -25,14 +25,6 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
  */
 final class CommandReadCounterCeiling extends Command {
 
-  /** Ceiling operation type */
-  enum CeilingsOperationType {
-    /** Single ceiling */
-    READ_SINGLE_CEILING,
-    /** Ceiling record */
-    READ_CEILING_RECORD
-  }
-
   private final int ceilingFileRecordNumber;
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
@@ -60,7 +52,7 @@ final class CommandReadCounterCeiling extends Command {
     super(CommandRef.READ_CEILINGS, 48, context);
 
     byte cla = context.getTargetSam().getClassByte();
-    byte p1 = (byte) 0x00;
+    byte p1 = 0x00;
     byte p2 = (byte) (0xB1 + ceilingFileRecordNumber);
     this.ceilingFileRecordNumber = ceilingFileRecordNumber;
 
@@ -112,10 +104,10 @@ final class CommandReadCounterCeiling extends Command {
     short counterIncrementConfig = (short) ByteArrayUtil.extractInt(dataOut, 27, 2, false);
     for (int i = 0; i < 9; i++) {
       targetSam.putCounterCeilingValue(
-          (this.ceilingFileRecordNumber * 9) + i,
+          (ceilingFileRecordNumber * 9) + i,
           ByteArrayUtil.extractInt(dataOut, 8 + (3 * i), 3, false));
       targetSam.putCounterIncrementConfiguration(
-          (this.ceilingFileRecordNumber * 9) + i, (counterIncrementConfig & (1 << i)) != 0);
+          (ceilingFileRecordNumber * 9) + i, (counterIncrementConfig & (1 << i)) != 0);
     }
   }
 }

@@ -22,7 +22,7 @@ import org.eclipse.keyple.core.util.Assert;
  *
  * @since 0.1.0
  */
-class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory {
+final class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory {
 
   /**
    * {@inheritDoc}
@@ -50,11 +50,11 @@ class LSTransactionManagerFactoryAdapter implements LSTransactionManagerFactory 
    */
   @Override
   public LSAsyncTransactionCreatorManager createAsyncTransactionCreatorManager(
-      String targetSamContext, LSSecuritySetting lsSecuritySetting) {
+      String targetSamContext, LSSecuritySetting securitySetting) {
     Assert.getInstance()
         .notNull(targetSamContext, "targetSamContext")
-        .notNull(lsSecuritySetting, "lsSecuritySetting");
-    return new LSAsyncTransactionCreatorManagerAdapter(targetSamContext, lsSecuritySetting);
+        .notNull(securitySetting, "securitySetting");
+    return new LSAsyncTransactionCreatorManagerAdapter(targetSamContext, securitySetting);
   }
 
   /**

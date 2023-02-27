@@ -20,7 +20,7 @@ import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
  *
  * @since 0.1.0
  */
-class LSCommandDataFactoryAdapter implements LSCommandDataFactory {
+final class LSCommandDataFactoryAdapter implements LSCommandDataFactory {
 
   /**
    * {@inheritDoc}

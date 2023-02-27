@@ -56,10 +56,10 @@ final class CommandReadKeyParameters extends Command {
 
     super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = context.getTargetSam().getClassByte();
-    final byte inst = getCommandRef().getInstructionByte();
+    byte cla = context.getTargetSam().getClassByte();
+    byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
-    final byte p2;
+    byte p2;
     this.systemKeyType = systemKeyType;
     switch (this.systemKeyType) {
       case PERSONALIZATION:
@@ -77,7 +77,7 @@ final class CommandReadKeyParameters extends Command {
       default:
         throw new IllegalStateException("Unexpected value: " + systemKeyType);
     }
-    final byte[] dataIn = new byte[] {0x00, 0x00};
+    byte[] dataIn = {0x00, 0x00};
 
     setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
@@ -94,11 +94,11 @@ final class CommandReadKeyParameters extends Command {
 
     super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = context.getTargetSam().getClassByte();
-    final byte inst = getCommandRef().getInstructionByte();
+    byte cla = context.getTargetSam().getClassByte();
+    byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     final byte p2 = (byte) 0xF0;
-    final byte[] dataIn = new byte[] {kif, kvc};
+    byte[] dataIn = {kif, kvc};
 
     setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
@@ -114,11 +114,11 @@ final class CommandReadKeyParameters extends Command {
 
     super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
-    final byte cla = context.getTargetSam().getClassByte();
-    final byte inst = getCommandRef().getInstructionByte();
+    byte cla = context.getTargetSam().getClassByte();
+    byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
-    final byte p2 = (byte) recordNumber;
-    final byte[] dataIn = new byte[] {0x00, 0x00};
+    byte p2 = (byte) recordNumber;
+    byte[] dataIn = {0x00, 0x00};
 
     setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
@@ -161,14 +161,12 @@ final class CommandReadKeyParameters extends Command {
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
-    if (this.systemKeyType != null) {
+    if (systemKeyType != null) {
       byte[] keyParameter = new byte[13];
       System.arraycopy(apduResponse.getApdu(), 8, keyParameter, 0, 13);
       getContext()
           .getTargetSam()
           .setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
-    } else {
-      // TODO: work keys
     }
   }
 }

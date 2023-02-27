@@ -49,7 +49,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    */
   LSFreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
     super(targetSamReader, targetSam, null, null);
-    this.samKeyDiversifier = targetSam.getSerialNumber();
+    samKeyDiversifier = targetSam.getSerialNumber();
   }
 
   /**
@@ -116,7 +116,8 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'BasicSignatureComputationDataAdapter' or 'TraceableSignatureComputationDataAdapter'");
+          "The provided data must be an instance of 'BasicSignatureComputationDataAdapter'"
+              + " or 'TraceableSignatureComputationDataAdapter'");
     }
     return this;
   }
@@ -278,7 +279,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
   @Override
   public String exportTargetSamContextForAsyncTransaction() {
 
-    final List<Command> commands = new ArrayList<Command>();
+    List<Command> commands = new ArrayList<Command>();
 
     // read system key parameters if not available
     if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
@@ -379,13 +380,11 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
               counterPersonalization,
               getContext().getTargetSam().getCounter(counterPersonalization));
     }
-
     if (counterKeyManagement != 0) {
       targetSamContextDto
           .getCounterNumberToCounterValueMap()
           .put(counterKeyManagement, getContext().getTargetSam().getCounter(counterKeyManagement));
     }
-
     if (counterReloading != 0) {
       targetSamContextDto
           .getCounterNumberToCounterValueMap()

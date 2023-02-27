@@ -33,19 +33,19 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
   /**
    * Constructs a new instance with the specified target SAM context and security settings.
    *
-   * @param targetSamContextJSon The target SAM context as a JSon String.
-   * @param lsSecuritySetting An instance of {@link LSSecuritySetting}.
+   * @param targetSamContextJson The target SAM context as a JSon String.
+   * @param securitySetting An instance of {@link LSSecuritySetting}.
    * @since 0.3.0
    */
   LSAsyncTransactionCreatorManagerAdapter(
-      String targetSamContextJSon, LSSecuritySetting lsSecuritySetting) {
+      String targetSamContextJson, LSSecuritySetting securitySetting) {
     super(
         null,
         null,
-        ((LSSecuritySettingAdapter) lsSecuritySetting).getControlSamReader(),
-        ((LSSecuritySettingAdapter) lsSecuritySetting).getControlSam());
-    this.targetSamContext =
-        JsonUtil.getParser().fromJson(targetSamContextJSon, TargetSamContextDto.class);
+        ((LSSecuritySettingAdapter) securitySetting).getControlSamReader(),
+        ((LSSecuritySettingAdapter) securitySetting).getControlSam());
+    targetSamContext =
+        JsonUtil.getParser().fromJson(targetSamContextJson, TargetSamContextDto.class);
   }
 
   /**
@@ -135,12 +135,12 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
    * transaction manager, which is not designed to handle target SAM commands. As a result, when
    * called, this method always throws an exception.
    *
-   * @throws IllegalStateException Always.
+   * @throws UnsupportedOperationException Always.
    * @since 0.3.0
    */
   @Override
   public LSAsyncTransactionCreatorManager processCommands() {
-    throw new IllegalStateException(
+    throw new UnsupportedOperationException(
         "processCommands() is not allowed during the creation of an asynchronous transaction.");
   }
 }

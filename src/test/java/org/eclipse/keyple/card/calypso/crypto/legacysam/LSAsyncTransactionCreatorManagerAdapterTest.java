@@ -37,11 +37,10 @@ import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
-public class LSAsyncTransactionCreatorManagerAdapterTest {
+public final class LSAsyncTransactionCreatorManagerAdapterTest {
 
   private static final String SAM_SERIAL_NUMBER = "11223344";
   private static final String R_9000 = "9000";
-  private static final String R_INCORRECT_SIGNATURE = "6988";
   private static final String SAM_C1_POWER_ON_DATA =
       "3B3F9600805A4880C1205017" + SAM_SERIAL_NUMBER + "82" + R_9000;
   private static final String C_SELECT_DIVERSIFIER = "8014000004" + SAM_SERIAL_NUMBER;
@@ -111,7 +110,6 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
 
   private LSAsyncTransactionCreatorManager samTransactionManager;
   private ReaderMock samReader;
-  private LegacySam controlSam;
 
   interface ReaderMock extends CardReader, ProxyReaderApi {}
 
@@ -122,10 +120,6 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
 
     CardSelectionResponseApi samCardSelectionResponse = mock(CardSelectionResponseApi.class);
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
-    controlSam = new LegacySamAdapter(samCardSelectionResponse);
-
-    LSFreeTransactionManagerAdapterTest.ReaderMock controlSamReader =
-        mock(LSFreeTransactionManagerAdapterTest.ReaderMock.class);
 
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
     LegacySam controlSam = new LegacySamAdapter(samCardSelectionResponse);
@@ -139,7 +133,7 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
             .createAsyncTransactionCreatorManager(TARGET_SAM_CONTEXT, securitySetting);
   }
 
-  private CardRequestSpi createCardRequest(String... apduCommands) {
+  private static CardRequestSpi createCardRequest(String... apduCommands) {
     List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
     for (String apduCommand : apduCommands) {
       apduRequests.add(new ApduRequestAdapter(HexUtil.toByteArray(apduCommand)));
@@ -147,7 +141,7 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
     return new CardRequestAdapter(apduRequests, false);
   }
 
-  private CardResponseApi createCardResponse(String... apduCommandResponses) {
+  private static CardResponseApi createCardResponse(String... apduCommandResponses) {
     List<ApduResponseApi> apduResponses = new ArrayList<ApduResponseApi>();
     for (String apduResponse : apduCommandResponses) {
       apduResponses.add(new TestDtoAdapters.ApduResponseAdapter(HexUtil.toByteArray(apduResponse)));
@@ -163,11 +157,11 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
     }
 
     @Override
-    public boolean matches(CardRequestSpi right) {
-      if (right == null) {
+    public final boolean matches(CardRequestSpi argument) {
+      if (argument == null) {
         return false;
       }
-      List<ApduRequestSpi> rightApduRequests = right.getApduRequests();
+      List<ApduRequestSpi> rightApduRequests = argument.getApduRequests();
       if (leftApduRequests.size() != rightApduRequests.size()) {
         return false;
       }
@@ -184,8 +178,8 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
     }
   }
 
-  @Test(expected = IllegalStateException.class)
-  public void processCommands_shouldThrowISE() {
+  @Test(expected = UnsupportedOperationException.class)
+  public void processCommands_shouldThrowUOE() {
     samTransactionManager.prepareWriteCounterCeiling(0, 100);
     samTransactionManager.processCommands();
   }
@@ -268,8 +262,8 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
     JsonArray samCommands = jsonObject.get(SAM_COMMANDS).getAsJsonArray();
 
     // they should contain 2 elements
-    assertThat(samCommandsTypes.size()).isEqualTo(2);
-    assertThat(samCommands.size()).isEqualTo(2);
+    assertThat(samCommandsTypes).hasSize(2);
+    assertThat(samCommands).hasSize(2);
 
     for (int i = 0; i < samCommandsTypes.size(); i++) {
       // check the resulting command class
@@ -341,8 +335,8 @@ public class LSAsyncTransactionCreatorManagerAdapterTest {
     JsonArray samCommands = jsonObject.get(SAM_COMMANDS).getAsJsonArray();
 
     // they should contain 3 elements
-    assertThat(samCommandsTypes.size()).isEqualTo(3);
-    assertThat(samCommands.size()).isEqualTo(3);
+    assertThat(samCommandsTypes).hasSize(3);
+    assertThat(samCommands).hasSize(3);
 
     for (int i = 0; i < samCommandsTypes.size(); i++) {
       // check the resulting command class

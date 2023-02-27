@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Upgraded
+- "Calypsonet Terminal Reader API" to version `1.2.0`.
 - "Calypsonet Terminal Calypso Crypto Legacy SAM API" to version `0.2.0`.
 - "Google Gson Library" (com.google.code.gson) to version `2.10.1`.
  

@@ -26,14 +26,6 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
  */
 final class CommandReadCounter extends Command {
 
-  /** Event counter operation type */
-  enum CounterOperationType {
-    /** Single counter */
-    READ_SINGLE_COUNTER,
-    /** Counter record */
-    READ_COUNTER_RECORD
-  }
-
   private final int counterFileRecordNumber;
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
@@ -121,7 +113,7 @@ final class CommandReadCounter extends Command {
       getContext()
           .getTargetSam()
           .putCounterValue(
-              (this.counterFileRecordNumber * 9) + i,
+              (counterFileRecordNumber * 9) + i,
               ByteArrayUtil.extractInt(dataOut, 8 + (3 * i), 3, false));
     }
   }

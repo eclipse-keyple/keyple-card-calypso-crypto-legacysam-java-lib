@@ -34,8 +34,9 @@ abstract class CommonTransactionManagerAdapter {
   static final String SAM_COMMANDS_TYPES = "samCommandsTypes";
   static final String SAM_COMMANDS = "samCommands";
 
-  static final int[] counterToRecordLookup =
-      new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2};
+  static final int[] counterToRecordLookup = {
+    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2
+  };
   private final ProxyReaderApi targetSamReader;
   private final LegacySamAdapter targetSam;
   private final ProxyReaderApi controlSamReader;
@@ -82,12 +83,12 @@ abstract class CommonTransactionManagerAdapter {
   }
 
   /**
-   * Gets the the list of added target SAM commands.
+   * Gets the list of added target SAM commands.
    *
    * @return A not null list of commands.
    * @since 0.3.0
    */
-  List<Command> getTargetSamCommands() {
+  final List<Command> getTargetSamCommands() {
     return targetSamCommands;
   }
 
@@ -132,7 +133,7 @@ abstract class CommonTransactionManagerAdapter {
    * @param commands A not null list of {@link Command}.
    * @since 0.3.0
    */
-  final void processTargetSamCommands(List<Command> commands) {
+  final void processTargetSamCommands(List<? extends Command> commands) {
     CommandExecutor.processCommands(commands, targetSamReader, false);
   }
 }

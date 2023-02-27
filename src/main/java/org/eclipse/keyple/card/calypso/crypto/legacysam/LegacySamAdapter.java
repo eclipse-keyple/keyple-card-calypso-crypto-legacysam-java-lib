@@ -64,8 +64,8 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   LegacySamAdapter(CardSelectionResponseApi cardSelectionResponse) {
 
     // in the case of a SAM, the power-on data corresponds to the ATR of the card.
-    this.powerOnData = cardSelectionResponse.getPowerOnData();
-    if (this.powerOnData == null) {
+    powerOnData = cardSelectionResponse.getPowerOnData();
+    if (powerOnData == null) {
       throw new IllegalStateException("ATR should not be empty.");
     }
 
@@ -200,7 +200,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    */
   @Override
   public String getProductInfo() {
-    return "Type: " + getProductType().name() + ", S/N: " + HexUtil.toHex(getSerialNumber());
+    return "Type: " + samProductType.name() + ", S/N: " + HexUtil.toHex(getSerialNumber());
   }
 
   /**
@@ -281,7 +281,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.1.0
    */
   void putCounterValue(int counterNumber, int value) {
-    this.counters.put(counterNumber, value);
+    counters.put(counterNumber, value);
   }
 
   /**
@@ -292,7 +292,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.1.0
    */
   void putCounterCeilingValue(int counterNumber, int value) {
-    this.counterCeilings.put(counterNumber, value);
+    counterCeilings.put(counterNumber, value);
   }
 
   /**
@@ -404,6 +404,6 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.3.0
    */
   byte[] getChallenge() {
-    return this.challenge;
+    return challenge;
   }
 }

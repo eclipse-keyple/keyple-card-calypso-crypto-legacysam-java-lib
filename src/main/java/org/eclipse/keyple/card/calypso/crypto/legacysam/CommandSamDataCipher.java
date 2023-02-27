@@ -75,10 +75,10 @@ final class CommandSamDataCipher extends Command {
 
     super(CommandRef.SAM_DATA_CIPHER, 48, context);
 
-    final byte cla = context.getTargetSam().getClassByte();
-    final byte inst = getCommandRef().getInstructionByte();
+    byte cla = context.getTargetSam().getClassByte();
+    byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
-    final byte p2;
+    byte p2;
     switch (dataType) {
       case CAAD_RECORD:
         p2 = (byte) (0xE7 + recordNumber);
@@ -140,7 +140,7 @@ final class CommandSamDataCipher extends Command {
   }
 
   /**
-   * Retreives the ciphered data resulting of the execution of the command.
+   * Retrieves the ciphered data resulting of the execution of the command.
    *
    * @return A 48-byte byte array.
    */
@@ -180,6 +180,6 @@ final class CommandSamDataCipher extends Command {
      *
      * @since 0.3.0
      */
-    PARAMETERS_RECORD;
+    PARAMETERS_RECORD
   }
 }

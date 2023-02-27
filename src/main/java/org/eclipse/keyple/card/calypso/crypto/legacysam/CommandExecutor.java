@@ -28,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 0.3.0
  */
-class CommandExecutor {
+final class CommandExecutor {
   private static final Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
   private static final String MSG_CARD_READER_COMMUNICATION_ERROR =
       "A communication error with the card reader occurred ";
@@ -48,7 +48,7 @@ class CommandExecutor {
    * @since 0.3.0
    */
   static void processCommands(
-      List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
     if (commands.isEmpty()) {
       return;
     }
@@ -73,7 +73,7 @@ class CommandExecutor {
    * @since 0.3.0
    */
   static void processCommandsAlreadyFinalized(
-      List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
     if (commands.isEmpty()) {
       return;
     }
@@ -87,7 +87,7 @@ class CommandExecutor {
    * @param closePhysicalChannel True if the physical channel must be closed after the operation.
    */
   private static void executeCommands(
-      List<Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
     // Retrieve the list of C-APDUs
     List<ApduRequestSpi> apduRequests = getApduRequests(commands);
     // Wrap the list of C-APDUs into a card request
@@ -143,7 +143,7 @@ class CommandExecutor {
    * @return An empty list if there is no command.
    * @since 0.3.0
    */
-  private static List<ApduRequestSpi> getApduRequests(List<Command> commands) {
+  private static List<ApduRequestSpi> getApduRequests(List<? extends Command> commands) {
     List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
     if (commands != null) {
       for (Command command : commands) {

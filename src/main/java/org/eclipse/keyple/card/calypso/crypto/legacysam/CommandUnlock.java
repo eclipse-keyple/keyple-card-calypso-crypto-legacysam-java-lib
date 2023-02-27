@@ -51,8 +51,8 @@ final class CommandUnlock extends Command {
     super(CommandRef.UNLOCK, 0, null);
 
     byte cla = productType == LegacySam.ProductType.SAM_S1DX ? (byte) 0x94 : (byte) 0x80;
-    byte p1 = (byte) 0x00;
-    byte p2 = (byte) 0x00;
+    byte p1 = 0x00;
+    byte p2 = 0x00;
 
     if (unlockData == null) {
       throw new IllegalArgumentException("Unlock data null!");
