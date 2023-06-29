@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.3.+ (2023-02-13)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 1.0.+ (2023-06-29)
 end title
 
 ' == THEME ==
@@ -54,7 +54,7 @@ hide <<grey>> stereotype
 legend top
     __Colors legend__ :
     * __External API references__ :
-    ** <back:lightgreen>**calypsonet-terminal-calypso-crypto-legacysam-java-api**</back>
+    ** <back:lightgreen>**keypop-calypso-crypto-legacysam-java-api**</back>
     ** <back:cyan>**keyple-common-java-api**</back>
     ** <back:orange>**keyple-service-resource-java-lib**</back>
 end legend
@@ -64,14 +64,8 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
         --
         +{static} LegacySamCardExtensionService getInstance ()
 
-        +<back:lightgreen>LegacySamSelectionFactory</back> getLegacySamSelectionFactory ()
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelection</back> legacySamSelection)
-
-        +<color:green><back:lightgreen>LSSecuritySettingFactory</back> getSecuritySettingFactory()
-
-        +<back:lightgreen>LSTransactionManagerFactory</back> getTransactionManagerFactory ()
-        +<back:lightgreen>LSCommandDataFactory</back> getCommandDataFactory ()
-
+        +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension)
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
         +String getReaderApiVersion ()
