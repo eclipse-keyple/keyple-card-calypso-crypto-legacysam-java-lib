@@ -60,22 +60,30 @@ legend top
 end legend
 
 package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
-    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService <<green>> {
         --
         +{static} LegacySamCardExtensionService getInstance ()
 
         +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
+
         +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension)
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataFilter)
+
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
         +String getReaderApiVersion ()
         +String getCardApiVersion ()
+    }
+    +class "**final** LegacySamUtil" as LegacySamUtil <<green>> {
+        +{static} String buildPowerOnDataFilter (<back:lightgreen>LegacySam.ProductType</back> productType, String serialNumberRegex)
     }
 }
 
 ' Associations
 
 ' == LAYOUT ==
+
+LegacySamCardExtensionService -[hidden]- LegacySamUtil
 
 ' == STYLE ==
 
