@@ -13,13 +13,13 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InconsistentDataException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.ReaderIOException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamIOException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.ReaderIOException;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SamIOException;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.ApduRequestSpi;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

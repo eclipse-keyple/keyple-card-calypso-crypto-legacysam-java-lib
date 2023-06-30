@@ -16,10 +16,11 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.Comma
 
 import java.util.HashMap;
 import java.util.Map;
-import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * Builds the Write Ceilings APDU command.
@@ -29,8 +30,9 @@ import org.eclipse.keyple.core.util.ByteArrayUtil;
 final class CommandWriteCeilings extends Command {
   private final transient TargetSamContextDto targetSamContext; // NOSONAR
   private final transient byte[] plainData = new byte[30]; // NOSONAR
-  private final transient Map<Integer, Boolean> counterNumberToManualCounterIncrementAuthorizedMap =
-      new HashMap<Integer, Boolean>(); // NOSONAR
+  private final transient Map<Integer, CounterIncrementAccess>
+      counterNumberToManualCounterIncrementAuthorizedMap =
+          new HashMap<Integer, CounterIncrementAccess>(); // NOSONAR
   private final transient int counterFileRecordNumber; // NOSONAR
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
@@ -104,7 +106,7 @@ final class CommandWriteCeilings extends Command {
    * @param counterNumber The number of the counter whose ceiling is to be written (in range
    *     [0..26]).
    * @param ceilingValue The ceiling value.
-   * @param isManualCounterIncrementAuthorized The counter incrementation configuration.
+   * @param counterIncrementAccess The counter incrementation configuration.
    * @since 0.1.0
    */
   CommandWriteCeilings(
@@ -112,14 +114,14 @@ final class CommandWriteCeilings extends Command {
       TargetSamContextDto targetSamContext,
       int counterNumber,
       int ceilingValue,
-      boolean isManualCounterIncrementAuthorized) {
+      CounterIncrementAccess counterIncrementAccess) {
     super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
     counterFileRecordNumber = CommonTransactionManagerAdapter.counterToRecordLookup[counterNumber];
 
     plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
-    addCounter(counterNumber, ceilingValue, isManualCounterIncrementAuthorized);
+    addCounter(counterNumber, ceilingValue, counterIncrementAccess);
   }
 
   /**
@@ -130,16 +132,16 @@ final class CommandWriteCeilings extends Command {
    *
    * @param counterNumber The counter number (in range [0..26]).
    * @param ceilingValue The ceiling value to be written (in range [0..16777210]).
-   * @param isManualCounterIncrementAuthorized True if free incrementing of the counter should be
-   *     allowed.
+   * @param counterIncrementAccess True if free incrementing of the counter should be allowed.
    * @since 0.3.0
    */
-  void addCounter(int counterNumber, int ceilingValue, boolean isManualCounterIncrementAuthorized) {
+  void addCounter(
+      int counterNumber, int ceilingValue, CounterIncrementAccess counterIncrementAccess) {
     // update the plain data block to be ciphered later
     ByteArrayUtil.copyBytes(ceilingValue, plainData, (counterNumber % 9) * 3 + 1, 3);
     // keep the config into a map
     counterNumberToManualCounterIncrementAuthorizedMap.put(
-        counterNumber % 9, isManualCounterIncrementAuthorized);
+        counterNumber % 9, counterIncrementAccess);
   }
 
   /**
@@ -208,18 +210,19 @@ final class CommandWriteCeilings extends Command {
   private void computePlainData() {
     short configBits = 0;
     for (int i = 0; i < 9; i++) {
-      Boolean config = counterNumberToManualCounterIncrementAuthorizedMap.get(i);
+      CounterIncrementAccess config = counterNumberToManualCounterIncrementAuthorizedMap.get(i);
       if (config == null) {
         config =
             getContext()
                 .getTargetSam()
-                .isManualCounterIncrementAuthorized((counterFileRecordNumber * 9) + i);
+                .getCounterIncrementAccess((counterFileRecordNumber * 9) + i);
         if (config == null) {
           throw new IllegalStateException(
               "Unable to determine counter incrementation configuration.");
         }
       }
-      if (config && (i != 0 || counterFileRecordNumber != 0)) {
+      if (config == CounterIncrementAccess.FREE_COUNTING_ENABLED
+          && (i != 0 || counterFileRecordNumber != 0)) {
         configBits |= 1 << i;
       }
     }

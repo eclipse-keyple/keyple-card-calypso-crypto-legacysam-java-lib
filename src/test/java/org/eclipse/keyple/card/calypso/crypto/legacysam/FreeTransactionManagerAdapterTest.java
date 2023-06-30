@@ -19,29 +19,22 @@ import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.Mockito.*;
 
 import java.util.*;
-import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSFreeTransactionManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.SamRevokedException;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.ApduRequestSpi;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.CardReader;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 import org.mockito.InOrder;
 
-public final class LSFreeTransactionManagerAdapterTest {
+public final class FreeTransactionManagerAdapterTest {
 
   private static final String SAM_SERIAL_NUMBER = "11223344";
   private static final String CIPHER_MESSAGE = "A1A2A3A4A5A6A7A8";
@@ -144,7 +137,7 @@ public final class LSFreeTransactionManagerAdapterTest {
       };
   private final SystemKeyType[] systemKeyTypes = SystemKeyType.values();
 
-  private LSFreeTransactionManager samTransactionManager;
+  private FreeTransactionManager samTransactionManager;
   private ReaderMock samReader;
   private LegacySam sam;
 
@@ -163,7 +156,7 @@ public final class LSFreeTransactionManagerAdapterTest {
 
     samTransactionManager =
         LegacySamCardExtensionService.getInstance()
-            .getTransactionManagerFactory()
+            .getLegacySamApiFactory()
             .createFreeTransactionManager(samReader, sam);
   }
 
@@ -263,7 +256,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(new byte[207], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(0, true);
+            .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -306,7 +299,8 @@ public final class LSFreeTransactionManagerAdapterTest {
     data.setData(new byte[208], (byte) 1, (byte) 2);
     samTransactionManager.prepareComputeSignature(data);
 
-    data.setData(new byte[206], (byte) 1, (byte) 2).withSamTraceabilityMode(0, true);
+    data.setData(new byte[206], (byte) 1, (byte) 2)
+        .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -377,7 +371,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(new byte[10], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(-1, true);
+            .withSamTraceabilityMode(-1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -387,7 +381,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(new byte[10], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(3 * 8 + 1, true);
+            .withSamTraceabilityMode(3 * 8 + 1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -397,7 +391,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(new byte[10], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(2 * 8 + 1, false);
+            .withSamTraceabilityMode(2 * 8 + 1, SamTraceabilityMode.FULL_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -408,13 +402,13 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(new byte[10], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(0, true);
+            .withSamTraceabilityMode(0, SamTraceabilityMode.FULL_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
 
-    data.withSamTraceabilityMode(3 * 8, true);
+    data.withSamTraceabilityMode(3 * 8, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
 
-    data.withSamTraceabilityMode(2 * 8, false);
+    data.withSamTraceabilityMode(2 * 8, SamTraceabilityMode.FULL_SERIAL_NUMBER);
     samTransactionManager.prepareComputeSignature(data);
   }
 
@@ -885,12 +879,12 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data1 =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(1, true)
+            .withSamTraceabilityMode(1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER)
             .withoutBusyMode();
     TraceableSignatureComputationData data2 =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(1, false)
+            .withSamTraceabilityMode(1, SamTraceabilityMode.FULL_SERIAL_NUMBER)
             .withoutBusyMode();
     samTransactionManager
         .prepareComputeSignature(data1)
@@ -964,7 +958,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(new byte[207], new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(0, true, null);
+            .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1012,7 +1006,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setData(new byte[206], new byte[8], (byte) 1, (byte) 2)
-        .withSamTraceabilityMode(0, true, null);
+        .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1092,7 +1086,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(new byte[10], new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(-1, true, null);
+            .withSamTraceabilityMode(-1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1102,7 +1096,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(new byte[10], new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(3 * 8 + 1, true, null);
+            .withSamTraceabilityMode(3 * 8 + 1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1112,7 +1106,7 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(new byte[10], new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(2 * 8 + 1, false, null);
+            .withSamTraceabilityMode(2 * 8 + 1, SamTraceabilityMode.FULL_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1123,13 +1117,13 @@ public final class LSFreeTransactionManagerAdapterTest {
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(new byte[10], new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(0, true, null);
+            .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
 
-    data.withSamTraceabilityMode(3 * 8, true, null);
+    data.withSamTraceabilityMode(3 * 8, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
 
-    data.withSamTraceabilityMode(2 * 8, false, null);
+    data.withSamTraceabilityMode(2 * 8, SamTraceabilityMode.FULL_SERIAL_NUMBER, null);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1219,40 +1213,46 @@ public final class LSFreeTransactionManagerAdapterTest {
 
   @Test
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusOK_shouldBeSuccessful() {
-    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
+    LegacySamRevocationServiceSpi samRevocationServiceSpi =
+        mock(LegacySamRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4"), 0xC5C6C7))
         .thenReturn(false);
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(
                 HexUtil.toByteArray(PSO_MESSAGE_SAM_TRACEABILITY), new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(8, true, samRevocationServiceSpi);
+            .withSamTraceabilityMode(
+                8, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, samRevocationServiceSpi);
     samTransactionManager.prepareVerifySignature(data);
   }
 
   @Test(expected = SamRevokedException.class)
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusKOPartial_shouldThrowSRE() {
-    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
+    LegacySamRevocationServiceSpi samRevocationServiceSpi =
+        mock(LegacySamRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4"), 0xB5B6B7))
         .thenReturn(true);
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(
                 HexUtil.toByteArray(PSO_MESSAGE_SAM_TRACEABILITY), new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(8, true, samRevocationServiceSpi);
+            .withSamTraceabilityMode(
+                8, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, samRevocationServiceSpi);
     samTransactionManager.prepareVerifySignature(data);
   }
 
   @Test(expected = SamRevokedException.class)
   public void prepareVerifySignature_PSO_whenCheckSamRevocationStatusKOFull_shouldThrowSRE() {
-    LSRevocationServiceSpi samRevocationServiceSpi = mock(LSRevocationServiceSpi.class);
+    LegacySamRevocationServiceSpi samRevocationServiceSpi =
+        mock(LegacySamRevocationServiceSpi.class);
     when(samRevocationServiceSpi.isSamRevoked(HexUtil.toByteArray("B2B3B4B5"), 0xB6B7B8))
         .thenReturn(true);
     TraceableSignatureVerificationData data =
         new TraceableSignatureVerificationDataAdapter()
             .setData(
                 HexUtil.toByteArray(PSO_MESSAGE_SAM_TRACEABILITY), new byte[8], (byte) 1, (byte) 2)
-            .withSamTraceabilityMode(8, false, samRevocationServiceSpi);
+            .withSamTraceabilityMode(
+                8, SamTraceabilityMode.FULL_SERIAL_NUMBER, samRevocationServiceSpi);
     samTransactionManager.prepareVerifySignature(data);
   }
 
@@ -1629,7 +1629,7 @@ public final class LSFreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2)
-            .withSamTraceabilityMode(1, true, null)
+            .withSamTraceabilityMode(1, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null)
             .withoutBusyMode();
     TraceableSignatureVerificationData data2 =
         new TraceableSignatureVerificationDataAdapter()
@@ -1638,7 +1638,7 @@ public final class LSFreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2)
-            .withSamTraceabilityMode(1, false, null)
+            .withSamTraceabilityMode(1, SamTraceabilityMode.FULL_SERIAL_NUMBER, null)
             .withoutBusyMode();
     samTransactionManager
         .prepareVerifySignature(data1)

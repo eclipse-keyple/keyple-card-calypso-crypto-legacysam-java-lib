@@ -12,93 +12,60 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam.*;
+import static org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.Collections;
 import java.util.List;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
-import org.calypsonet.terminal.card.spi.ParseException;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.card.ParseException;
 import org.junit.Before;
 import org.junit.Test;
 
-public final class LegacySamSelectionAdapterTest {
+public final class LegacySamSelectionExtensionAdapterTest {
 
   private static final String SAM_ATR = "3B3F9600805AAABBC1DDEEFF11223344829000";
-  private LegacySamSelectionAdapter samSelection;
+  private LegacySamSelectionExtensionAdapter samSelectionExtension;
 
   @Before
   public void setUp() {
-    samSelection =
-        (LegacySamSelectionAdapter)
+    samSelectionExtension =
+        (LegacySamSelectionExtensionAdapter)
             LegacySamCardExtensionService.getInstance()
-                .getLegacySamSelectionFactory()
-                .createSamSelection();
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void filterByProductType_whenProductTypeIsNull_shouldThrowIAE() {
-    samSelection.filterByProductType(null);
-  }
-
-  @Test
-  public void
-      filterByProductType_whenProductTypeIsNotDefined_shouldReturnResponseContainingACardSelectorWithPowerDataRegexAllowingAnyType() {
-    CardSelectorSpi cardSelector = samSelection.getCardSelectionRequest().getCardSelector();
-    assertThat(cardSelector.getPowerOnDataRegex()).isEqualTo(".*");
-  }
-
-  @Test
-  public void
-      filterByProductType_whenProductTypeIsDefined_shouldReturnResponseContainingACardSelectorWithPowerDataRegex() {
-    samSelection.filterByProductType(ProductType.SAM_C1);
-    CardSelectorSpi cardSelector = samSelection.getCardSelectionRequest().getCardSelector();
-    assertThat(cardSelector.getPowerOnDataRegex()).contains("80C1.{6}");
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void filterBySerialNumber_whenSerialNumberRegexIsNull_shouldThrowIAE() {
-    samSelection.filterBySerialNumber(null);
-  }
-
-  @Test(expected = IllegalArgumentException.class)
-  public void filterBySerialNumber_whenSerialNumberRegexIsInvalid_shouldThrowIAE() {
-    samSelection.filterBySerialNumber("[");
-  }
-
-  @Test
-  public void filterBySerialNumber_shouldReturnResponseContainingACardSelectorWithPowerDataRegex() {
-    samSelection.filterByProductType(ProductType.SAM_C1).filterBySerialNumber("112233..");
-    CardSelectorSpi cardSelector = samSelection.getCardSelectionRequest().getCardSelector();
-    assertThat(cardSelector.getPowerOnDataRegex()).contains("112233..");
+                .getLegacySamApiFactory()
+                .createLegacySamSelectionExtension();
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void setUnlockData_whenUnlockDataIsNull_shouldThrowIAE() {
-    samSelection.setUnlockData(null);
+    samSelectionExtension.setUnlockData(null);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void setUnlockData_whenUnlockDataHasABadLength_shouldThrowIAE() {
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEE");
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEE");
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void setUnlockData_whenUnlockDataIsInvalide_shouldThrowIAE() {
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEEGG");
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEEGG");
   }
 
   @Test
   public void setUnlockData_whenUnlockData_shouldProduceUnlockDataApdu() {
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEEFF");
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEEFF");
     byte[] unlockDataApdu =
-        samSelection.getCardSelectionRequest().getCardRequest().getApduRequests().get(0).getApdu();
+        samSelectionExtension
+            .getCardSelectionRequest()
+            .getCardRequest()
+            .getApduRequests()
+            .get(0)
+            .getApdu();
     assertThat(unlockDataApdu)
         .isEqualTo(HexUtil.toByteArray("802000001000112233445566778899AABBCCDDEEFF"));
   }
@@ -107,9 +74,9 @@ public final class LegacySamSelectionAdapterTest {
   public void parse_whenCommandsResponsesMismatch_shouldThrowIDE() throws Exception {
     CardSelectionResponseApi cardSelectionResponseApi = mock(CardSelectionResponseApi.class);
     when(cardSelectionResponseApi.getPowerOnData()).thenReturn(SAM_ATR);
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEEFF");
-    samSelection.getCardSelectionRequest();
-    samSelection.parse(cardSelectionResponseApi);
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEEFF");
+    samSelectionExtension.getCardSelectionRequest();
+    samSelectionExtension.parse(cardSelectionResponseApi);
   }
 
   @Test(expected = ParseException.class)
@@ -125,9 +92,9 @@ public final class LegacySamSelectionAdapterTest {
     when(cardSelectionResponseApi.getSelectApplicationResponse()).thenReturn(unlockApduResponse);
     when(cardSelectionResponseApi.getCardResponse()).thenReturn(cardResponseApi);
     when(cardResponseApi.getApduResponses()).thenReturn(apduResponseApis);
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEEFF");
-    samSelection.getCardSelectionRequest();
-    samSelection.parse(cardSelectionResponseApi);
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEEFF");
+    samSelectionExtension.getCardSelectionRequest();
+    samSelectionExtension.parse(cardSelectionResponseApi);
   }
 
   @Test
@@ -142,10 +109,9 @@ public final class LegacySamSelectionAdapterTest {
     when(cardSelectionResponseApi.getSelectApplicationResponse()).thenReturn(unlockApduResponse);
     when(cardSelectionResponseApi.getCardResponse()).thenReturn(cardResponseApi);
     when(cardResponseApi.getApduResponses()).thenReturn(apduResponseApis);
-    samSelection.filterByProductType(ProductType.SAM_C1);
-    samSelection.setUnlockData("00112233445566778899AABBCCDDEEFF");
-    samSelection.getCardSelectionRequest();
-    LegacySam LegacySam = (LegacySam) samSelection.parse(cardSelectionResponseApi);
+    samSelectionExtension.setUnlockData("00112233445566778899AABBCCDDEEFF");
+    samSelectionExtension.getCardSelectionRequest();
+    LegacySam LegacySam = (LegacySam) samSelectionExtension.parse(cardSelectionResponseApi);
     assertThat(LegacySam).isNotNull();
     assertThat(LegacySam.getProductType()).isEqualTo(ProductType.SAM_C1);
     assertThat(LegacySam.getSerialNumber()).isEqualTo(HexUtil.toByteArray("11223344"));

@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.calypsonet.terminal.card.*;
+import org.eclipse.keypop.card.*;
 
 /**
  * Superclass for all SAM commands.
@@ -27,7 +27,7 @@ import org.calypsonet.terminal.card.*;
  * <ul>
  *   <li>the card command reference,
  *   <li>the name of the command,
- *   <li>the built {@link org.calypsonet.terminal.card.spi.ApduRequestSpi},
+ *   <li>the built {@link org.eclipse.keypop.card.spi.ApduRequestSpi},
  *   <li>the parsed {@link ApduResponseApi}.
  * </ul>
  *

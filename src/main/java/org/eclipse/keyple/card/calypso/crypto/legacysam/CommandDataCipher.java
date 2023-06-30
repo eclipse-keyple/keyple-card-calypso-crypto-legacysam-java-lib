@@ -16,9 +16,9 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InvalidSignatureException;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * Builds the "Data Cipher" SAM command.
@@ -77,8 +77,8 @@ final class CommandDataCipher extends Command {
 
     final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
-    final byte p1 = (byte) 0x40; // TODO implement the other modes (cipher, decipher)
-    final byte p2 = (byte) 0x00;
+    final byte p1 = 0x40; // TODO implement the other modes (cipher, decipher)
+    final byte p2 = 0x00;
 
     final byte[] dataIn;
     if (signatureComputationData != null) {

@@ -15,17 +15,18 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import com.google.gson.JsonObject;
 import java.util.*;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
 
 /**
- * Adapter of {@link LSAsyncTransactionCreatorManager}.
+ * Adapter of {@link AsyncTransactionCreatorManager}.
  *
  * @since 0.3.0
  */
-final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
-    implements LSAsyncTransactionCreatorManager {
+final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManagerAdapter
+    implements AsyncTransactionCreatorManager {
 
   /* Final fields */
   private final TargetSamContextDto targetSamContext;
@@ -34,16 +35,16 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
    * Constructs a new instance with the specified target SAM context and security settings.
    *
    * @param targetSamContextJson The target SAM context as a JSon String.
-   * @param securitySetting An instance of {@link LSSecuritySetting}.
+   * @param securitySetting An instance of {@link SecuritySetting}.
    * @since 0.3.0
    */
-  LSAsyncTransactionCreatorManagerAdapter(
-      String targetSamContextJson, LSSecuritySetting securitySetting) {
+  AsyncTransactionCreatorManagerAdapter(
+      String targetSamContextJson, SecuritySetting securitySetting) {
     super(
         null,
         null,
-        ((LSSecuritySettingAdapter) securitySetting).getControlSamReader(),
-        ((LSSecuritySettingAdapter) securitySetting).getControlSam());
+        ((SecuritySettingAdapter) securitySetting).getControlSamReader(),
+        ((SecuritySettingAdapter) securitySetting).getControlSam());
     targetSamContext =
         JsonUtil.getParser().fromJson(targetSamContextJson, TargetSamContextDto.class);
   }
@@ -54,7 +55,7 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
    * @since 0.3.0
    */
   @Override
-  public LSAsyncTransactionCreatorManager prepareWriteCounterCeiling(
+  public AsyncTransactionCreatorManager prepareWriteCounterCeiling(
       int counterNumber, int ceilingValue) {
 
     Assert.getInstance()
@@ -75,8 +76,8 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
    * @since 0.3.0
    */
   @Override
-  public LSAsyncTransactionCreatorManager prepareWriteCounterConfiguration(
-      int counterNumber, int ceilingValue, boolean isManualCounterIncrementAuthorized) {
+  public AsyncTransactionCreatorManager prepareWriteCounterConfiguration(
+      int counterNumber, int ceilingValue, CounterIncrementAccess counterIncrementAccess) {
 
     Assert.getInstance()
         .isInRange(
@@ -89,18 +90,14 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
           && ((CommandWriteCeilings) command).getCounterFileRecordNumber()
               == counterToRecordLookup[counterNumber]) {
         ((CommandWriteCeilings) command)
-            .addCounter(counterNumber, ceilingValue, isManualCounterIncrementAuthorized);
+            .addCounter(counterNumber, ceilingValue, counterIncrementAccess);
         return this;
       }
     }
 
     addTargetSamCommand(
         new CommandWriteCeilings(
-            getContext(),
-            targetSamContext,
-            counterNumber,
-            ceilingValue,
-            isManualCounterIncrementAuthorized));
+            getContext(), targetSamContext, counterNumber, ceilingValue, counterIncrementAccess));
 
     return this;
   }
@@ -139,7 +136,7 @@ final class LSAsyncTransactionCreatorManagerAdapter extends CommonTransactionMan
    * @since 0.3.0
    */
   @Override
-  public LSAsyncTransactionCreatorManager processCommands() {
+  public AsyncTransactionCreatorManager processCommands() {
     throw new UnsupportedOperationException(
         "processCommands() is not allowed during the creation of an asynchronous transaction.");
   }

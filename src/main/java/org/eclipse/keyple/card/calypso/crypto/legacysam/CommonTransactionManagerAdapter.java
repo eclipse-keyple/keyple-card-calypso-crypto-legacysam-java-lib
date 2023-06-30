@@ -15,7 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.card.*;
+import org.eclipse.keypop.card.*;
 
 /**
  * Abstract class of all transaction manager adapters.

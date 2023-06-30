@@ -11,8 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.KeyParameter;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.KeyParameter;
 
 /**
  * Implementation of {@link KeyParameter}.

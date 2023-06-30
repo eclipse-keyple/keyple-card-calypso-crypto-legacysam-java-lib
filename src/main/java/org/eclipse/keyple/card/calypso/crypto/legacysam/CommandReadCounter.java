@@ -15,9 +15,9 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * Builds the Read Event Counter APDU command.

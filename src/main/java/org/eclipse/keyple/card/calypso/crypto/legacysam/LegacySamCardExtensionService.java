@@ -11,17 +11,14 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelection;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelectionFactory;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSCommandDataFactory;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySettingFactory;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSTransactionManagerFactory;
-import org.calypsonet.terminal.card.CardApiProperties;
-import org.calypsonet.terminal.reader.ReaderApiProperties;
 import org.eclipse.keyple.core.common.CommonApiProperties;
 import org.eclipse.keyple.core.common.KeypleCardExtension;
 import org.eclipse.keyple.core.service.resource.spi.CardResourceProfileExtension;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.calypso.crypto.legacysam.LegacySamApiFactory;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
+import org.eclipse.keypop.card.CardApiProperties;
+import org.eclipse.keypop.reader.ReaderApiProperties;
 
 /**
  * Card extension dedicated to the management of Calypso legacy SAMs (SAM-C1, HSM-C1, etc...).
@@ -77,56 +74,44 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
   }
 
   /**
-   * Returns a {@link LegacySamSelectionFactory}.
+   * Returns a {@link LegacySamApiFactory}.
    *
    * @return A not null reference.
-   * @since 0.2.0
+   * @since 1.0.0
    */
-  public LegacySamSelectionFactory getLegacySamSelectionFactory() {
-    return new LegacySamSelectionFactoryAdapter();
+  public LegacySamApiFactory getLegacySamApiFactory() {
+    return new LegacySamApiFactoryAdapter();
   }
 
   /**
    * Returns a {@link CardResourceProfileExtension} to be used with the card resource service.
    *
-   * @param legacySamSelection The legacy SAM selection to use.
+   * @param legacySamSelection The legacy SAM selection extension to use.
    * @return A not null reference.
    * @throws IllegalArgumentException If no SAM selection is provided.
    * @since 0.2.0
    */
   public CardResourceProfileExtension createLegacySamResourceProfileExtension(
-      LegacySamSelection legacySamSelection) {
+      LegacySamSelectionExtension legacySamSelection) {
     Assert.getInstance().notNull(legacySamSelection, "Legacy SAM selection");
-    return new LegacySamResourceProfileExtensionAdapter(legacySamSelection);
+    return new LegacySamResourceProfileExtensionAdapter(legacySamSelection, null);
   }
 
   /**
-   * Returns a {@link LSTransactionManagerFactory}.
+   * Returns a {@link CardResourceProfileExtension} to be used with the card resource service.
    *
+   * @param legacySamSelection The legacy SAM selection extension to use.
+   * @param powerOnDataRegex A regular expression.
    * @return A not null reference.
+   * @throws IllegalArgumentException If no SAM selection is provided.
+   * @throws IllegalArgumentException If the regular expression is null or empty.
    * @since 0.2.0
    */
-  public LSTransactionManagerFactory getTransactionManagerFactory() {
-    return new LSTransactionManagerFactoryAdapter();
-  }
-
-  /**
-   * Returns a {@link LSCommandDataFactory}.
-   *
-   * @return A not null reference.
-   * @since 0.2.0
-   */
-  public LSCommandDataFactory getCommandDataFactory() {
-    return new LSCommandDataFactoryAdapter();
-  }
-
-  /**
-   * Returns a {@link LSSecuritySettingFactory}.
-   *
-   * @return A not null reference.
-   * @since 0.3.0
-   */
-  public LSSecuritySettingFactory getSecuritySettingFactory() {
-    return new LSSecuritySettingFactoryAdapter();
+  public CardResourceProfileExtension createLegacySamResourceProfileExtension(
+      LegacySamSelectionExtension legacySamSelection, String powerOnDataRegex) {
+    Assert.getInstance()
+        .notNull(legacySamSelection, "Legacy SAM selection")
+        .notEmpty(powerOnDataRegex, "powerOnDataRegex");
+    return new LegacySamResourceProfileExtensionAdapter(legacySamSelection, powerOnDataRegex);
   }
 }

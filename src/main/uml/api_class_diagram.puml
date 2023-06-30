@@ -67,7 +67,7 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
         +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
 
         +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension)
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataFilter)
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
 
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
