@@ -12,15 +12,20 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstant.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
 import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardResponseApi;
 import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.eclipse.keypop.card.ParseException;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
@@ -44,14 +49,21 @@ final class LegacySamSelectionExtensionAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamSelectionExtensionAdapter.class);
   private static final int SW_NOT_LOCKED = 0x6985;
-  private CommandUnlock unlockCommand;
+  private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
+  LegacySamAdapter legacySamAdapter;
+  CommandContextDto context;
+  private final List<Command> commands;
 
   /**
    * Creates a {@link LegacySamSelectionExtension}.
    *
    * @since 0.1.0
    */
-  LegacySamSelectionExtensionAdapter() {}
+  LegacySamSelectionExtensionAdapter() {
+    legacySamAdapter = new LegacySamAdapter(LegacySam.ProductType.SAM_C1);
+    context = new CommandContextDto(legacySamAdapter, null, null);
+    commands = new ArrayList<Command>();
+  }
 
   /**
    * {@inheritDoc}
@@ -60,16 +72,16 @@ final class LegacySamSelectionExtensionAdapter
    */
   @Override
   public CardSelectionRequestSpi getCardSelectionRequest() {
-
-    // prepare the UNLOCK command if unlock data has been defined
-    if (unlockCommand != null) {
-      List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
-      cardSelectionApduRequests.add(
-          unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED));
+    List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
+    for (Command command : commands) {
+      cardSelectionApduRequests.add(command.getApduRequest());
+    }
+    // TODO check this logic:
+    if (commands.isEmpty()) {
+      return new CardSelectionRequestAdapter(null);
+    } else {
       return new CardSelectionRequestAdapter(
           new CardRequestAdapter(cardSelectionApduRequests, false));
-    } else {
-      return new CardSelectionRequestAdapter(null);
     }
   }
 
@@ -81,27 +93,77 @@ final class LegacySamSelectionExtensionAdapter
   @Override
   public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi)
       throws ParseException {
-    if (unlockCommand != null) {
-      // an unlock command has been requested
-      if (cardSelectionResponseApi.getCardResponse() == null
-          || cardSelectionResponseApi.getCardResponse().getApduResponses().isEmpty()) {
-        throw new ParseException("Mismatch in the number of requests/responses");
-      }
-      // check the SAM response to the unlock command
-      ApduResponseApi apduResponse =
-          cardSelectionResponseApi.getCardResponse().getApduResponses().get(0);
-      try {
-        unlockCommand.setResponseAndCheckStatus(apduResponse);
-      } catch (AccessForbiddenException e) {
-        logger.warn("SAM not locked or already unlocked");
-      } catch (CommandException e) {
-        throw new ParseException("An exception occurred while parsing the SAM response.", e);
-      }
+
+    CardResponseApi cardResponse = cardSelectionResponseApi.getCardResponse();
+    List<ApduResponseApi> apduResponses =
+        cardResponse != null
+            ? cardResponse.getApduResponses()
+            : Collections.<ApduResponseApi>emptyList();
+    if (commands.size() != apduResponses.size()) {
+      throw new ParseException("Mismatch in the number of requests/responses.");
     }
     try {
-      return new LegacySamAdapter(cardSelectionResponseApi);
-    } catch (RuntimeException e) {
-      throw new ParseException("An exception occurred while parsing the SAM response.", e);
+      // late initialization of the LegacySamAdapter
+      legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
+      if (!commands.isEmpty()) {
+        parseApduResponses(commands, apduResponses);
+      }
+    } catch (Exception e) {
+      throw new ParseException("Invalid card response: " + e.getMessage(), e);
+    }
+    if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
+        && cardSelectionResponseApi.getSelectApplicationResponse() == null
+        && cardSelectionResponseApi.getPowerOnData() == null) {
+      throw new ParseException(
+          "Unable to create a LegacySam: no power-on data and no FCI provided.");
+    }
+    return legacySamAdapter;
+  }
+
+  /**
+   * Parses the APDU responses and updates the LegacySam image.
+   *
+   * @param commands The list of commands that get the responses.
+   * @param apduResponses The APDU responses returned by the SAM to all commands.
+   */
+  private static void parseApduResponses(
+      List<? extends Command> commands, List<? extends ApduResponseApi> apduResponses) {
+    // If there are more responses than requests, then we are unable to fill the card image. In this
+    // case we stop processing immediately because it may be a case of fraud, and we throw a
+    // desynchronized exception.
+    if (apduResponses.size() > commands.size()) {
+      throw new InconsistentDataException(
+          "The number of commands/responses does not match: nb commands = "
+              + commands.size()
+              + ", nb responses = "
+              + apduResponses.size());
+    }
+    // We go through all the responses (and not the requests) because there may be fewer in the
+    // case of an error that occurred in strict mode. In this case the last response will raise an
+    // exception.
+    for (int i = 0; i < apduResponses.size(); i++) {
+      try {
+        commands.get(i).setResponseAndCheckStatus(apduResponses.get(i));
+      } catch (CommandException e) {
+        if (e instanceof AccessForbiddenException && commands.get(i) instanceof CommandUnlock) {
+          logger.warn("SAM not locked or already unlocked");
+        } else {
+          throw new UnexpectedCommandStatusException(
+              MSG_CARD_COMMAND_ERROR
+                  + "while processing responses to card commands: "
+                  + commands.get(i).getCommandRef(),
+              e);
+        }
+      }
+    }
+    // Finally, if no error has occurred and there are fewer responses than requests, then we
+    // throw a desynchronized exception.
+    if (apduResponses.size() < commands.size()) {
+      throw new InconsistentDataException(
+          "The number of commands/responses does not match: nb commands = "
+              + commands.size()
+              + ", nb responses = "
+              + apduResponses.size());
     }
   }
 
@@ -120,7 +182,10 @@ final class LegacySamSelectionExtensionAdapter
             "unlock data length == 16 or 32")
         .isHexString(unlockData, "unlockData")
         .notNull(productType, "productType");
-    unlockCommand = new CommandUnlock(productType, HexUtil.toByteArray(unlockData));
+    CommandUnlock unlockCommand = new CommandUnlock(productType, HexUtil.toByteArray(unlockData));
+    unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
+    // prepare the UNLOCK command and put it in first position
+    commands.add(0, unlockCommand);
     return this;
   }
 
@@ -134,18 +199,52 @@ final class LegacySamSelectionExtensionAdapter
     return setUnlockData(unlockData, LegacySam.ProductType.SAM_C1);
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 1.0.0
+   */
   @Override
   public LegacySamSelectionExtension prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
-    return null;
+    Assert.getInstance().notNull(systemKeyType, "systemKeyType");
+    commands.add(new CommandReadKeyParameters(context, systemKeyType));
+    return this;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 1.0.0
+   */
   @Override
-  public LegacySamSelectionExtension prepareReadCounterStatus(int i) {
-    return null;
+  public LegacySamSelectionExtension prepareReadCounterStatus(int counterNumber) {
+    Assert.getInstance()
+        .isInRange(counterNumber, MIN_COUNTER_NUMBER, MAX_COUNTER_NUMBER, "counterNumber");
+    for (Command command : commands) {
+      if (command instanceof CommandReadCounter
+          && ((CommandReadCounter) command).getCounterFileRecordNumber()
+              == COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
+        // already scheduled
+        return this;
+      }
+    }
+    commands.add(new CommandReadCounter(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    commands.add(new CommandReadCounterCeiling(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+
+    return this;
   }
 
+  /**
+   * {@inheritDoc}
+   *
+   * @since 1.0.0
+   */
   @Override
   public LegacySamSelectionExtension prepareReadAllCountersStatus() {
-    return null;
+    for (int i = 0; i < 3; i++) {
+      commands.add(new CommandReadCounter(context, i));
+      commands.add(new CommandReadCounterCeiling(context, i));
+    }
+    return this;
   }
 }

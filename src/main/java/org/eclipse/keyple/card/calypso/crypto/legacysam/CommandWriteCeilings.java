@@ -118,7 +118,7 @@ final class CommandWriteCeilings extends Command {
     super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
-    counterFileRecordNumber = CommonTransactionManagerAdapter.counterToRecordLookup[counterNumber];
+    counterFileRecordNumber = LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber];
 
     plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
     addCounter(counterNumber, ceilingValue, counterIncrementAccess);

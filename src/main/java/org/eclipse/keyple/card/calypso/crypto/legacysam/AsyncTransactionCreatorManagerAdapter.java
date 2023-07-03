@@ -60,9 +60,15 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
 
     Assert.getInstance()
         .isInRange(
-            counterNumber, MIN_COUNTER_CEILING_NUMBER, MAX_COUNTER_CEILING_NUMBER, "counterNumber")
+            counterNumber,
+            LegacySamConstant.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstant.MAX_COUNTER_CEILING_NUMBER,
+            "counterNumber")
         .isInRange(
-            ceilingValue, MIN_COUNTER_CEILING_VALUE, MAX_COUNTER_CEILING_VALUE, "ceilingValue");
+            ceilingValue,
+            LegacySamConstant.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstant.MAX_COUNTER_CEILING_VALUE,
+            "ceilingValue");
 
     addTargetSamCommand(
         new CommandWriteCeilings(getContext(), targetSamContext, counterNumber, ceilingValue));
@@ -81,14 +87,20 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
 
     Assert.getInstance()
         .isInRange(
-            counterNumber, MIN_COUNTER_CEILING_NUMBER, MAX_COUNTER_CEILING_NUMBER, "counterNumber")
+            counterNumber,
+            LegacySamConstant.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstant.MAX_COUNTER_CEILING_NUMBER,
+            "counterNumber")
         .isInRange(
-            ceilingValue, MIN_COUNTER_CEILING_VALUE, MAX_COUNTER_CEILING_VALUE, "ceilingValue");
+            ceilingValue,
+            LegacySamConstant.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstant.MAX_COUNTER_CEILING_VALUE,
+            "ceilingValue");
 
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandWriteCeilings
           && ((CommandWriteCeilings) command).getCounterFileRecordNumber()
-              == counterToRecordLookup[counterNumber]) {
+              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         ((CommandWriteCeilings) command)
             .addCounter(counterNumber, ceilingValue, counterIncrementAccess);
         return this;

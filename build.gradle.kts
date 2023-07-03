@@ -32,6 +32,7 @@ repositories {
 dependencies {
     implementation("org.eclipse.keypop:keypop-reader-java-api:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keypop:keypop-card-java-api:2.0.0-SNAPSHOT") { isChanging = true }
+    implementation("org.eclipse.keypop:keypop-calypso-card-java-api:2.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keypop:keypop-calypso-crypto-symmetric-java-api:1.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keypop:keypop-calypso-crypto-legacysam-java-api:1.0.0-SNAPSHOT") { isChanging = true }
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.0")

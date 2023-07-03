@@ -37,16 +37,16 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
 
   private static final Logger logger = LoggerFactory.getLogger(LegacySamAdapter.class);
 
-  private final String powerOnData;
-  private final ProductType samProductType;
-  private final byte[] serialNumber;
-  private final byte platform;
-  private final byte applicationType;
-  private final byte applicationSubType;
-  private final byte softwareIssuer;
-  private final byte softwareVersion;
-  private final byte softwareRevision;
-  private final byte classByte;
+  private String powerOnData;
+  private ProductType samProductType;
+  private byte[] serialNumber;
+  private byte platform;
+  private byte applicationType;
+  private byte applicationSubType;
+  private byte softwareIssuer;
+  private byte softwareVersion;
+  private byte softwareRevision;
+  private byte classByte;
   private final SortedMap<Integer, Integer> counters = new TreeMap<Integer, Integer>();
   private final Map<Integer, CounterIncrementAccess> countersIncrementConfig =
       new HashMap<Integer, CounterIncrementAccess>();
@@ -58,13 +58,35 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   /**
    * Constructor.
    *
+   * <p>Create a {@link LegacySamAdapter} just containing the {@link ProductType}.
+   *
+   * @param productType The SAM product type.
+   * @since 1.0.0
+   */
+  LegacySamAdapter(ProductType productType) {
+    this.samProductType = productType;
+  }
+
+  /**
+   * Constructor.
+   *
    * <p>Create the initial content from the data received in response to the card selection.
    *
    * @param cardSelectionResponse the response to the selection command.
    * @since 0.1.0
    */
   LegacySamAdapter(CardSelectionResponseApi cardSelectionResponse) {
+    parseSelectionResponse(cardSelectionResponse);
+  }
 
+  /**
+   * Parses the selection response in order to determine all the SAM attributes from the power-on
+   * data.
+   *
+   * @param cardSelectionResponse the response to the selection command.
+   * @since 1.0.0
+   */
+  void parseSelectionResponse(CardSelectionResponseApi cardSelectionResponse) {
     // in the case of a SAM, the power-on data corresponds to the ATR of the card.
     powerOnData = cardSelectionResponse.getPowerOnData();
     if (powerOnData == null) {
@@ -395,12 +417,14 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Gets the challenge.
+   * Gets and resets the current challenge.
    *
-   * @return null if no challenge is available.
-   * @since 0.3.0
+   * @return Null if no challenge is available.
+   * @since 1.0.0
    */
-  byte[] getChallenge() {
-    return challenge;
+  byte[] popChallenge() {
+    byte[] res = challenge;
+    challenge = null;
+    return res;
   }
 }

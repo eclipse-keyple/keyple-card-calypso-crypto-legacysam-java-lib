@@ -258,18 +258,25 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public FreeTransactionManagerAdapter prepareReadCounterStatus(int counterNumber) {
     Assert.getInstance()
-        .isInRange(counterNumber, MIN_COUNTER_NUMBER, MAX_COUNTER_NUMBER, "counterNumber");
+        .isInRange(
+            counterNumber,
+            LegacySamConstant.MIN_COUNTER_NUMBER,
+            LegacySamConstant.MAX_COUNTER_NUMBER,
+            "counterNumber");
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandReadCounter
           && ((CommandReadCounter) command).getCounterFileRecordNumber()
-              == counterToRecordLookup[counterNumber]) {
+              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
-    addTargetSamCommand(new CommandReadCounter(getContext(), counterToRecordLookup[counterNumber]));
     addTargetSamCommand(
-        new CommandReadCounterCeiling(getContext(), counterToRecordLookup[counterNumber]));
+        new CommandReadCounter(
+            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    addTargetSamCommand(
+        new CommandReadCounterCeiling(
+            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -375,13 +382,15 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     // compute needed counter file records
     Set<Integer> counterFileRecordNumbers = new HashSet<Integer>(3);
     if (counterPersonalization != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterPersonalization]);
+      counterFileRecordNumbers.add(
+          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
     }
     if (counterKeyManagement != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterKeyManagement]);
+      counterFileRecordNumbers.add(
+          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
     }
     if (counterReloading != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterReloading]);
+      counterFileRecordNumbers.add(LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
     }
 
     // read counters
