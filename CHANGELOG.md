@@ -6,9 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Added
+- Added S1D3 to S1D7 to the list of SAM types recognized by the library.
 - Added project status badges on `README.md` file.
 ### Fixed
 - CI: code coverage report when releasing.
+### Upgraded
+- Calypsonet Terminal Reader API `1.2.0` -> `1.3.0` (source code not impacted)
+- Keyple Util Library `2.3.0` -> `2.3.1` (source code not impacted)
 
 ## [0.3.0] - 2023-02-27
 ### Upgraded
