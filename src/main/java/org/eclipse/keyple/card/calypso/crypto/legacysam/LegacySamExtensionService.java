@@ -25,13 +25,17 @@ import org.eclipse.keypop.reader.ReaderApiProperties;
  *
  * @since 0.2.0
  */
-public final class LegacySamCardExtensionService implements KeypleCardExtension {
+public final class LegacySamExtensionService implements KeypleCardExtension {
 
   /** Singleton */
-  private static final LegacySamCardExtensionService INSTANCE = new LegacySamCardExtensionService();
+  private static final LegacySamExtensionService INSTANCE = new LegacySamExtensionService();
+
+  private final ContextSettingAdapter contextSetting;
 
   /** Private constructor */
-  private LegacySamCardExtensionService() {}
+  private LegacySamExtensionService() {
+    contextSetting = new ContextSettingAdapter();
+  }
 
   /**
    * Returns the service instance.
@@ -39,48 +43,28 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
    * @return A not null reference.
    * @since 0.2.0
    */
-  public static LegacySamCardExtensionService getInstance() {
+  public static LegacySamExtensionService getInstance() {
     return INSTANCE;
   }
 
   /**
-   * {@inheritDoc}
+   * Returns the context setting.
    *
-   * @since 0.2.0
+   * @return A not null {@link ContextSetting}.
+   * @since 0.4.0
    */
-  @Override
-  public String getReaderApiVersion() {
-    return ReaderApiProperties.VERSION;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 0.2.0
-   */
-  @Override
-  public String getCardApiVersion() {
-    return CardApiProperties.VERSION;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 0.2.0
-   */
-  @Override
-  public String getCommonApiVersion() {
-    return CommonApiProperties.VERSION;
+  public ContextSetting getContextSetting() {
+    return contextSetting;
   }
 
   /**
    * Returns a {@link LegacySamApiFactory}.
    *
    * @return A not null reference.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   public LegacySamApiFactory getLegacySamApiFactory() {
-    return new LegacySamApiFactoryAdapter();
+    return new LegacySamApiFactoryAdapter(contextSetting);
   }
 
   /**
@@ -113,5 +97,35 @@ public final class LegacySamCardExtensionService implements KeypleCardExtension 
         .notNull(legacySamSelection, "Legacy SAM selection")
         .notEmpty(powerOnDataRegex, "powerOnDataRegex");
     return new LegacySamResourceProfileExtensionAdapter(legacySamSelection, powerOnDataRegex);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.2.0
+   */
+  @Override
+  public String getCommonApiVersion() {
+    return CommonApiProperties.VERSION;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.2.0
+   */
+  @Override
+  public String getReaderApiVersion() {
+    return ReaderApiProperties.VERSION;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.2.0
+   */
+  @Override
+  public String getCardApiVersion() {
+    return CardApiProperties.VERSION;
   }
 }

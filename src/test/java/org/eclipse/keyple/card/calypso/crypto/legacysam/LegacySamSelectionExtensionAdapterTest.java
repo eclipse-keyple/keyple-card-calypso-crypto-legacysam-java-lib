@@ -36,7 +36,7 @@ public final class LegacySamSelectionExtensionAdapterTest {
   public void setUp() {
     samSelectionExtension =
         (LegacySamSelectionExtensionAdapter)
-            LegacySamCardExtensionService.getInstance()
+            LegacySamExtensionService.getInstance()
                 .getLegacySamApiFactory()
                 .createLegacySamSelectionExtension();
   }

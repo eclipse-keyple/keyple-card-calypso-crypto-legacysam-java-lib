@@ -29,7 +29,6 @@ import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
  * @since 0.1.0
  */
 final class DtoAdapters {
-  private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
   private static final String MSG_THE_COMMAND_HAS_NOT_YET_BEEN_PROCESSED =
       "The command has not yet been processed";
 
@@ -656,15 +655,19 @@ final class DtoAdapters {
       successfulSelectionStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @since 0.1.0
+     */
     @Override
     public Set<Integer> getSuccessfulSelectionStatusWords() {
       return successfulSelectionStatusWords;
     }
 
     /**
-     * Gets the card request.
+     * {@inheritDoc}
      *
-     * @return a {@link CardRequestSpi} or null if it has not been defined
      * @since 0.1.0
      */
     @Override
@@ -673,9 +676,8 @@ final class DtoAdapters {
     }
 
     /**
-     * Converts the card selection request into a string where the data is encoded in a json format.
+     * {@inheritDoc}
      *
-     * @return A not empty String
      * @since 0.1.0
      */
     @Override
@@ -694,11 +696,11 @@ final class DtoAdapters {
     private final byte[] serialNumber;
     private final boolean isDynamicMode;
     private final Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
-        new HashMap<SystemKeyType, Integer>(
-            3); // NOSONAR enummap is not suitable for the gson serializer
+        //  enummap is not suitable for the gson serializer
+        new HashMap<SystemKeyType, Integer>(3); // NOSONAR
     private final Map<SystemKeyType, Byte> systemKeyTypeToKvcMap =
-        new HashMap<SystemKeyType, Byte>(
-            3); // NOSONAR enummap is not suitable for the gson serializer
+        //  enummap is not suitable for the gson serializer
+        new HashMap<SystemKeyType, Byte>(3); // NOSONAR
     private final Map<Integer, Integer> counterNumberToCounterValueMap =
         new HashMap<Integer, Integer>(3);
 

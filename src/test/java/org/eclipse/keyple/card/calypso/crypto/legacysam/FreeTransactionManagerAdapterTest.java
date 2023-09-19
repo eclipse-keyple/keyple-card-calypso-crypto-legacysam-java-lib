@@ -155,7 +155,7 @@ public final class FreeTransactionManagerAdapterTest {
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
 
     samTransactionManager =
-        LegacySamCardExtensionService.getInstance()
+        LegacySamExtensionService.getInstance()
             .getLegacySamApiFactory()
             .createFreeTransactionManager(samReader, sam);
   }

@@ -16,7 +16,7 @@ import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 /**
  * Util to help with Legacy SAM specificities.
  *
- * @since 1.0.0
+ * @since 0.4.0
  */
 public final class LegacySamUtil {
 
@@ -51,7 +51,7 @@ public final class LegacySamUtil {
    * @return A not empty string containing a regular
    * @throws IllegalArgumentException If productType is null.
    * @throws IllegalArgumentException If serialNumberRegex is null, empty or invalid.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   public static String buildPowerOnDataFilter(
       LegacySam.ProductType productType, String serialNumberRegex) {

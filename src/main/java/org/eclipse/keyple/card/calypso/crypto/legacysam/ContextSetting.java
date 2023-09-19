@@ -12,21 +12,19 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 /**
- * Constants related to Calypso cards.
+ * Contains additional parameters for the management of context specific cases.
  *
- * @since 2.0.0
+ * @since 0.4.0
  */
-final class LegacySamConstant {
+public interface ContextSetting {
 
-  private LegacySamConstant() {}
-
-  static final int MIN_COUNTER_NUMBER = 0;
-  static final int MAX_COUNTER_NUMBER = 26;
-  static final int MIN_COUNTER_CEILING_NUMBER = 0;
-  static final int MAX_COUNTER_CEILING_NUMBER = 26;
-  static final int MIN_COUNTER_CEILING_VALUE = 0;
-  static final int MAX_COUNTER_CEILING_VALUE = 0xFFFFFA;
-  static final int[] COUNTER_TO_RECORD_LOOKUP = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2
-  };
+  /**
+   * Defines the maximum size of APDUs that the library can generate when communicating with a
+   * contact card.
+   *
+   * @param payloadCapacity A positive integer lower than 255.
+   * @return The object instance.
+   * @since 0.4.0
+   */
+  ContextSetting setContactReaderPayloadCapacity(int payloadCapacity);
 }

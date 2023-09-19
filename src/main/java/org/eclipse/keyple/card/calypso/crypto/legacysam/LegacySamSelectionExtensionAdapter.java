@@ -76,7 +76,6 @@ final class LegacySamSelectionExtensionAdapter
     for (Command command : commands) {
       cardSelectionApduRequests.add(command.getApduRequest());
     }
-    // TODO check this logic:
     if (commands.isEmpty()) {
       return new CardSelectionRequestAdapter(null);
     } else {
@@ -170,7 +169,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public LegacySamSelectionExtension setUnlockData(
@@ -202,7 +201,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
@@ -214,7 +213,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadCounterStatus(int counterNumber) {
@@ -237,7 +236,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadAllCountersStatus() {

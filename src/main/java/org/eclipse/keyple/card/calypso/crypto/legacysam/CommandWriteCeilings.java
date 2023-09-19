@@ -30,9 +30,9 @@ import org.eclipse.keypop.card.ApduResponseApi;
 final class CommandWriteCeilings extends Command {
   private final transient TargetSamContextDto targetSamContext; // NOSONAR
   private final transient byte[] plainData = new byte[30]; // NOSONAR
-  private final transient Map<Integer, CounterIncrementAccess>
+  private final transient Map<Integer, CounterIncrementAccess> // NOSONAR
       counterNumberToManualCounterIncrementAuthorizedMap =
-          new HashMap<Integer, CounterIncrementAccess>(); // NOSONAR
+          new HashMap<Integer, CounterIncrementAccess>();
   private final transient int counterFileRecordNumber; // NOSONAR
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 

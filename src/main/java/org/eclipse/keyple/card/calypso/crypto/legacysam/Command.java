@@ -55,9 +55,9 @@ abstract class Command {
   private final int le;
   private String name;
   private ApduRequestAdapter apduRequest;
-  private transient ApduResponseApi apduResponse;
-  private final transient CommandContextDto context;
-  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2);
+  private transient ApduResponseApi apduResponse; // NOSONAR
+  private final transient CommandContextDto context; // NOSONAR
+  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2); // NOSONAR
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands
@@ -128,6 +128,16 @@ abstract class Command {
    */
   final ApduRequestAdapter getApduRequest() {
     return apduRequest;
+  }
+
+  /**
+   * Gets {@link ApduResponseApi}
+   *
+   * @return Null if the response is not set.
+   * @since 0.4.0
+   */
+  final ApduResponseApi getApduResponse() {
+    return apduResponse;
   }
 
   /**

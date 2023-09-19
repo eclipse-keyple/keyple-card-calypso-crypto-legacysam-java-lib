@@ -52,7 +52,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
       new HashMap<Integer, CounterIncrementAccess>();
   private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<Integer, Integer>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParamterMap =
-      new HashMap<SystemKeyType, KeyParameterAdapter>();
+      new HashMap<SystemKeyType, KeyParameterAdapter>(); // NOSONAR JSON serializer
   private byte[] challenge;
 
   /**
@@ -61,7 +61,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * <p>Create a {@link LegacySamAdapter} just containing the {@link ProductType}.
    *
    * @param productType The SAM product type.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   LegacySamAdapter(ProductType productType) {
     this.samProductType = productType;
@@ -84,7 +84,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * data.
    *
    * @param cardSelectionResponse the response to the selection command.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   void parseSelectionResponse(CardSelectionResponseApi cardSelectionResponse) {
     // in the case of a SAM, the power-on data corresponds to the ATR of the card.
@@ -420,7 +420,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * Gets and resets the current challenge.
    *
    * @return Null if no challenge is available.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   byte[] popChallenge() {
     byte[] res = challenge;

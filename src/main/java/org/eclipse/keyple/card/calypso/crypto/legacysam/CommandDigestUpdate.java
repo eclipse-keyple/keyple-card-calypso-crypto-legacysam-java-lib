@@ -75,7 +75,7 @@ final class CommandDigestUpdate extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -85,7 +85,7 @@ final class CommandDigestUpdate extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -95,7 +95,7 @@ final class CommandDigestUpdate extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
@@ -117,7 +117,7 @@ final class CommandDigestUpdate extends Command {
    * Return the command output.
    *
    * @return A not null byte array.
-   * @since 1.0.0
+   * @since 0.4.0
    */
   byte[] getProcessedData() {
     return processedData;

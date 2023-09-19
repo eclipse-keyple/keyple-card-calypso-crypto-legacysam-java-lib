@@ -129,7 +129,7 @@ public final class AsyncTransactionCreatorManagerAdapterTest {
         new SecuritySettingAdapter().setControlSamResource(samReader, controlSam);
 
     samTransactionManager =
-        LegacySamCardExtensionService.getInstance()
+        LegacySamExtensionService.getInstance()
             .getLegacySamApiFactory()
             .createAsyncTransactionCreatorManager(TARGET_SAM_CONTEXT, securitySetting);
   }

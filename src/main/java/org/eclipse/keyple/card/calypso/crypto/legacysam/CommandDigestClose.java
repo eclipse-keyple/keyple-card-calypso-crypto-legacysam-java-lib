@@ -70,7 +70,7 @@ final class CommandDigestClose extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -80,7 +80,7 @@ final class CommandDigestClose extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -90,7 +90,7 @@ final class CommandDigestClose extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {

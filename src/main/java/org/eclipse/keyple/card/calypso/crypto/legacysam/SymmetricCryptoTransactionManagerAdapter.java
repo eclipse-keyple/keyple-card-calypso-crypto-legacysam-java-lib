@@ -37,11 +37,11 @@ import org.slf4j.LoggerFactory;
  *
  * @since 2.3.1
  */
-final class CardTransactionLegacySamExtensionAdapter
+final class SymmetricCryptoTransactionManagerAdapter
     implements SymmetricCryptoTransactionManagerSpi, CardTransactionLegacySamExtension {
 
   private static final Logger logger =
-      LoggerFactory.getLogger(CardTransactionLegacySamExtensionAdapter.class);
+      LoggerFactory.getLogger(SymmetricCryptoTransactionManagerAdapter.class);
 
   /* Prefix/suffix used to compose exception messages */
   private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
@@ -84,7 +84,7 @@ final class CardTransactionLegacySamExtensionAdapter
    *     to the SAM can contain.
    * @since 2.0.0
    */
-  CardTransactionLegacySamExtensionAdapter(
+  SymmetricCryptoTransactionManagerAdapter(
       ProxyReaderApi samReader,
       LegacySamAdapter sam,
       byte[] cardKeyDiversifier,
@@ -186,7 +186,7 @@ final class CardTransactionLegacySamExtensionAdapter
     } else {
       // Plain mode.
       digestManager.updateSession(cardApdu);
-      return null;
+      return null; // NOSONAR
     }
   }
 
@@ -448,13 +448,10 @@ final class CardTransactionLegacySamExtensionAdapter
           } else if (commandRef == CommandRef.SV_CHECK && e instanceof SecurityDataException) {
             throw new InvalidCardMacException("Invalid SV card signature.");
           }
-          String sw = "??";
-          /*
-          TODO: add a method to Command???
-                        samCommands.get(i).getApduResponse() != null
-                            ? HexUtil.toHex(samCommands.get(i).getApduResponse().getStatusWord())
-                            : "null";
-          */
+          String sw =
+              samCommands.get(i).getApduResponse() != null
+                  ? HexUtil.toHex(samCommands.get(i).getApduResponse().getStatusWord())
+                  : "null";
           throw new SymmetricCryptoException(
               MSG_SAM_COMMAND_ERROR
                   + "while processing responses to SAM commands: "
@@ -615,7 +612,7 @@ final class CardTransactionLegacySamExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public CardTransactionLegacySamExtension prepareComputeSignature(
@@ -692,7 +689,7 @@ final class CardTransactionLegacySamExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 1.0.0
+   * @since 0.4.0
    */
   @Override
   public CardTransactionLegacySamExtension prepareVerifySignature(
