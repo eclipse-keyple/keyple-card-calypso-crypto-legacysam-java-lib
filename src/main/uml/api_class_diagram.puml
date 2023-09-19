@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 1.0.+ (2023-06-29)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.3.+ (2023-09-19)
 end title
 
 ' == THEME ==
@@ -60,9 +60,11 @@ legend top
 end legend
 
 package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
-    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService <<green>> {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n<color:blue>**final** LegacySamExtensionService" as LegacySamExtensionService <<green>> {
         --
-        +{static} LegacySamCardExtensionService getInstance ()
+        +{static} LegacySamExtensionService getInstance ()
+
+        +<color:blue>ContextSetting getContextSetting ()
 
         +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
 
@@ -74,6 +76,9 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
         +String getReaderApiVersion ()
         +String getCardApiVersion ()
     }
+    +interface "<color:blue>ContextSetting" as ContextSetting {
+        +<color:blue>ContextSetting setContactReaderPayloadCapacity (int payloadCapacity)
+    }
     +class "**final** LegacySamUtil" as LegacySamUtil <<green>> {
         +{static} String buildPowerOnDataFilter (<back:lightgreen>LegacySam.ProductType</back> productType, String serialNumberRegex)
     }
@@ -81,9 +86,11 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
 
 ' Associations
 
+LegacySamExtensionService ..> ContextSetting #C_USE : use >
+
 ' == LAYOUT ==
 
-LegacySamCardExtensionService -[hidden]- LegacySamUtil
+ContextSetting -[hidden]- LegacySamUtil
 
 ' == STYLE ==
 
