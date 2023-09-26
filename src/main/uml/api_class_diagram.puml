@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.3.+ (2023-09-19)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.4.+ (2023-09-19)
 end title
 
 ' == THEME ==
@@ -68,8 +68,8 @@ package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
 
         +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
 
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension)
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen><color:blue>LegacySamSelectionExtension</color></back> legacySamSelectionExtension)
+        +<color:blue><back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
 
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
