@@ -49,7 +49,7 @@ final class CommandDigestClose extends Command {
     setApduRequest(
         new DtoAdapters.ApduRequestAdapter(
             ApduUtil.build(
-                context.getControlSam().getClassByte(),
+                context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
                 (byte) 0x00,
                 (byte) 0x00,
