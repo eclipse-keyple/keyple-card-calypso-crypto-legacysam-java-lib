@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
+import org.eclipse.keypop.calypso.crypto.symmetric.SvCommandSecurityDataApi;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
@@ -43,7 +44,7 @@ final class CommandSvPrepareLoad extends Command {
     STATUS_TABLE = m;
   }
 
-  private final DtoAdapters.SvCommandSecurityDataApiAdapter data;
+  private final SvCommandSecurityDataApi data;
 
   /**
    * Instantiates a new CommandSvPrepareLoad to prepare a load transaction.
@@ -55,8 +56,7 @@ final class CommandSvPrepareLoad extends Command {
    * @param data The SV input/output command data.
    * @since 2.0.1
    */
-  CommandSvPrepareLoad(
-      DtoAdapters.CommandContextDto context, DtoAdapters.SvCommandSecurityDataApiAdapter data) {
+  CommandSvPrepareLoad(DtoAdapters.CommandContextDto context, SvCommandSecurityDataApi data) {
 
     super(CommandRef.SV_PREPARE_LOAD, 0, context);
 

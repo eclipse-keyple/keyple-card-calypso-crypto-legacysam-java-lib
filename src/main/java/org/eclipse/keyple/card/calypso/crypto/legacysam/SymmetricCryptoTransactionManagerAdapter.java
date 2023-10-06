@@ -271,13 +271,11 @@ final class SymmetricCryptoTransactionManagerAdapter
   @Override
   public void computeSvCommandSecurityData(SvCommandSecurityDataApi svCommandSecurityData)
       throws SymmetricCryptoIOException, SymmetricCryptoException {
-    DtoAdapters.SvCommandSecurityDataApiAdapter data =
-        (DtoAdapters.SvCommandSecurityDataApiAdapter) svCommandSecurityData;
     prepareSelectDiversifierIfNeeded();
-    if (data.getSvCommandPartialRequest()[0] == (byte) 0xB8) {
-      samCommands.add(new CommandSvPrepareLoad(getContext(), data));
+    if (svCommandSecurityData.getSvCommandPartialRequest()[0] == (byte) 0xB8) {
+      samCommands.add(new CommandSvPrepareLoad(getContext(), svCommandSecurityData));
     } else {
-      samCommands.add(new CommandSvPrepareDebitOrUndebit(getContext(), data));
+      samCommands.add(new CommandSvPrepareDebitOrUndebit(getContext(), svCommandSecurityData));
     }
     processCommands();
   }

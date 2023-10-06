@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
+import org.eclipse.keypop.calypso.crypto.symmetric.SvCommandSecurityDataApi;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
@@ -43,7 +44,7 @@ final class CommandSvPrepareDebitOrUndebit extends Command {
     STATUS_TABLE = m;
   }
 
-  private final DtoAdapters.SvCommandSecurityDataApiAdapter data;
+  private final SvCommandSecurityDataApi data;
 
   /**
    * Instantiates a new CmdSamSvPrepareDebit to prepare a debit or cancel transaction.
@@ -53,7 +54,7 @@ final class CommandSvPrepareDebitOrUndebit extends Command {
    * @since 2.0.1
    */
   CommandSvPrepareDebitOrUndebit(
-      DtoAdapters.CommandContextDto context, DtoAdapters.SvCommandSecurityDataApiAdapter data) {
+      DtoAdapters.CommandContextDto context, SvCommandSecurityDataApi data) {
 
     super(
         data.getSvCommandPartialRequest()[0] == (byte) 0xBA

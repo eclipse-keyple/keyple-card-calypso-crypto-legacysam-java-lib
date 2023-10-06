@@ -17,7 +17,6 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
-import org.eclipse.keypop.calypso.crypto.symmetric.SvCommandSecurityDataApi;
 import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
@@ -816,127 +815,6 @@ final class DtoAdapters {
      */
     LegacySamAdapter getControlSam() {
       return controlSam;
-    }
-  }
-
-  /**
-   * Adapter of {@link SvCommandSecurityDataApi}
-   *
-   * @since 2.3.1
-   */
-  static final class SvCommandSecurityDataApiAdapter implements SvCommandSecurityDataApi {
-
-    private byte[] svGetRequest;
-    private byte[] svGetResponse;
-    private byte[] svCommandPartialRequest;
-    private byte[] serialNumber;
-    private byte[] transactionNumber;
-    private byte[] terminalChallenge;
-    private byte[] terminalSvMac;
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public byte[] getSvGetRequest() {
-      return svGetRequest;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public byte[] getSvGetResponse() {
-      return svGetResponse;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public byte[] getSvCommandPartialRequest() {
-      return svCommandPartialRequest;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public SvCommandSecurityDataApiAdapter setSerialNumber(byte[] serialNumber) {
-      this.serialNumber = serialNumber;
-      return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public SvCommandSecurityDataApiAdapter setTransactionNumber(byte[] transactionNumber) {
-      this.transactionNumber = transactionNumber;
-      return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public SvCommandSecurityDataApiAdapter setTerminalChallenge(byte[] terminalChallenge) {
-      this.terminalChallenge = terminalChallenge;
-      return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 2.3.1
-     */
-    @Override
-    public SvCommandSecurityDataApiAdapter setTerminalSvMac(byte[] terminalSvMac) {
-      this.terminalSvMac = terminalSvMac;
-      return this;
-    }
-
-    SvCommandSecurityDataApi setSvGetRequest(byte[] svGetRequest) {
-      this.svGetRequest = svGetRequest;
-      return this;
-    }
-
-    SvCommandSecurityDataApi setSvGetResponse(byte[] svGetResponse) {
-      this.svGetResponse = svGetResponse;
-      return this;
-    }
-
-    SvCommandSecurityDataApi setSvCommandPartialRequest(byte[] svCommandPartialRequest) {
-      this.svCommandPartialRequest = svCommandPartialRequest;
-      return this;
-    }
-
-    byte[] getSerialNumber() {
-      return serialNumber;
-    }
-
-    byte[] getTransactionNumber() {
-      return transactionNumber;
-    }
-
-    byte[] getTerminalChallenge() {
-      return terminalChallenge;
-    }
-
-    byte[] getTerminalSvMac() {
-      return terminalSvMac;
     }
   }
 }
