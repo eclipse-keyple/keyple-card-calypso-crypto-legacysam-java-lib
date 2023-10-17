@@ -18,7 +18,6 @@ import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
-import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keypop.calypso.crypto.symmetric.SvCommandSecurityDataApi;
@@ -28,8 +27,6 @@ import org.eclipse.keypop.calypso.crypto.symmetric.spi.*;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Adapter of {@link SymmetricCryptoTransactionManagerSpi} and {@link
@@ -40,19 +37,9 @@ import org.slf4j.LoggerFactory;
 final class SymmetricCryptoTransactionManagerAdapter
     implements SymmetricCryptoTransactionManagerSpi, CardTransactionLegacySamExtension {
 
-  private static final Logger logger =
-      LoggerFactory.getLogger(SymmetricCryptoTransactionManagerAdapter.class);
-
-  /* Prefix/suffix used to compose exception messages */
-  private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
-      "A communication error with the SAM reader occurred ";
-  private static final String MSG_SAM_COMMUNICATION_ERROR =
-      "A communication error with the SAM occurred ";
-  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
   private static final String MSG_SAM_INCONSISTENT_DATA =
       "The number of SAM commands/responses does not match: nb commands = ";
   private static final String MSG_SAM_NB_RESPONSES = ", nb responses = ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
   private static final String MSG_INPUT_OUTPUT_DATA = "input/output data";
   private static final String MSG_SIGNATURE_SIZE = "signature size";
   private static final String MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8 =
@@ -105,21 +92,8 @@ final class SymmetricCryptoTransactionManagerAdapter
    * @return An instance of {@link DtoAdapters.CommandContextDto}.
    * @since 0.3.0
    */
-  DtoAdapters.CommandContextDto getContext() {
+  private DtoAdapters.CommandContextDto getContext() {
     return new DtoAdapters.CommandContextDto(sam, null, null);
-  }
-
-  /**
-   * {@inheritDoc}
-   *
-   * @since 2.3.4
-   */
-  @Override
-  public void preInitTerminalSecureSessionContext()
-      throws SymmetricCryptoException, SymmetricCryptoIOException {
-    CommandGetChallenge cmd = new CommandGetChallenge(getContext(), isExtendedModeRequired ? 8 : 4);
-    samCommands.add(cmd);
-    processCommands();
   }
 
   /**
@@ -135,10 +109,14 @@ final class SymmetricCryptoTransactionManagerAdapter
     }
     byte[] challenge = sam.popChallenge();
     if (challenge == null) {
-      preInitTerminalSecureSessionContext();
-      challenge = sam.popChallenge();
+      CommandGetChallenge cmd =
+          new CommandGetChallenge(getContext(), isExtendedModeRequired ? 8 : 4);
+      samCommands.add(cmd);
+      processCommands();
+      return sam.popChallenge();
+    } else {
+      return isExtendedModeRequired ? challenge : Arrays.copyOf(challenge, 4);
     }
-    return challenge;
   }
 
   /**
@@ -400,13 +378,15 @@ final class SymmetricCryptoTransactionManagerAdapter
     }
     try {
       // Get the list of C-APDU to transmit
-      List<ApduRequestSpi> apduRequests = getApduRequests(samCommands);
+      List<ApduRequestSpi> apduRequests = CardTransactionUtil.getApduRequests(samCommands);
 
       // Wrap the list of C-APDUs into a card request
       CardRequestSpi cardRequest = new DtoAdapters.CardRequestAdapter(apduRequests, true);
 
       // Transmit the commands to the SAM
-      CardResponseApi cardResponse = transmitCardRequest(cardRequest);
+      CardResponseApi cardResponse =
+          CardTransactionUtil.transmitCardRequest(
+              cardRequest, samReader, sam, transactionAuditData);
 
       // Retrieve the list of R-APDUs
       List<ApduResponseApi> apduResponses =
@@ -426,7 +406,8 @@ final class SymmetricCryptoTransactionManagerAdapter
                     + apduRequests.size()
                     + MSG_SAM_NB_RESPONSES
                     + apduResponses.size()
-                    + getTransactionAuditDataAsString()));
+                    + CardTransactionUtil.getTransactionAuditDataAsString(
+                        transactionAuditData, sam)));
       }
 
       // We go through all the responses (and not the requests) because there may be fewer in the
@@ -451,20 +432,21 @@ final class SymmetricCryptoTransactionManagerAdapter
                   ? HexUtil.toHex(samCommands.get(i).getApduResponse().getStatusWord())
                   : "null";
           throw new SymmetricCryptoException(
-              MSG_SAM_COMMAND_ERROR
+              CardTransactionUtil.MSG_SAM_COMMAND_ERROR
                   + "while processing responses to SAM commands: "
                   + commandRef
                   + " ["
                   + sw
                   + "]",
               new UnexpectedCommandStatusException(
-                  MSG_SAM_COMMAND_ERROR
+                  CardTransactionUtil.MSG_SAM_COMMAND_ERROR
                       + "while processing responses to SAM commands: "
                       + commandRef
                       + " ["
                       + sw
                       + "]"
-                      + getTransactionAuditDataAsString(),
+                      + CardTransactionUtil.getTransactionAuditDataAsString(
+                          transactionAuditData, sam),
                   e));
         }
       }
@@ -482,98 +464,13 @@ final class SymmetricCryptoTransactionManagerAdapter
                     + apduRequests.size()
                     + MSG_SAM_NB_RESPONSES
                     + apduResponses.size()
-                    + getTransactionAuditDataAsString()));
+                    + CardTransactionUtil.getTransactionAuditDataAsString(
+                        transactionAuditData, sam)));
       }
     } finally {
       // Reset the list of commands.
       samCommands.clear();
     }
-  }
-
-  /**
-   * Creates a list of {@link ApduRequestSpi} from a list of {@link Command}.
-   *
-   * @param commands The list of commands.
-   * @return An empty list if there is no command.
-   */
-  private static List<ApduRequestSpi> getApduRequests(List<Command> commands) {
-    List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
-    if (commands != null) {
-      for (Command command : commands) {
-        apduRequests.add(command.getApduRequest());
-      }
-    }
-    return apduRequests;
-  }
-
-  /**
-   * Transmits a card request, processes and converts any exceptions.
-   *
-   * @param cardRequest The card request to transmit.
-   * @return The card response.
-   */
-  private CardResponseApi transmitCardRequest(CardRequestSpi cardRequest)
-      throws SymmetricCryptoIOException {
-    CardResponseApi cardResponse;
-    try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
-    } catch (ReaderBrokenCommunicationException e) {
-      saveTransactionAuditData(cardRequest, e.getCardResponse());
-      throw new SymmetricCryptoIOException(
-          MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS,
-          new ReaderIOException(
-              MSG_SAM_READER_COMMUNICATION_ERROR
-                  + MSG_WHILE_TRANSMITTING_COMMANDS
-                  + getTransactionAuditDataAsString(),
-              e));
-    } catch (CardBrokenCommunicationException e) {
-      saveTransactionAuditData(cardRequest, e.getCardResponse());
-      throw new SymmetricCryptoIOException(
-          MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS,
-          new SamIOException(
-              MSG_SAM_COMMUNICATION_ERROR
-                  + MSG_WHILE_TRANSMITTING_COMMANDS
-                  + getTransactionAuditDataAsString(),
-              e));
-    } catch (UnexpectedStatusWordException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("A SAM command has failed: {}", e.getMessage());
-      }
-      cardResponse = e.getCardResponse();
-    }
-    saveTransactionAuditData(cardRequest, cardResponse);
-    return cardResponse;
-  }
-
-  /**
-   * Saves the provided exchanged APDU commands in the list of transaction audit data.
-   *
-   * @param cardRequest The card request.
-   * @param cardResponse The associated card response.
-   */
-  private void saveTransactionAuditData(CardRequestSpi cardRequest, CardResponseApi cardResponse) {
-    if (cardResponse != null) {
-      List<ApduRequestSpi> requests = cardRequest.getApduRequests();
-      List<ApduResponseApi> responses = cardResponse.getApduResponses();
-      for (int i = 0; i < responses.size(); i++) {
-        transactionAuditData.add(requests.get(i).getApdu());
-        transactionAuditData.add(responses.get(i).getApdu());
-      }
-    }
-  }
-
-  /**
-   * Returns a string representation of the transaction audit data.
-   *
-   * @return A not empty string.
-   */
-  private String getTransactionAuditDataAsString() {
-    return "\nTransaction audit JSON data: {"
-        + "\"sam\":"
-        + sam
-        + ",\"apdus\":"
-        + JsonUtil.toJson(transactionAuditData)
-        + "}";
   }
 
   /** Prepares a "SelectDiversifier" command using the current key diversifier. */
