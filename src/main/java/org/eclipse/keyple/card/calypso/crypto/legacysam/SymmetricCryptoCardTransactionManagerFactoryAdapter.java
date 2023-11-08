@@ -15,13 +15,13 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import org.eclipse.keyple.core.util.HexUtil;
-import org.eclipse.keypop.calypso.card.transaction.spi.SymmetricCryptoTransactionManagerFactory;
+import org.eclipse.keypop.calypso.card.transaction.spi.SymmetricCryptoCardTransactionManagerFactory;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
 import org.eclipse.keypop.calypso.crypto.symmetric.SymmetricCryptoException;
 import org.eclipse.keypop.calypso.crypto.symmetric.SymmetricCryptoIOException;
-import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoTransactionManagerFactorySpi;
-import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoTransactionManagerSpi;
+import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransactionManagerFactorySpi;
+import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransactionManagerSpi;
 import org.eclipse.keypop.card.ApduResponseApi;
 import org.eclipse.keypop.card.CardResponseApi;
 import org.eclipse.keypop.card.ProxyReaderApi;
@@ -29,20 +29,20 @@ import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 
 /**
- * Adapter of {@link SymmetricCryptoTransactionManagerFactory}.
+ * Adapter of {@link SymmetricCryptoCardTransactionManagerFactory}.
  *
  * @since 0.4.0
  */
-class SymmetricCryptoTransactionManagerFactoryAdapter
-    implements SymmetricCryptoTransactionManagerFactory,
-        SymmetricCryptoTransactionManagerFactorySpi {
+class SymmetricCryptoCardTransactionManagerFactoryAdapter
+    implements SymmetricCryptoCardTransactionManagerFactory,
+        SymmetricCryptoCardTransactionManagerFactorySpi {
 
   private final ProxyReaderApi samReader;
   private final LegacySamAdapter sam;
   private final boolean isExtendedModeSupported;
   private final int maxCardApduLengthSupported;
 
-  SymmetricCryptoTransactionManagerFactoryAdapter(
+  SymmetricCryptoCardTransactionManagerFactoryAdapter(
       ProxyReaderApi samReader, LegacySamAdapter sam, ContextSettingAdapter contextSetting) {
     this.samReader = samReader;
     this.sam = sam;
@@ -93,12 +93,12 @@ class SymmetricCryptoTransactionManagerFactoryAdapter
    * @since 2.3.1
    */
   @Override
-  public SymmetricCryptoTransactionManagerSpi createTransactionManager(
+  public SymmetricCryptoCardTransactionManagerSpi createCardTransactionManager(
       byte[] cardKeyDiversifier, boolean useExtendedMode, List<byte[]> transactionAuditData) {
     if (useExtendedMode && !isExtendedModeSupported) {
       throw new IllegalStateException("The extended mode is not supported by the crypto service");
     }
-    return new SymmetricCryptoTransactionManagerAdapter(
+    return new SymmetricCryptoCardTransactionManagerAdapter(
         samReader,
         sam,
         cardKeyDiversifier,

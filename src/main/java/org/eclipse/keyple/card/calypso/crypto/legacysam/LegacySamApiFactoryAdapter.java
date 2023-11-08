@@ -12,7 +12,7 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import org.eclipse.keyple.core.util.Assert;
-import org.eclipse.keypop.calypso.card.transaction.spi.SymmetricCryptoTransactionManagerFactory;
+import org.eclipse.keypop.calypso.card.transaction.spi.SymmetricCryptoCardTransactionManagerFactory;
 import org.eclipse.keypop.calypso.crypto.legacysam.LegacySamApiFactory;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
@@ -52,8 +52,8 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
    * @since 0.4.0
    */
   @Override
-  public SymmetricCryptoTransactionManagerFactory createSymmetricCryptoTransactionManagerFactory(
-      CardReader samReader, LegacySam sam) {
+  public SymmetricCryptoCardTransactionManagerFactory
+      createSymmetricCryptoCardTransactionManagerFactory(CardReader samReader, LegacySam sam) {
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
           MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
@@ -62,7 +62,7 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
       throw new IllegalArgumentException(
           MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
     }
-    return new SymmetricCryptoTransactionManagerFactoryAdapter(
+    return new SymmetricCryptoCardTransactionManagerFactoryAdapter(
         (ProxyReaderApi) samReader, (LegacySamAdapter) sam, (ContextSettingAdapter) contextSetting);
   }
 

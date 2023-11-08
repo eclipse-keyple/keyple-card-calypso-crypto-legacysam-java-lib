@@ -21,7 +21,7 @@ import org.eclipse.keypop.card.CardApiProperties;
 import org.eclipse.keypop.reader.ReaderApiProperties;
 
 /**
- * Card extension dedicated to the management of Calypso legacy SAMs (SAM-C1, HSM-C1, etc...).
+ * Card extension dedicated to the management of Calypso legacy SAMs (SAM-C1, HSM-C1, etc.).
  *
  * @since 0.2.0
  */

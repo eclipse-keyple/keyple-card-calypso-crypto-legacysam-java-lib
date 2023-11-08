@@ -29,13 +29,13 @@ import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 
 /**
- * Adapter of {@link SymmetricCryptoTransactionManagerSpi} and {@link
+ * Adapter of {@link SymmetricCryptoCardTransactionManagerSpi} and {@link
  * CardTransactionLegacySamExtension}.
  *
  * @since 2.3.1
  */
-final class SymmetricCryptoTransactionManagerAdapter
-    implements SymmetricCryptoTransactionManagerSpi, CardTransactionLegacySamExtension {
+final class SymmetricCryptoCardTransactionManagerAdapter
+    implements SymmetricCryptoCardTransactionManagerSpi, CardTransactionLegacySamExtension {
 
   private static final String MSG_SAM_INCONSISTENT_DATA =
       "The number of SAM commands/responses does not match: nb commands = ";
@@ -71,7 +71,7 @@ final class SymmetricCryptoTransactionManagerAdapter
    *     to the SAM can contain.
    * @since 2.0.0
    */
-  SymmetricCryptoTransactionManagerAdapter(
+  SymmetricCryptoCardTransactionManagerAdapter(
       ProxyReaderApi samReader,
       LegacySamAdapter sam,
       byte[] cardKeyDiversifier,
