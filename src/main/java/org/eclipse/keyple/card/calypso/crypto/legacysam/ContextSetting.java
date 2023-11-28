@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2022 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2023 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,23 +11,20 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelection;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelectionFactory;
-
 /**
- * Adapter of {@link LegacySamSelectionFactory}.
+ * Contains additional parameters for the management of context specific cases.
  *
- * @since 0.1.0
+ * @since 0.4.0
  */
-class LegacySamSelectionFactoryAdapter implements LegacySamSelectionFactory {
+public interface ContextSetting {
 
   /**
-   * {@inheritDoc}
+   * Defines the maximum size of APDUs that the library can generate when communicating with a
+   * contact card.
    *
-   * @since 0.1.0
+   * @param payloadCapacity A positive integer lower than 255.
+   * @return The object instance.
+   * @since 0.4.0
    */
-  @Override
-  public LegacySamSelection createSamSelection() {
-    return new LegacySamSelectionAdapter();
-  }
+  ContextSetting setContactReaderPayloadCapacity(int payloadCapacity);
 }

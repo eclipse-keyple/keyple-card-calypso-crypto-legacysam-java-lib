@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,19 +11,17 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the Write Key APDU command.
+ * Builds the Digest Init APDU command.
  *
- * @since 0.1.0
+ * @since 2.0.1
  */
-final class CommandWriteKey extends Command {
+final class CommandDigestInit extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
@@ -37,60 +35,69 @@ final class CommandWriteKey extends Command {
     m.put(
         0x6985,
         new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
-    m.put(0x6A00, new StatusProperties("P1 or P2 incorrect.", IllegalParameterException.class));
-    m.put(
-        0x6A80,
-        new StatusProperties(
-            "Incorrect plain or decrypted data.", IncorrectInputDataException.class));
+    m.put(0x6A00, new StatusProperties("Incorrect P2.", IllegalParameterException.class));
     m.put(
         0x6A83,
         new StatusProperties(
-            "Record not found: deciphering key not found.", DataAccessException.class));
-    m.put(
-        0x6A87,
-        new StatusProperties("Lc inconsistent with P1 or P2.", IncorrectInputDataException.class));
+            "Record not found: signing key not found.", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
   /**
-   * Instantiates a new CommandWriteKey.
+   * Instantiates a new CommandDigestInit.
    *
    * @param context The command context.
-   * @param writingMode the writing mode (P1).
-   * @param keyReference the key reference (P2).
-   * @param keyData the key data.
-   * @since 0.1.0
+   * @param verificationMode the verification mode.
+   * @param confidentialSessionMode the confidential session mode (rev 3.2).
+   * @param workKif from the card response.
+   * @param workKvc from the card response.
+   * @param digestData all data out from the card response.
+   * @throws IllegalArgumentException If the KIF or KVC is 0
+   * @throws IllegalArgumentException If the digest data is null
+   * @throws IllegalArgumentException If the request is inconsistent
+   * @since 2.0.1
    */
-  CommandWriteKey(CommandContextDto context, byte writingMode, byte keyReference, byte[] keyData) {
+  CommandDigestInit(
+      DtoAdapters.CommandContextDto context,
+      boolean verificationMode,
+      boolean confidentialSessionMode,
+      byte workKif,
+      byte workKvc,
+      byte[] digestData) {
 
-    super(CommandRef.WRITE_KEY, 0, context);
+    super(CommandRef.DIGEST_INIT, 0, context);
 
+    if (workKif == 0x00 || workKvc == 0x00) {
+      throw new IllegalArgumentException("Bad kif or kvc!");
+    }
+    if (digestData == null) {
+      throw new IllegalArgumentException("Digest data is null!");
+    }
     byte cla = context.getTargetSam().getClassByte();
-
-    if (keyData == null) {
-      throw new IllegalArgumentException("Key data null!");
+    byte p1 = 0x00;
+    if (verificationMode) {
+      p1 = (byte) (p1 + 1);
+    }
+    if (confidentialSessionMode) {
+      p1 = (byte) (p1 + 2);
     }
 
-    if (keyData.length < 48 || keyData.length > 80) {
-      throw new IllegalArgumentException("Key data should be between 40 and 80 bytes long!");
-    }
+    byte p2 = (byte) 0xFF;
+
+    byte[] dataIn = new byte[2 + digestData.length];
+    dataIn[0] = workKif;
+    dataIn[1] = workKvc;
+    System.arraycopy(digestData, 0, dataIn, 2, digestData.length);
 
     setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla,
-                getCommandRef().getInstructionByte(),
-                writingMode,
-                keyReference,
-                keyData,
-                null)));
+        new DtoAdapters.ApduRequestAdapter(
+            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, dataIn, null)));
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -100,7 +107,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -110,7 +117,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
@@ -120,7 +127,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 2.0.1
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {

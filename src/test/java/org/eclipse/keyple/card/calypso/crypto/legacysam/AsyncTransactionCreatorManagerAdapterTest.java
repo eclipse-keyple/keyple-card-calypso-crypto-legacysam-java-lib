@@ -24,20 +24,21 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.*;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSAsyncTransactionCreatorManager;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySetting;
-import org.calypsonet.terminal.card.*;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.AsyncTransactionCreatorManager;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SecuritySetting;
+import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.card.spi.ApduRequestSpi;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.CardReader;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
 
-public final class LSAsyncTransactionCreatorManagerAdapterTest {
+public final class AsyncTransactionCreatorManagerAdapterTest {
 
   private static final String SAM_SERIAL_NUMBER = "11223344";
   private static final String R_9000 = "9000";
@@ -108,7 +109,7 @@ public final class LSAsyncTransactionCreatorManagerAdapterTest {
           + "    }\n"
           + "}";
 
-  private LSAsyncTransactionCreatorManager samTransactionManager;
+  private AsyncTransactionCreatorManager samTransactionManager;
   private ReaderMock samReader;
 
   interface ReaderMock extends CardReader, ProxyReaderApi {}
@@ -116,7 +117,7 @@ public final class LSAsyncTransactionCreatorManagerAdapterTest {
   @Before
   public void setUp() {
 
-    samReader = mock(LSAsyncTransactionCreatorManagerAdapterTest.ReaderMock.class);
+    samReader = mock(AsyncTransactionCreatorManagerAdapterTest.ReaderMock.class);
 
     CardSelectionResponseApi samCardSelectionResponse = mock(CardSelectionResponseApi.class);
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
@@ -124,12 +125,12 @@ public final class LSAsyncTransactionCreatorManagerAdapterTest {
     when(samCardSelectionResponse.getPowerOnData()).thenReturn(SAM_C1_POWER_ON_DATA);
     LegacySam controlSam = new LegacySamAdapter(samCardSelectionResponse);
 
-    LSSecuritySetting securitySetting =
-        new LSSecuritySettingAdapter().setControlSamResource(samReader, controlSam);
+    SecuritySetting securitySetting =
+        new SecuritySettingAdapter().setControlSamResource(samReader, controlSam);
 
     samTransactionManager =
-        LegacySamCardExtensionService.getInstance()
-            .getTransactionManagerFactory()
+        LegacySamExtensionService.getInstance()
+            .getLegacySamApiFactory()
             .createAsyncTransactionCreatorManager(TARGET_SAM_CONTEXT, securitySetting);
   }
 
@@ -206,22 +207,26 @@ public final class LSAsyncTransactionCreatorManagerAdapterTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void prepareWriteCounterConfiguration_whenCeilingNumberIsOutOfRangeLow_shouldThrowIAE() {
-    samTransactionManager.prepareWriteCounterConfiguration(-1, 0, false);
+    samTransactionManager.prepareWriteCounterConfiguration(
+        -1, 0, CounterIncrementAccess.FREE_COUNTING_DISABLED);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void prepareWriteCounterConfiguration_whenCeilingNumberIsOutOfRangeHigh_shouldThrowIAE() {
-    samTransactionManager.prepareWriteCounterConfiguration(27, 0, false);
+    samTransactionManager.prepareWriteCounterConfiguration(
+        27, 0, CounterIncrementAccess.FREE_COUNTING_DISABLED);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void prepareWriteCounterConfiguration_whenCeilingValueIsOutOfRangeLow_shouldThrowIAE() {
-    samTransactionManager.prepareWriteCounterConfiguration(0, -1, false);
+    samTransactionManager.prepareWriteCounterConfiguration(
+        0, -1, CounterIncrementAccess.FREE_COUNTING_DISABLED);
   }
 
   @Test(expected = IllegalArgumentException.class)
   public void prepareWriteCounterConfiguration_whenCeilingValueIsOutOfRangeHigh_shouldThrowIAE() {
-    samTransactionManager.prepareWriteCounterConfiguration(0, 0xFFFFFB, false);
+    samTransactionManager.prepareWriteCounterConfiguration(
+        0, 0xFFFFFB, CounterIncrementAccess.FREE_COUNTING_DISABLED);
   }
 
   @Test
@@ -319,7 +324,8 @@ public final class LSAsyncTransactionCreatorManagerAdapterTest {
         .thenReturn(cardResponseCipherDataRec3);
 
     for (int i = 0; i < 27; i++) {
-      samTransactionManager.prepareWriteCounterConfiguration(i, i + 1, true);
+      samTransactionManager.prepareWriteCounterConfiguration(
+          i, i + 1, CounterIncrementAccess.FREE_COUNTING_ENABLED);
     }
 
     String commandsJson = samTransactionManager.exportCommands();

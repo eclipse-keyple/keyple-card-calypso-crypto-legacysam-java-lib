@@ -14,9 +14,10 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.*;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * Builds the Read Ceilings APDU command.
@@ -107,7 +108,10 @@ final class CommandReadCounterCeiling extends Command {
           (ceilingFileRecordNumber * 9) + i,
           ByteArrayUtil.extractInt(dataOut, 8 + (3 * i), 3, false));
       targetSam.putCounterIncrementConfiguration(
-          (ceilingFileRecordNumber * 9) + i, (counterIncrementConfig & (1 << i)) != 0);
+          (ceilingFileRecordNumber * 9) + i,
+          (counterIncrementConfig & (1 << i)) != 0
+              ? CounterIncrementAccess.FREE_COUNTING_ENABLED
+              : CounterIncrementAccess.FREE_COUNTING_DISABLED);
     }
   }
 }

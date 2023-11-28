@@ -11,18 +11,18 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySetting;
-import org.calypsonet.terminal.card.ProxyReaderApi;
-import org.calypsonet.terminal.reader.CardReader;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SecuritySetting;
+import org.eclipse.keypop.card.ProxyReaderApi;
+import org.eclipse.keypop.reader.CardReader;
 
 /**
- * Implementation of {@link LSSecuritySettingAdapter}.
+ * Implementation of {@link SecuritySettingAdapter}.
  *
  * @since 0.3.0
  */
-final class LSSecuritySettingAdapter implements LSSecuritySetting {
+final class SecuritySettingAdapter implements SecuritySetting {
   private ProxyReaderApi controlSamReader;
   private LegacySamAdapter controlSam;
 
@@ -32,7 +32,7 @@ final class LSSecuritySettingAdapter implements LSSecuritySetting {
    * @since 0.3.0
    */
   @Override
-  public LSSecuritySetting setControlSamResource(CardReader samReader, LegacySam controlSam) {
+  public SecuritySetting setControlSamResource(CardReader samReader, LegacySam controlSam) {
     Assert.getInstance()
         .notNull(samReader, "samReader")
         .notNull(controlSam, "controlSam")

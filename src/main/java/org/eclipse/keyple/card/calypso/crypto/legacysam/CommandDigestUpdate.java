@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,19 +11,20 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the Write Key APDU command.
+ * Builds the Digest Update APDU command.
  *
- * @since 0.1.0
+ * <p>This command have to be sent twice for each command executed during a session. First time for
+ * the command sent and second time for the answer received.
+ *
+ * @since 2.0.1
  */
-final class CommandWriteKey extends Command {
+final class CommandDigestUpdate extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
@@ -31,66 +32,50 @@ final class CommandWriteKey extends Command {
     Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
     m.put(
-        0x6900,
-        new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
-    m.put(
         0x6985,
         new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
-    m.put(0x6A00, new StatusProperties("P1 or P2 incorrect.", IllegalParameterException.class));
     m.put(
         0x6A80,
         new StatusProperties(
-            "Incorrect plain or decrypted data.", IncorrectInputDataException.class));
-    m.put(
-        0x6A83,
-        new StatusProperties(
-            "Record not found: deciphering key not found.", DataAccessException.class));
-    m.put(
-        0x6A87,
-        new StatusProperties("Lc inconsistent with P1 or P2.", IncorrectInputDataException.class));
+            "Incorrect value in the incoming data: session in Rev.3.2 mode with encryption/decryption active and not enough data (less than 5 bytes for and odd occurrence or less than 2 bytes for an even occurrence).",
+            IncorrectInputDataException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1 or P2.", IllegalParameterException.class));
     STATUS_TABLE = m;
   }
 
+  private byte[] processedData;
+
   /**
-   * Instantiates a new CommandWriteKey.
+   * Instantiates a new CommandDigestUpdate.
    *
    * @param context The command context.
-   * @param writingMode the writing mode (P1).
-   * @param keyReference the key reference (P2).
-   * @param keyData the key data.
-   * @since 0.1.0
+   * @param encryptedSession the encrypted session flag, true if encrypted.
+   * @param digestData all bytes from command sent by the card or response from the command.
+   * @throws IllegalArgumentException If the digest data is null or has a length &gt; 255
+   * @since 2.0.1
    */
-  CommandWriteKey(CommandContextDto context, byte writingMode, byte keyReference, byte[] keyData) {
+  CommandDigestUpdate(
+      DtoAdapters.CommandContextDto context, boolean encryptedSession, byte[] digestData) {
 
-    super(CommandRef.WRITE_KEY, 0, context);
+    super(CommandRef.DIGEST_UPDATE, 0, context);
 
     byte cla = context.getTargetSam().getClassByte();
+    byte p1 = (byte) 0x00;
+    byte p2 = encryptedSession ? (byte) 0x80 : (byte) 0x00;
 
-    if (keyData == null) {
-      throw new IllegalArgumentException("Key data null!");
-    }
-
-    if (keyData.length < 48 || keyData.length > 80) {
-      throw new IllegalArgumentException("Key data should be between 40 and 80 bytes long!");
+    if (digestData == null || digestData.length > 255) {
+      throw new IllegalArgumentException("Digest data null or too long!");
     }
 
     setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(
-                cla,
-                getCommandRef().getInstructionByte(),
-                writingMode,
-                keyReference,
-                keyData,
-                null)));
+        new DtoAdapters.ApduRequestAdapter(
+            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, digestData, null)));
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -100,7 +85,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -110,20 +95,31 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
+    processedData = apduResponse.getDataOut();
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 2.0.1
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {
     return STATUS_TABLE;
+  }
+
+  /**
+   * Return the command output.
+   *
+   * @return A not null byte array.
+   * @since 0.4.0
+   */
+  byte[] getProcessedData() {
+    return processedData;
   }
 }

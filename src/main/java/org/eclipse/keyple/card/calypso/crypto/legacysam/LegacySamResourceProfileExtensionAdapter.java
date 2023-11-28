@@ -11,12 +11,14 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySamSelection;
-import org.calypsonet.terminal.reader.CardReader;
-import org.calypsonet.terminal.reader.selection.CardSelectionManager;
-import org.calypsonet.terminal.reader.selection.CardSelectionResult;
-import org.calypsonet.terminal.reader.selection.spi.SmartCard;
 import org.eclipse.keyple.core.service.resource.spi.CardResourceProfileExtension;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
+import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ReaderApiFactory;
+import org.eclipse.keypop.reader.selection.BasicCardSelector;
+import org.eclipse.keypop.reader.selection.CardSelectionManager;
+import org.eclipse.keypop.reader.selection.CardSelectionResult;
+import org.eclipse.keypop.reader.selection.spi.SmartCard;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,14 +32,17 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamResourceProfileExtensionAdapter.class);
 
-  private final LegacySamSelection legacySamSelection;
+  private final LegacySamSelectionExtension legacySamSelection;
+  private final String powerOnDataRegex;
 
   /**
-   * @param samSelection The {@link LegacySamSelection}.
+   * @param samSelectionExtension The {@link LegacySamSelectionExtension}.
    * @since 0.1.0
    */
-  LegacySamResourceProfileExtensionAdapter(LegacySamSelection samSelection) {
-    this.legacySamSelection = samSelection;
+  LegacySamResourceProfileExtensionAdapter(
+      LegacySamSelectionExtension samSelectionExtension, String powerOnDataRegex) {
+    this.legacySamSelection = samSelectionExtension;
+    this.powerOnDataRegex = powerOnDataRegex;
   }
 
   /**
@@ -46,13 +51,17 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
    * @since 0.1.0
    */
   @Override
-  public SmartCard matches(CardReader reader, CardSelectionManager samCardSelectionManager) {
+  public SmartCard matches(CardReader reader, ReaderApiFactory readerApiFactory) {
 
     if (!reader.isCardPresent()) {
       return null;
     }
-
-    samCardSelectionManager.prepareSelection(legacySamSelection);
+    BasicCardSelector cardSelector = readerApiFactory.createBasicCardSelector();
+    if (powerOnDataRegex != null) {
+      cardSelector.filterByPowerOnData(powerOnDataRegex);
+    }
+    CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();
+    samCardSelectionManager.prepareSelection(cardSelector, legacySamSelection);
     CardSelectionResult samCardSelectionResult = null;
     try {
       samCardSelectionResult = samCardSelectionManager.processCardSelectionScenario(reader);

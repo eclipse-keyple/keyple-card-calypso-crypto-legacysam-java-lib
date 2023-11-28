@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.3.+ (2023-02-13)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.4.+ (2023-09-19)
 end title
 
 ' == THEME ==
@@ -54,34 +54,43 @@ hide <<grey>> stereotype
 legend top
     __Colors legend__ :
     * __External API references__ :
-    ** <back:lightgreen>**calypsonet-terminal-calypso-crypto-legacysam-java-api**</back>
+    ** <back:lightgreen>**keypop-calypso-crypto-legacysam-java-api**</back>
     ** <back:cyan>**keyple-common-java-api**</back>
     ** <back:orange>**keyple-service-resource-java-lib**</back>
 end legend
 
 package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
-    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamCardExtensionService" as LegacySamCardExtensionService {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n<color:blue>**final** LegacySamExtensionService" as LegacySamExtensionService <<green>> {
         --
-        +{static} LegacySamCardExtensionService getInstance ()
+        +{static} LegacySamExtensionService getInstance ()
 
-        +<back:lightgreen>LegacySamSelectionFactory</back> getLegacySamSelectionFactory ()
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelection</back> legacySamSelection)
+        +<color:blue>ContextSetting getContextSetting ()
 
-        +<color:green><back:lightgreen>LSSecuritySettingFactory</back> getSecuritySettingFactory()
+        +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
 
-        +<back:lightgreen>LSTransactionManagerFactory</back> getTransactionManagerFactory ()
-        +<back:lightgreen>LSCommandDataFactory</back> getCommandDataFactory ()
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen><color:blue>LegacySamSelectionExtension</color></back> legacySamSelectionExtension)
+        +<color:blue><back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
 
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
         +String getReaderApiVersion ()
         +String getCardApiVersion ()
     }
+    +interface "<color:blue>ContextSetting" as ContextSetting {
+        +<color:blue>ContextSetting setContactReaderPayloadCapacity (int payloadCapacity)
+    }
+    +class "**final** LegacySamUtil" as LegacySamUtil <<green>> {
+        +{static} String buildPowerOnDataFilter (<back:lightgreen>LegacySam.ProductType</back> productType, String serialNumberRegex)
+    }
 }
 
 ' Associations
 
+LegacySamExtensionService ..> ContextSetting #C_USE : use >
+
 ' == LAYOUT ==
+
+ContextSetting -[hidden]- LegacySamUtil
 
 ' == STYLE ==
 

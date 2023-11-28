@@ -16,17 +16,17 @@ import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSAsyncTransactionExecutorManager;
-import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.AsyncTransactionExecutorManager;
+import org.eclipse.keypop.card.ProxyReaderApi;
 
 /**
- * Adapter of {@link LSAsyncTransactionExecutorManager}.
+ * Adapter of {@link AsyncTransactionExecutorManager}.
  *
  * @since 0.3.0
  */
-final class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
-    implements LSAsyncTransactionExecutorManager {
+final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionManagerAdapter
+    implements AsyncTransactionExecutorManager {
 
   /**
    * Constructs a new instance with the specified target SAM reader, target SAM and commands to be
@@ -37,7 +37,7 @@ final class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionMa
    * @param samCommandsJson The commands to be executed as a JSON String.
    * @since 0.3.0
    */
-  LSAsyncTransactionExecutorManagerAdapter(
+  AsyncTransactionExecutorManagerAdapter(
       ProxyReaderApi targetSamReader, LegacySamAdapter targetSam, String samCommandsJson) {
     super(targetSamReader, targetSam, null, null);
 
@@ -69,7 +69,7 @@ final class LSAsyncTransactionExecutorManagerAdapter extends CommonTransactionMa
    * @since 0.3.0
    */
   @Override
-  public LSAsyncTransactionExecutorManager processCommands() {
+  public AsyncTransactionExecutorManager processCommands() {
     processTargetSamCommandsAlreadyFinalized(false);
     return this;
   }

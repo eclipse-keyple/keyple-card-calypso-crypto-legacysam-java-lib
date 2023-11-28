@@ -12,20 +12,15 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import java.util.*;
-import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
-import org.calypsonet.terminal.calypso.crypto.legacysam.spi.LSRevocationServiceSpi;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.BasicSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.CommonSignatureVerificationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureComputationData;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.TraceableSignatureVerificationData;
-import org.calypsonet.terminal.card.ProxyReaderApi;
-import org.calypsonet.terminal.card.spi.ApduRequestSpi;
-import org.calypsonet.terminal.card.spi.CardRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectionRequestSpi;
-import org.calypsonet.terminal.card.spi.CardSelectorSpi;
+import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
+import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
+import org.eclipse.keypop.card.ProxyReaderApi;
+import org.eclipse.keypop.card.spi.ApduRequestSpi;
+import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
 
 /**
  * Contains all DTO adapters.
@@ -33,21 +28,19 @@ import org.eclipse.keyple.core.util.json.JsonUtil;
  * @since 0.1.0
  */
 final class DtoAdapters {
-
   private static final String MSG_THE_COMMAND_HAS_NOT_YET_BEEN_PROCESSED =
       "The command has not yet been processed";
 
   private DtoAdapters() {}
 
   /**
-   * Adapter of {@link CommonSignatureComputationData}.
+   * Adapter of {@link SignatureComputationData}.
    *
    * @param <T> The type of the lowest level child object.
    * @since 0.1.0
    */
-  abstract static class CommonSignatureComputationDataAdapter<
-          T extends CommonSignatureComputationData<T>>
-      implements CommonSignatureComputationData<T> {
+  abstract static class SignatureComputationDataAdapter<T extends SignatureComputationData<T>>
+      implements SignatureComputationData<T> {
 
     private final T currentInstance = (T) this;
     private byte[] data;
@@ -157,16 +150,16 @@ final class DtoAdapters {
   }
 
   /**
-   * Adapter of {@link CommonSignatureVerificationData}.
+   * Adapter of {@link SignatureVerificationData}.
    *
    * @param <T> The type of the lowest level child object.
    * @since 0.1.0
    */
-  abstract static class CommonSignatureVerificationDataAdapter<
-          T extends CommonSignatureVerificationData<T>>
-      implements CommonSignatureVerificationData<T> {
+  abstract static class SignatureVerificationDataAdapter<T extends SignatureVerificationData<T>>
+      implements SignatureVerificationData<T> {
 
     private final T currentInstance = (T) this;
+    protected SamTraceabilityMode samTraceabilityMode;
     private byte[] data;
     private byte[] signature;
     private byte kif;
@@ -270,7 +263,7 @@ final class DtoAdapters {
    * @since 0.1.0
    */
   static class BasicSignatureComputationDataAdapter
-      extends CommonSignatureComputationDataAdapter<BasicSignatureComputationData>
+      extends SignatureComputationDataAdapter<BasicSignatureComputationData>
       implements BasicSignatureComputationData {}
 
   /**
@@ -279,7 +272,7 @@ final class DtoAdapters {
    * @since 0.1.0
    */
   static class BasicSignatureVerificationDataAdapter
-      extends CommonSignatureVerificationDataAdapter<BasicSignatureVerificationData>
+      extends SignatureVerificationDataAdapter<BasicSignatureVerificationData>
       implements BasicSignatureVerificationData {}
 
   /**
@@ -288,14 +281,14 @@ final class DtoAdapters {
    * @since 0.1.0
    */
   static final class TraceableSignatureComputationDataAdapter
-      extends CommonSignatureComputationDataAdapter<TraceableSignatureComputationData>
+      extends SignatureComputationDataAdapter<TraceableSignatureComputationData>
       implements TraceableSignatureComputationData {
 
     private boolean isSamTraceabilityMode;
     private int traceabilityOffset;
-    private boolean isPartialSamSerialNumber;
     private boolean isBusyMode = true;
     private byte[] signedData;
+    private SamTraceabilityMode samTraceabilityMode;
 
     /**
      * {@inheritDoc}
@@ -304,10 +297,11 @@ final class DtoAdapters {
      */
     @Override
     public TraceableSignatureComputationData withSamTraceabilityMode(
-        int offset, boolean usePartialSamSerialNumber) {
+        int offset, SamTraceabilityMode samTraceabilityMode) {
+      Assert.getInstance().notNull(samTraceabilityMode, "samTraceabilityMode");
       isSamTraceabilityMode = true;
       traceabilityOffset = offset;
-      isPartialSamSerialNumber = usePartialSamSerialNumber;
+      this.samTraceabilityMode = samTraceabilityMode;
       return this;
     }
 
@@ -353,13 +347,12 @@ final class DtoAdapters {
     }
 
     /**
-     * @return True if it is requested to use the partial SAM serial number with the "SAM
-     *     traceability" mode. It is required to check if the "SAM traceability" mode is enabled
-     *     first.
+     * @return the "SAM traceability" mode. It is required to check if the "SAM traceability" mode
+     *     is enabled first.
      * @since 0.1.0
      */
-    boolean isPartialSamSerialNumber() {
-      return isPartialSamSerialNumber;
+    SamTraceabilityMode getSamTraceabilityMode() {
+      return samTraceabilityMode;
     }
 
     /**
@@ -387,13 +380,12 @@ final class DtoAdapters {
    * @since 0.1.0
    */
   static final class TraceableSignatureVerificationDataAdapter
-      extends CommonSignatureVerificationDataAdapter<TraceableSignatureVerificationData>
+      extends SignatureVerificationDataAdapter<TraceableSignatureVerificationData>
       implements TraceableSignatureVerificationData {
 
     private boolean isSamTraceabilityMode;
     private int traceabilityOffset;
-    private boolean isPartialSamSerialNumber;
-    private LSRevocationServiceSpi samRevocationService;
+    private LegacySamRevocationServiceSpi samRevocationService;
     private boolean isBusyMode = true;
 
     /**
@@ -403,10 +395,13 @@ final class DtoAdapters {
      */
     @Override
     public TraceableSignatureVerificationData withSamTraceabilityMode(
-        int offset, boolean isPartialSamSerialNumber, LSRevocationServiceSpi samRevocationService) {
+        int offset,
+        SamTraceabilityMode samTraceabilityMode,
+        LegacySamRevocationServiceSpi samRevocationService) {
+      Assert.getInstance().notNull(samTraceabilityMode, "samTraceabilityMode");
       isSamTraceabilityMode = true;
       traceabilityOffset = offset;
-      this.isPartialSamSerialNumber = isPartialSamSerialNumber;
+      this.samTraceabilityMode = samTraceabilityMode;
       this.samRevocationService = samRevocationService;
       return this;
     }
@@ -440,13 +435,12 @@ final class DtoAdapters {
     }
 
     /**
-     * @return True if it is requested to use the partial SAM serial number with the "SAM
-     *     traceability" mode. It is required to check if the "SAM traceability" mode is enabled
-     *     first.
+     * @return the "SAM traceability" mode. It is required to check if the "SAM traceability" mode
+     *     is enabled first.
      * @since 0.1.0
      */
-    boolean isPartialSamSerialNumber() {
-      return isPartialSamSerialNumber;
+    SamTraceabilityMode getSamTraceabilityMode() {
+      return samTraceabilityMode;
     }
 
     /**
@@ -455,7 +449,7 @@ final class DtoAdapters {
      *     first.
      * @since 0.1.0
      */
-    LSRevocationServiceSpi getSamRevocationService() {
+    LegacySamRevocationServiceSpi getSamRevocationService() {
       return samRevocationService;
     }
 
@@ -636,93 +630,28 @@ final class DtoAdapters {
   }
 
   /**
-   * Adapter of {@link CardSelectorSpi}.
+   * This POJO contains the data used to define a selection extension containing additional APDU
+   * commands to be sent to the card when the selection is successful.
    *
    * @since 0.1.0
    */
-  static final class CardSelectorAdapter implements CardSelectorSpi {
+  static final class CardSelectionRequestAdapter implements CardSelectionRequestSpi {
 
     private static final int DEFAULT_SUCCESSFUL_CODE = 0x9000;
-
-    private String powerOnDataRegex;
+    private final CardRequestSpi cardRequest;
     private final Set<Integer> successfulSelectionStatusWords;
 
     /**
-     * Creates a new instance.
+     * Builds a card selection request to open a logical channel with additional APDUs to be sent
+     * after the selection step.
      *
-     * <p>Initialize default values.
-     *
+     * @param cardRequest The card request.
      * @since 0.1.0
      */
-    CardSelectorAdapter() {
-      successfulSelectionStatusWords = new LinkedHashSet<Integer>();
+    CardSelectionRequestAdapter(CardRequestSpi cardRequest) {
+      this.cardRequest = cardRequest;
+      successfulSelectionStatusWords = new LinkedHashSet<Integer>(1);
       successfulSelectionStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
-    }
-
-    /**
-     * Sets a power-on data-based filtering by defining a regular expression that will be applied to
-     * the card's power-on data.
-     *
-     * <p>If it is set, only the cards whose power-on data is recognized by the provided regular
-     * expression will match the card selector.
-     *
-     * @param powerOnDataRegex A valid regular expression
-     * @return The object instance.
-     * @since 0.1.0
-     */
-    CardSelectorSpi filterByPowerOnData(String powerOnDataRegex) {
-      this.powerOnDataRegex = powerOnDataRegex;
-      return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    @Override
-    public String getCardProtocol() {
-      return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    @Override
-    public String getPowerOnDataRegex() {
-      return powerOnDataRegex;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    @Override
-    public byte[] getAid() {
-      return null;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    @Override
-    public FileOccurrence getFileOccurrence() {
-      return FileOccurrence.FIRST;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @since 0.1.0
-     */
-    @Override
-    public FileControlInformation getFileControlInformation() {
-      return FileControlInformation.FCI;
     }
 
     /**
@@ -734,52 +663,10 @@ final class DtoAdapters {
     public Set<Integer> getSuccessfulSelectionStatusWords() {
       return successfulSelectionStatusWords;
     }
-  }
-
-  /**
-   * This POJO contains the data used to define a selection case.
-   *
-   * <p>A selection case is defined by a {@link CardSelectorSpi} that target a particular smart card
-   * and an optional {@link CardRequestSpi} containing additional APDU commands to be sent to the
-   * card when the selection is successful.
-   *
-   * <p>One of the uses of this class is to open a logical communication channel with a card in
-   * order to continue with other exchanges and carry out a complete transaction.
-   *
-   * @since 0.1.0
-   */
-  static final class CardSelectionRequestAdapter implements CardSelectionRequestSpi {
-
-    private final CardSelectorSpi cardSelector;
-    private final CardRequestSpi cardRequest;
-
-    /**
-     * Builds a card selection request to open a logical channel with additional APDUs to be sent
-     * after the selection step.
-     *
-     * @param cardSelector The card selector.
-     * @param cardRequest The card request.
-     * @since 0.1.0
-     */
-    CardSelectionRequestAdapter(CardSelectorSpi cardSelector, CardRequestSpi cardRequest) {
-      this.cardSelector = cardSelector;
-      this.cardRequest = cardRequest;
-    }
 
     /**
      * {@inheritDoc}
      *
-     * @since 0.1.0
-     */
-    @Override
-    public CardSelectorSpi getCardSelector() {
-      return cardSelector;
-    }
-
-    /**
-     * Gets the card request.
-     *
-     * @return a {@link CardRequestSpi} or null if it has not been defined
      * @since 0.1.0
      */
     @Override
@@ -788,9 +675,8 @@ final class DtoAdapters {
     }
 
     /**
-     * Converts the card selection request into a string where the data is encoded in a json format.
+     * {@inheritDoc}
      *
-     * @return A not empty String
      * @since 0.1.0
      */
     @Override
@@ -809,11 +695,11 @@ final class DtoAdapters {
     private final byte[] serialNumber;
     private final boolean isDynamicMode;
     private final Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
-        new HashMap<SystemKeyType, Integer>(
-            3); // NOSONAR enummap is not suitable for the gson serializer
+        //  enummap is not suitable for the gson serializer
+        new HashMap<SystemKeyType, Integer>(3); // NOSONAR
     private final Map<SystemKeyType, Byte> systemKeyTypeToKvcMap =
-        new HashMap<SystemKeyType, Byte>(
-            3); // NOSONAR enummap is not suitable for the gson serializer
+        //  enummap is not suitable for the gson serializer
+        new HashMap<SystemKeyType, Byte>(3); // NOSONAR
     private final Map<Integer, Integer> counterNumberToCounterValueMap =
         new HashMap<Integer, Integer>(3);
 

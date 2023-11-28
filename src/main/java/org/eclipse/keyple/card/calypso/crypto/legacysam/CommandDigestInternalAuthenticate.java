@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2022 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,54 +11,77 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the Get Challenge APDU command.
+ * Builds the Digest Internal Authenticate APDU command.
  *
- * @since 0.1.0
+ * <p>This outgoing command generates the signature to send to the card in a Manage Secure Session
+ * command during a secure session in Extended Mode.
+ *
+ * @since 2.3.1
  */
-final class CommandGetChallenge extends Command {
+final class CommandDigestInternalAuthenticate extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Le.", IllegalParameterException.class));
+    m.put(
+        0x6985,
+        new StatusProperties(
+            "Preconditions not satisfied:\n"
+                + "- Session not in \"ongoing\" state.\n"
+                + "- Session not opened in Extended mode.\n"
+                + "- Session opened in Verification mode.\n"
+                + "- Authentication not allowed by the key (not an AES key).\n"
+                + "- 250th occurrence since session start.",
+            AccessForbiddenException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1.", IllegalParameterException.class));
+
     STATUS_TABLE = m;
   }
 
+  private byte[] terminalSignature;
+
   /**
-   * Instantiates a new CmdSamGetChallenge.
+   * Instantiates a new CommandDigestInternalAuthenticate.
    *
    * @param context The command context.
-   * @param expectedResponseLength the expected response length.
-   * @since 0.1.0
+   * @since 2.3.1
    */
-  CommandGetChallenge(CommandContextDto context, int expectedResponseLength) {
+  CommandDigestInternalAuthenticate(DtoAdapters.CommandContextDto context) {
 
-    super(CommandRef.GET_CHALLENGE, expectedResponseLength, context);
+    super(CommandRef.DIGEST_INTERNAL_AUTHENTICATE, 8, context);
 
     setApduRequest(
-        new ApduRequestAdapter(
+        new DtoAdapters.ApduRequestAdapter(
             ApduUtil.build(
                 context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
-                (byte) 0,
-                (byte) 0,
+                (byte) 0x80,
+                (byte) 0x00,
                 null,
-                (byte) expectedResponseLength)));
+                (byte) 8)));
+  }
+
+  /**
+   * Gets the terminal signature.
+   *
+   * @return An 8-byte byte array.
+   * @since 2.3.1
+   */
+  byte[] getTerminalSignature() {
+    return terminalSignature;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -68,7 +91,7 @@ final class CommandGetChallenge extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -78,18 +101,18 @@ final class CommandGetChallenge extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
-    getContext().getTargetSam().setChallenge(apduResponse.getDataOut());
+    terminalSignature = apduResponse.getDataOut();
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 2.3.1
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {

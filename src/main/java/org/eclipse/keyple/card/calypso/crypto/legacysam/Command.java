@@ -17,7 +17,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import org.calypsonet.terminal.card.*;
+import org.eclipse.keypop.card.*;
 
 /**
  * Superclass for all SAM commands.
@@ -27,7 +27,7 @@ import org.calypsonet.terminal.card.*;
  * <ul>
  *   <li>the card command reference,
  *   <li>the name of the command,
- *   <li>the built {@link org.calypsonet.terminal.card.spi.ApduRequestSpi},
+ *   <li>the built {@link org.eclipse.keypop.card.spi.ApduRequestSpi},
  *   <li>the parsed {@link ApduResponseApi}.
  * </ul>
  *
@@ -55,9 +55,9 @@ abstract class Command {
   private final int le;
   private String name;
   private ApduRequestAdapter apduRequest;
-  private transient ApduResponseApi apduResponse;
-  private final transient CommandContextDto context;
-  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2);
+  private transient ApduResponseApi apduResponse; // NOSONAR
+  private final transient CommandContextDto context; // NOSONAR
+  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2); // NOSONAR
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands
@@ -128,6 +128,16 @@ abstract class Command {
    */
   final ApduRequestAdapter getApduRequest() {
     return apduRequest;
+  }
+
+  /**
+   * Gets {@link ApduResponseApi}
+   *
+   * @return Null if the response is not set.
+   * @since 0.4.0
+   */
+  final ApduResponseApi getApduResponse() {
+    return apduResponse;
   }
 
   /**

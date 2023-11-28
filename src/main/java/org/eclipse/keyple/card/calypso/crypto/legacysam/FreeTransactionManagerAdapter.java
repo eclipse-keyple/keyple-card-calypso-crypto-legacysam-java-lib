@@ -14,21 +14,21 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.*;
-import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.*;
-import org.calypsonet.terminal.card.ProxyReaderApi;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
+import org.eclipse.keypop.card.ProxyReaderApi;
 
 /**
- * Adapter of {@link LSFreeTransactionManager}.
+ * Adapter of {@link FreeTransactionManagerAdapter}.
  *
  * @since 0.1.0
  */
-final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
-    implements LSFreeTransactionManager {
+final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapter
+    implements FreeTransactionManager {
   private static final String MSG_INPUT_OUTPUT_DATA = "input/output data";
   private static final String MSG_SIGNATURE_SIZE = "signature size";
   private static final String MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8 =
@@ -47,7 +47,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @param targetSam The target legacy SAM.
    * @since 0.3.0
    */
-  LSFreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
+  FreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
     super(targetSamReader, targetSam, null, null);
     samKeyDiversifier = targetSam.getSerialNumber();
   }
@@ -58,7 +58,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareComputeSignature(CommonSignatureComputationData<?> data) {
+  public FreeTransactionManagerAdapter prepareComputeSignature(SignatureComputationData<?> data) {
 
     if (data instanceof BasicSignatureComputationDataAdapter) {
       // Basic signature
@@ -100,10 +100,16 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
                   || (dataAdapter.getTraceabilityOffset() >= 0
                       && dataAdapter.getTraceabilityOffset()
                           <= ((dataAdapter.getData().length * 8)
-                              - (dataAdapter.isPartialSamSerialNumber() ? 7 * 8 : 8 * 8))),
+                              - (dataAdapter.getSamTraceabilityMode()
+                                      == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                                  ? 7 * 8
+                                  : 8 * 8))),
               "traceability offset is in range [0.."
                   + ((dataAdapter.getData().length * 8)
-                      - (dataAdapter.isPartialSamSerialNumber() ? 7 * 8 : 8 * 8))
+                      - (dataAdapter.getSamTraceabilityMode()
+                              == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                          ? 7 * 8
+                          : 8 * 8))
                   + "]")
           .isTrue(
               dataAdapter.getKeyDiversifier() == null
@@ -128,7 +134,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareVerifySignature(CommonSignatureVerificationData<?> data) {
+  public FreeTransactionManagerAdapter prepareVerifySignature(SignatureVerificationData<?> data) {
     if (data instanceof BasicSignatureVerificationDataAdapter) {
       // Basic signature
       BasicSignatureVerificationDataAdapter dataAdapter =
@@ -171,10 +177,16 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
                   || (dataAdapter.getTraceabilityOffset() >= 0
                       && dataAdapter.getTraceabilityOffset()
                           <= ((dataAdapter.getData().length * 8)
-                              - (dataAdapter.isPartialSamSerialNumber() ? 7 * 8 : 8 * 8))),
+                              - (dataAdapter.getSamTraceabilityMode()
+                                      == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                                  ? 7 * 8
+                                  : 8 * 8))),
               "traceability offset is in range [0.."
                   + ((dataAdapter.getData().length * 8)
-                      - (dataAdapter.isPartialSamSerialNumber() ? 7 * 8 : 8 * 8))
+                      - (dataAdapter.getSamTraceabilityMode()
+                              == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                          ? 7 * 8
+                          : 8 * 8))
                   + "]")
           .isTrue(
               dataAdapter.getKeyDiversifier() == null
@@ -189,14 +201,19 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
             ByteArrayUtil.extractBytes(
                 dataAdapter.getData(),
                 dataAdapter.getTraceabilityOffset(),
-                dataAdapter.isPartialSamSerialNumber() ? 3 : 4);
+                dataAdapter.getSamTraceabilityMode() == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                    ? 3
+                    : 4);
 
         int samCounterValue =
             ByteArrayUtil.extractInt(
                 ByteArrayUtil.extractBytes(
                     dataAdapter.getData(),
                     dataAdapter.getTraceabilityOffset()
-                        + (dataAdapter.isPartialSamSerialNumber() ? 3 * 8 : 4 * 8),
+                        + (dataAdapter.getSamTraceabilityMode()
+                                == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER
+                            ? 3 * 8
+                            : 4 * 8),
                     3),
                 0,
                 3,
@@ -216,7 +233,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'CommonSignatureVerificationDataAdapter'");
+          "The provided data must be an instance of 'SignatureVerificationDataAdapter'");
     }
     return this;
   }
@@ -227,7 +244,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.3.0
    */
   @Override
-  public LSFreeTransactionManager prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
+  public FreeTransactionManagerAdapter prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
     addTargetSamCommand(new CommandReadKeyParameters(getContext(), systemKeyType));
     return this;
@@ -239,20 +256,27 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareReadCounterStatus(int counterNumber) {
+  public FreeTransactionManagerAdapter prepareReadCounterStatus(int counterNumber) {
     Assert.getInstance()
-        .isInRange(counterNumber, MIN_COUNTER_NUMBER, MAX_COUNTER_NUMBER, "counterNumber");
+        .isInRange(
+            counterNumber,
+            LegacySamConstant.MIN_COUNTER_NUMBER,
+            LegacySamConstant.MAX_COUNTER_NUMBER,
+            "counterNumber");
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandReadCounter
           && ((CommandReadCounter) command).getCounterFileRecordNumber()
-              == counterToRecordLookup[counterNumber]) {
+              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
-    addTargetSamCommand(new CommandReadCounter(getContext(), counterToRecordLookup[counterNumber]));
     addTargetSamCommand(
-        new CommandReadCounterCeiling(getContext(), counterToRecordLookup[counterNumber]));
+        new CommandReadCounter(
+            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    addTargetSamCommand(
+        new CommandReadCounterCeiling(
+            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -263,7 +287,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager prepareReadAllCountersStatus() {
+  public FreeTransactionManagerAdapter prepareReadAllCountersStatus() {
     for (int i = 0; i < 3; i++) {
       addTargetSamCommand(new CommandReadCounter(getContext(), i));
       addTargetSamCommand(new CommandReadCounterCeiling(getContext(), i));
@@ -358,13 +382,15 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
     // compute needed counter file records
     Set<Integer> counterFileRecordNumbers = new HashSet<Integer>(3);
     if (counterPersonalization != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterPersonalization]);
+      counterFileRecordNumbers.add(
+          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
     }
     if (counterKeyManagement != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterKeyManagement]);
+      counterFileRecordNumbers.add(
+          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
     }
     if (counterReloading != 0) {
-      counterFileRecordNumbers.add(counterToRecordLookup[counterReloading]);
+      counterFileRecordNumbers.add(LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
     }
 
     // read counters
@@ -401,7 +427,7 @@ final class LSFreeTransactionManagerAdapter extends CommonTransactionManagerAdap
    * @since 0.1.0
    */
   @Override
-  public LSFreeTransactionManager processCommands() {
+  public FreeTransactionManagerAdapter processCommands() {
     processTargetSamCommands(false);
     return this;
   }

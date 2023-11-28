@@ -15,10 +15,11 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.HashMap;
 import java.util.Map;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.InvalidSignatureException;
-import org.calypsonet.terminal.card.ApduResponseApi;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InvalidSignatureException;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SamTraceabilityMode;
+import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
  * Builds the "PSO Verify Signature" SAM command.
@@ -90,7 +91,7 @@ final class CommandPsoVerifySignature extends Command {
     // X: Mode
     byte opMode = (byte) 0; // %0000 Normal mode
     if (data.isSamTraceabilityMode()) {
-      if (data.isPartialSamSerialNumber()) {
+      if (data.getSamTraceabilityMode() == SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER) {
         opMode |= 4; // %x100
       } else {
         opMode |= 6; // %x110

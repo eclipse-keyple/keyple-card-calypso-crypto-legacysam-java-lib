@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2023 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2018 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,55 +11,62 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the "Give Random" APDU command.
+ * Builds the Digest Authenticate APDU command.
  *
- * @since 0.1.0
+ * @since 2.0.1
  */
-final class CommandGiveRandom extends Command {
+final class CommandDigestAuthenticate extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(
+        0x6985,
+        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
     STATUS_TABLE = m;
   }
 
   /**
-   * Instantiates a new CommandGiveRandom.
+   * Instantiates a new CommandDigestAuthenticate .
    *
    * @param context The command context.
-   * @param random The random data.
-   * @throws IllegalArgumentException If the random data is null or has a length not equal to 8.
-   * @since 0.1.0
+   * @param signature the signature.
+   * @throws IllegalArgumentException If the signature is null or has a wrong length.
+   * @since 2.0.1
    */
-  CommandGiveRandom(CommandContextDto context, byte[] random) {
-    super(CommandRef.GIVE_RANDOM, 0, context);
+  CommandDigestAuthenticate(DtoAdapters.CommandContextDto context, byte[] signature) {
 
+    super(CommandRef.DIGEST_AUTHENTICATE, 0, context);
+
+    if (signature == null) {
+      throw new IllegalArgumentException("Signature can't be null");
+    }
+    if (signature.length != 4 && signature.length != 8 && signature.length != 16) {
+      throw new IllegalArgumentException(
+          "Signature is not the right length : length is " + signature.length);
+    }
     byte cla = context.getTargetSam().getClassByte();
     byte p1 = 0x00;
-    byte p2 = 0x00;
+    byte p2 = (byte) 0x00;
 
-    if (random == null || random.length != 8) {
-      throw new IllegalArgumentException("Random value should be an 8 bytes long");
-    }
     setApduRequest(
-        new ApduRequestAdapter(
-            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, random, null)));
+        new DtoAdapters.ApduRequestAdapter(
+            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, signature, null)));
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void finalizeRequest() {
@@ -69,7 +76,7 @@ final class CommandGiveRandom extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -79,7 +86,7 @@ final class CommandGiveRandom extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
@@ -89,7 +96,7 @@ final class CommandGiveRandom extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 2.0.1
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {

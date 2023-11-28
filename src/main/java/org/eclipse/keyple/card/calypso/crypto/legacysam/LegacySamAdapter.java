@@ -17,13 +17,14 @@ import java.util.SortedMap;
 import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.calypsonet.terminal.calypso.crypto.legacysam.SystemKeyType;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.KeyParameter;
-import org.calypsonet.terminal.calypso.crypto.legacysam.sam.LegacySam;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
-import org.calypsonet.terminal.card.spi.SmartCardSpi;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.KeyParameter;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
+import org.eclipse.keypop.card.spi.SmartCardSpi;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,22 +37,35 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
 
   private static final Logger logger = LoggerFactory.getLogger(LegacySamAdapter.class);
 
-  private final String powerOnData;
-  private final ProductType samProductType;
-  private final byte[] serialNumber;
-  private final byte platform;
-  private final byte applicationType;
-  private final byte applicationSubType;
-  private final byte softwareIssuer;
-  private final byte softwareVersion;
-  private final byte softwareRevision;
-  private final byte classByte;
+  private String powerOnData;
+  private ProductType samProductType;
+  private byte[] serialNumber;
+  private byte platform;
+  private byte applicationType;
+  private byte applicationSubType;
+  private byte softwareIssuer;
+  private byte softwareVersion;
+  private byte softwareRevision;
+  private byte classByte;
   private final SortedMap<Integer, Integer> counters = new TreeMap<Integer, Integer>();
-  private final Map<Integer, Boolean> countersIncrementConfig = new HashMap<Integer, Boolean>();
+  private final Map<Integer, CounterIncrementAccess> countersIncrementConfig =
+      new HashMap<Integer, CounterIncrementAccess>();
   private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<Integer, Integer>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParamterMap =
-      new HashMap<SystemKeyType, KeyParameterAdapter>();
+      new HashMap<SystemKeyType, KeyParameterAdapter>(); // NOSONAR JSON serializer
   private byte[] challenge;
+
+  /**
+   * Constructor.
+   *
+   * <p>Create a {@link LegacySamAdapter} just containing the {@link ProductType}.
+   *
+   * @param productType The SAM product type.
+   * @since 0.4.0
+   */
+  LegacySamAdapter(ProductType productType) {
+    this.samProductType = productType;
+  }
 
   /**
    * Constructor.
@@ -62,7 +76,17 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.1.0
    */
   LegacySamAdapter(CardSelectionResponseApi cardSelectionResponse) {
+    parseSelectionResponse(cardSelectionResponse);
+  }
 
+  /**
+   * Parses the selection response in order to determine all the SAM attributes from the power-on
+   * data.
+   *
+   * @param cardSelectionResponse the response to the selection command.
+   * @since 0.4.0
+   */
+  void parseSelectionResponse(CardSelectionResponseApi cardSelectionResponse) {
     // in the case of a SAM, the power-on data corresponds to the ATR of the card.
     powerOnData = cardSelectionResponse.getPowerOnData();
     if (powerOnData == null) {
@@ -165,17 +189,6 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
       default:
         return 0;
     }
-  }
-
-  /**
-   * {@inheritDoc}<br>
-   * No select application for a SAM.
-   *
-   * @since 0.1.0
-   */
-  @Override
-  public byte[] getSelectApplicationResponse() {
-    return new byte[0];
   }
 
   /**
@@ -304,11 +317,12 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * Adds or replace a counter increment configuration.
    *
    * @param counterNumber The number of the counter.
-   * @param incrementingState The incrementing state.
+   * @param counterIncrementAccess The counter incrementing access.
    * @since 0.3.0
    */
-  void putCounterIncrementConfiguration(int counterNumber, boolean incrementingState) {
-    countersIncrementConfig.put(counterNumber, incrementingState);
+  void putCounterIncrementConfiguration(
+      int counterNumber, CounterIncrementAccess counterIncrementAccess) {
+    countersIncrementConfig.put(counterNumber, counterIncrementAccess);
   }
 
   /**
@@ -337,7 +351,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.3.0
    */
   @Override
-  public Boolean isManualCounterIncrementAuthorized(int counterNumber) {
+  public CounterIncrementAccess getCounterIncrementAccess(int counterNumber) {
     return countersIncrementConfig.get(counterNumber);
   }
 
@@ -403,12 +417,14 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Gets the challenge.
+   * Gets and resets the current challenge.
    *
-   * @return null if no challenge is available.
-   * @since 0.3.0
+   * @return Null if no challenge is available.
+   * @since 0.4.0
    */
-  byte[] getChallenge() {
-    return challenge;
+  byte[] popChallenge() {
+    byte[] res = challenge;
+    challenge = null;
+    return res;
   }
 }

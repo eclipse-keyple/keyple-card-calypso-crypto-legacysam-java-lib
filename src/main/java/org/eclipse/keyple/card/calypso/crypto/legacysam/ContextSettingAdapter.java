@@ -11,23 +11,36 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySetting;
-import org.calypsonet.terminal.calypso.crypto.legacysam.transaction.LSSecuritySettingFactory;
+import org.eclipse.keyple.core.util.Assert;
 
 /**
- * Implementation of {@link LSSecuritySettingFactory}.
+ * Adapter of {@link ContextSetting}.
  *
- * @since 0.3.0
+ * @since 0.4.0
  */
-final class LSSecuritySettingFactoryAdapter implements LSSecuritySettingFactory {
+final class ContextSettingAdapter implements ContextSetting {
+
+  private Integer contactReaderPayloadCapacity;
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.4.0
    */
   @Override
-  public LSSecuritySetting createSecuritySetting() {
-    return new LSSecuritySettingAdapter();
+  public ContextSetting setContactReaderPayloadCapacity(int payloadCapacity) {
+    Assert.getInstance().isInRange(payloadCapacity, 0, 255, "payloadCapacity");
+    this.contactReaderPayloadCapacity = payloadCapacity;
+    return this;
+  }
+
+  /**
+   * Returns the contact reader payload capacity.
+   *
+   * @return null if no payload capacity has been defined.
+   * @since 0.4.0
+   */
+  Integer getContactReaderPayloadCapacity() {
+    return contactReaderPayloadCapacity;
   }
 }

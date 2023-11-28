@@ -15,7 +15,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import org.calypsonet.terminal.card.*;
+import org.eclipse.keypop.card.*;
 
 /**
  * Abstract class of all transaction manager adapters.
@@ -23,20 +23,10 @@ import org.calypsonet.terminal.card.*;
  * @since 0.3.0
  */
 abstract class CommonTransactionManagerAdapter {
-  /* Constants */
-  static final int MIN_COUNTER_NUMBER = 0;
-  static final int MAX_COUNTER_NUMBER = 26;
-  static final int MIN_COUNTER_CEILING_NUMBER = 0;
-  static final int MAX_COUNTER_CEILING_NUMBER = 26;
-  static final int MIN_COUNTER_CEILING_VALUE = 0;
-  static final int MAX_COUNTER_CEILING_VALUE = 0xFFFFFA;
   /* JSON field names */
   static final String SAM_COMMANDS_TYPES = "samCommandsTypes";
   static final String SAM_COMMANDS = "samCommands";
 
-  static final int[] counterToRecordLookup = {
-    0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2
-  };
   private final ProxyReaderApi targetSamReader;
   private final LegacySamAdapter targetSam;
   private final ProxyReaderApi controlSamReader;

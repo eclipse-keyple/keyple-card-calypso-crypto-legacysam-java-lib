@@ -13,10 +13,10 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import java.util.Arrays;
 import java.util.List;
-import org.calypsonet.terminal.card.ApduResponseApi;
-import org.calypsonet.terminal.card.CardResponseApi;
-import org.calypsonet.terminal.card.CardSelectionResponseApi;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.card.ApduResponseApi;
+import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.CardSelectionResponseApi;
 
 class TestDtoAdapters {
   private TestDtoAdapters() {}
@@ -83,7 +83,7 @@ class TestDtoAdapters {
    * This POJO contains an ordered list of the responses received following a card request and
    * indicators related to the status of the channel and the completion of the card request.
    *
-   * @see org.calypsonet.terminal.card.spi.CardRequestSpi
+   * @see org.eclipse.keypop.card.spi.CardRequestSpi
    * @since 2.0.0
    */
   static final class CardResponseAdapter implements CardResponseApi {
