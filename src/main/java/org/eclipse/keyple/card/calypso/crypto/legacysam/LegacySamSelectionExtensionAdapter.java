@@ -22,16 +22,16 @@ import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
+import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamDynamicUnlockDataProviderSpi;
+import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamStaticUnlockDataProviderSpi;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
-import org.eclipse.keypop.card.ApduResponseApi;
-import org.eclipse.keypop.card.CardResponseApi;
-import org.eclipse.keypop.card.CardSelectionResponseApi;
-import org.eclipse.keypop.card.ParseException;
+import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardSelectionExtensionSpi;
 import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
 import org.eclipse.keypop.card.spi.SmartCardSpi;
+import org.eclipse.keypop.reader.CardReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +50,23 @@ final class LegacySamSelectionExtensionAdapter
       LoggerFactory.getLogger(LegacySamSelectionExtensionAdapter.class);
   private static final int SW_NOT_LOCKED = 0x6985;
   private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
+  private static final String MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET =
+      "A setting to unlock the SAM has already been set";
   LegacySamAdapter legacySamAdapter;
   CommandContextDto context;
   private final List<Command> commands;
+  private CardReader cardReader;
+
+  private enum UnlockSettingType {
+    UNSET,
+    UNLOCK_DATA,
+    STATIC_MODE_PROVIDER,
+    DYNAMIC_MODE_PROVIDER
+  }
+
+  private UnlockSettingType unlockSettingType = UnlockSettingType.UNSET;
+  private LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider;
+  private LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider;
 
   /**
    * Creates a {@link LegacySamSelectionExtension}.
@@ -72,16 +86,23 @@ final class LegacySamSelectionExtensionAdapter
    */
   @Override
   public CardSelectionRequestSpi getCardSelectionRequest() {
-    List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
-    for (Command command : commands) {
-      cardSelectionApduRequests.add(command.getApduRequest());
-    }
+
     if (commands.isEmpty()) {
       return new CardSelectionRequestAdapter(null);
-    } else {
-      return new CardSelectionRequestAdapter(
-          new CardRequestAdapter(cardSelectionApduRequests, false));
     }
+
+    List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
+    // Do not add command for now when using an Unlock Data provider
+    if (unlockSettingType == UnlockSettingType.UNSET
+        || unlockSettingType == UnlockSettingType.UNLOCK_DATA) {
+      for (Command command : commands) {
+        cardSelectionApduRequests.add(command.getApduRequest());
+      }
+    }
+    commands.clear();
+
+    return new CardSelectionRequestAdapter(
+        new CardRequestAdapter(cardSelectionApduRequests, false));
   }
 
   /**
@@ -94,16 +115,39 @@ final class LegacySamSelectionExtensionAdapter
       throws ParseException {
 
     CardResponseApi cardResponse = cardSelectionResponseApi.getCardResponse();
-    List<ApduResponseApi> apduResponses =
-        cardResponse != null
-            ? cardResponse.getApduResponses()
-            : Collections.<ApduResponseApi>emptyList();
-    if (commands.size() != apduResponses.size()) {
-      throw new ParseException("Mismatch in the number of requests/responses.");
-    }
+
     try {
       // late initialization of the LegacySamAdapter
       legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
+      if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER
+          || unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
+        byte[] unlockData;
+        if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER) {
+          unlockData = staticUnlockDataProvider.getUnlockData(legacySamAdapter.getSerialNumber());
+        } else {
+          unlockData = dynamicUnlockDataProvider.getUnlockData(legacySamAdapter.getSerialNumber());
+        }
+        CommandUnlock unlockCommand =
+            new CommandUnlock(legacySamAdapter.getProductType(), unlockData);
+        unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
+        // prepare the UNLOCK command and put it in first position
+        commands.add(0, unlockCommand);
+        List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
+        for (Command command : commands) {
+          cardSelectionApduRequests.add(command.getApduRequest());
+        }
+        CardRequestAdapter cardRequest = new CardRequestAdapter(cardSelectionApduRequests, false);
+        cardResponse =
+            ((ProxyReaderApi) cardReader)
+                .transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
+      }
+      List<ApduResponseApi> apduResponses =
+          cardResponse != null
+              ? cardResponse.getApduResponses()
+              : Collections.<ApduResponseApi>emptyList();
+      if (commands.size() != apduResponses.size()) {
+        throw new ParseException("Mismatch in the number of requests/responses.");
+      }
       if (!commands.isEmpty()) {
         parseApduResponses(commands, apduResponses);
       }
@@ -174,6 +218,9 @@ final class LegacySamSelectionExtensionAdapter
   @Override
   public LegacySamSelectionExtension setUnlockData(
       String unlockData, LegacySam.ProductType productType) {
+    if (unlockSettingType != UnlockSettingType.UNSET) {
+      throw new IllegalStateException(MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET);
+    }
     Assert.getInstance()
         .notEmpty(unlockData, "unlockData")
         .isTrue(
@@ -185,6 +232,7 @@ final class LegacySamSelectionExtensionAdapter
     unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
     // prepare the UNLOCK command and put it in first position
     commands.add(0, unlockCommand);
+    unlockSettingType = UnlockSettingType.UNLOCK_DATA;
     return this;
   }
 
@@ -196,6 +244,50 @@ final class LegacySamSelectionExtensionAdapter
   @Override
   public LegacySamSelectionExtension setUnlockData(String unlockData) {
     return setUnlockData(unlockData, LegacySam.ProductType.SAM_C1);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.5.0
+   */
+  @Override
+  public LegacySamSelectionExtension setStaticUnlockDataProvider(
+      LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider) {
+    if (unlockSettingType != UnlockSettingType.UNSET) {
+      throw new IllegalStateException(MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET);
+    }
+    this.staticUnlockDataProvider = staticUnlockDataProvider;
+    unlockSettingType = UnlockSettingType.STATIC_MODE_PROVIDER;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.5.0
+   */
+  @Override
+  public LegacySamSelectionExtension setDynamicUnlockDataProvider(
+      LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider) {
+    if (unlockSettingType != UnlockSettingType.UNSET) {
+      throw new IllegalStateException(MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET);
+    }
+    this.dynamicUnlockDataProvider = dynamicUnlockDataProvider;
+    unlockSettingType = UnlockSettingType.DYNAMIC_MODE_PROVIDER;
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.5.0
+   */
+  @Override
+  public LegacySamSelectionExtension setSamCardReader(CardReader cardReader) {
+    Assert.getInstance().notNull(cardReader, "cardReader");
+    this.cardReader = cardReader;
+    return this;
   }
 
   /**

@@ -49,6 +49,16 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
   /**
    * {@inheritDoc}
    *
+   * @since 0.5.0
+   */
+  @Override
+  public LegacySamSelectionExtension createLegacySamSelectionExtension(CardReader cardReader) {
+    return new LegacySamSelectionExtensionAdapter().setSamCardReader(cardReader);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.4.0
    */
   @Override

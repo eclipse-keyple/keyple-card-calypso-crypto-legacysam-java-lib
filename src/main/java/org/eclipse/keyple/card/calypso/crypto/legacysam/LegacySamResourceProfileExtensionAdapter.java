@@ -61,6 +61,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
       cardSelector.filterByPowerOnData(powerOnDataRegex);
     }
     CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();
+    legacySamSelection.setSamCardReader(reader);
     samCardSelectionManager.prepareSelection(cardSelector, legacySamSelection);
     CardSelectionResult samCardSelectionResult = null;
     try {
