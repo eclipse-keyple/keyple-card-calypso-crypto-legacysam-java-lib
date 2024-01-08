@@ -55,7 +55,7 @@ final class LegacySamSelectionExtensionAdapter
   LegacySamAdapter legacySamAdapter;
   CommandContextDto context;
   private final List<Command> commands;
-  private CardReader cardReader;
+  private CardReader targetSamReader;
   private CommandGetChallenge getChallengeCommand;
 
   private enum UnlockSettingType {
@@ -169,7 +169,8 @@ final class LegacySamSelectionExtensionAdapter
 
       CardRequestAdapter cardRequest = new CardRequestAdapter(cardSelectionApduRequests, false);
       cardResponse =
-          ((ProxyReaderApi) cardReader).transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
+          ((ProxyReaderApi) targetSamReader)
+              .transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
     }
     return cardResponse;
   }
@@ -314,9 +315,23 @@ final class LegacySamSelectionExtensionAdapter
     if (unlockSettingType != UnlockSettingType.UNSET) {
       throw new IllegalStateException(MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET);
     }
+    Assert.getInstance().notNull(staticUnlockDataProvider, "staticUnlockDataProvider");
     this.staticUnlockDataProvider = staticUnlockDataProvider;
     unlockSettingType = UnlockSettingType.STATIC_MODE_PROVIDER;
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.5.0
+   */
+  @Override
+  public LegacySamSelectionExtension setStaticUnlockDataProvider(
+      LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider, CardReader targetSamReader) {
+    Assert.getInstance().notNull(targetSamReader, "targetSamReader");
+    this.targetSamReader = targetSamReader;
+    return setStaticUnlockDataProvider(staticUnlockDataProvider);
   }
 
   /**
@@ -330,23 +345,23 @@ final class LegacySamSelectionExtensionAdapter
     if (unlockSettingType != UnlockSettingType.UNSET) {
       throw new IllegalStateException(MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET);
     }
+    Assert.getInstance().notNull(dynamicUnlockDataProvider, "dynamicUnlockDataProvider");
     this.dynamicUnlockDataProvider = dynamicUnlockDataProvider;
     unlockSettingType = UnlockSettingType.DYNAMIC_MODE_PROVIDER;
     return this;
   }
 
   /**
-   * Provides the {@link CardReader} for communicating with the SAM during the unlocking process
-   * when involving a static or a dynamic unlock data providers.
+   * {@inheritDoc}
    *
-   * @param cardReader The card reader to be used.
-   * @return The current instance.
-   * @throws IllegalArgumentException If the provided argument is null.
    * @since 0.5.0
    */
-  LegacySamSelectionExtension setSamCardReader(CardReader cardReader) {
-    this.cardReader = cardReader;
-    return this;
+  @Override
+  public LegacySamSelectionExtension setDynamicUnlockDataProvider(
+      LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider, CardReader targetSamReader) {
+    Assert.getInstance().notNull(targetSamReader, "targetSamReader");
+    this.targetSamReader = targetSamReader;
+    return setDynamicUnlockDataProvider(dynamicUnlockDataProvider);
   }
 
   /**
@@ -395,6 +410,19 @@ final class LegacySamSelectionExtensionAdapter
       commands.add(new CommandReadCounter(context, i));
       commands.add(new CommandReadCounterCeiling(context, i));
     }
+    return this;
+  }
+
+  /**
+   * Provides the {@link CardReader} for communicating with the SAM during the unlocking process
+   * when involving a static or a dynamic unlock data providers.
+   *
+   * @param targetSamReader The card reader used to communicate with the target SAM.
+   * @return The current instance.
+   * @since 0.5.0
+   */
+  LegacySamSelectionExtension setSamCardReader(CardReader targetSamReader) {
+    this.targetSamReader = targetSamReader;
     return this;
   }
 }
