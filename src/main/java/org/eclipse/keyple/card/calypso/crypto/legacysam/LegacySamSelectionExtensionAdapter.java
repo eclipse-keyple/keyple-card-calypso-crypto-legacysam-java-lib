@@ -116,28 +116,33 @@ final class LegacySamSelectionExtensionAdapter
       throws ParseException {
     try {
       legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
-      CardResponseApi cardResponse = handleUnlockCommand(cardSelectionResponseApi);
-      List<ApduResponseApi> apduResponses = validateAndFetchResponses(cardResponse);
-      processApduResponses(apduResponses);
+      CardResponseApi cardResponse = getCardResponse(cardSelectionResponseApi);
+      parseCardResponse(cardResponse);
     } catch (Exception e) {
       throw new ParseException("Invalid card response: " + e.getMessage(), e);
     }
-    return validateAndReturnLegacySam(cardSelectionResponseApi);
+    if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
+        && cardSelectionResponseApi.getSelectApplicationResponse() == null
+        && cardSelectionResponseApi.getPowerOnData() == null) {
+
+      throw new ParseException(
+          "Unable to create a LegacySam: no power-on data and no FCI provided.");
+    }
+    return legacySamAdapter;
   }
 
   /**
-   * Handles the unlock command for a given card selection response.
+   * Returns the card response and handles the unlock command if needed.
    *
    * @param cardSelectionResponseApi The response to the initial card selection request.
    * @return The updated card response after handling the unlock command.
    * @throws AbstractApduException if an error occurs while handling the unlock command.
    */
-  private CardResponseApi handleUnlockCommand(CardSelectionResponseApi cardSelectionResponseApi)
+  private CardResponseApi getCardResponse(CardSelectionResponseApi cardSelectionResponseApi)
       throws AbstractApduException, CommandException {
     CardResponseApi cardResponse = cardSelectionResponseApi.getCardResponse();
     if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER
         || unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
-
       byte[] unlockData;
       if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER) {
         unlockData = staticUnlockDataProvider.getUnlockData(legacySamAdapter.getSerialNumber());
@@ -159,6 +164,7 @@ final class LegacySamSelectionExtensionAdapter
       }
 
       CardRequestAdapter cardRequest = new CardRequestAdapter(cardSelectionApduRequests, false);
+
       cardResponse =
           ((ProxyReaderApi) targetSamReader)
               .transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
@@ -167,51 +173,22 @@ final class LegacySamSelectionExtensionAdapter
   }
 
   /**
-   * Validates and fetches the APDU responses from the card response.
+   * Parses the APDU responses returned by the SAM to all commands.
    *
-   * @param cardResponse The card response containing the APDU responses.
-   * @return The list of APDU responses.
+   * @param cardResponse The card response.
    */
-  private List<ApduResponseApi> validateAndFetchResponses(CardResponseApi cardResponse) {
+  private void parseCardResponse(CardResponseApi cardResponse) {
     List<ApduResponseApi> apduResponses =
         cardResponse != null
             ? cardResponse.getApduResponses()
             : Collections.<ApduResponseApi>emptyList();
 
-    if (commands.isEmpty() || commands.size() == apduResponses.size()) {
-      return apduResponses;
+    if (commands.size() != apduResponses.size()) {
+      throw new IllegalStateException("Mismatch in the number of requests/responses.");
     }
-    throw new IllegalStateException("Mismatch in the number of requests/responses.");
-  }
-
-  /**
-   * Processes the APDU responses returned by the SAM to all commands.
-   *
-   * @param apduResponses The list of APDU responses.
-   */
-  private void processApduResponses(List<ApduResponseApi> apduResponses) {
     if (!commands.isEmpty()) {
       parseApduResponses(commands, apduResponses);
     }
-  }
-
-  /**
-   * Validates and returns the LegacySam adapter.
-   *
-   * @param cardSelectionResponseApi The response to the initial card selection request.
-   * @return The LegacySam adapter.
-   * @throws ParseException If conditions for creating a LegacySam are not met.
-   */
-  private SmartCardSpi validateAndReturnLegacySam(CardSelectionResponseApi cardSelectionResponseApi)
-      throws ParseException {
-    if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
-        && cardSelectionResponseApi.getSelectApplicationResponse() == null
-        && cardSelectionResponseApi.getPowerOnData() == null) {
-
-      throw new ParseException(
-          "Unable to create a LegacySam: no power-on data and no FCI provided.");
-    }
-    return legacySamAdapter;
   }
 
   /**
