@@ -6,7 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Upgraded
-- "Keypop Calypso Crypto Legacy SAM API" to version `0.4.0`.
+- Keypop Calypso Crypto Legacy SAM API `0.3.0` -> `0.4.0` (management of advanced SAM unlocking)
 
 ## [0.4.0] - 2023-11-28
 :warning: Major version! Following the migration of the "Calypsonet Terminal" APIs to the
