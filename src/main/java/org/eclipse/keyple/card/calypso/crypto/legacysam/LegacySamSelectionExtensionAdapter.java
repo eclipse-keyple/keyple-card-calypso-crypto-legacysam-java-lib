@@ -336,13 +336,15 @@ final class LegacySamSelectionExtensionAdapter
   }
 
   /**
-   * {@inheritDoc}
+   * Provides the {@link CardReader} for communicating with the SAM during the unlocking process
+   * when involving a static or a dynamic unlock data providers.
    *
+   * @param cardReader The card reader to be used.
+   * @return The current instance.
+   * @throws IllegalArgumentException If the provided argument is null.
    * @since 0.5.0
    */
-  @Override
-  public LegacySamSelectionExtension setSamCardReader(CardReader cardReader) {
-    Assert.getInstance().notNull(cardReader, "cardReader");
+  LegacySamSelectionExtension setSamCardReader(CardReader cardReader) {
     this.cardReader = cardReader;
     return this;
   }

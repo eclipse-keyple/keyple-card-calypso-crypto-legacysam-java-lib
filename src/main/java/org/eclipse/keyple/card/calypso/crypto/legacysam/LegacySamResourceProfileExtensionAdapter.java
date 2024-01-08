@@ -32,7 +32,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamResourceProfileExtensionAdapter.class);
 
-  private final LegacySamSelectionExtension legacySamSelection;
+  private final LegacySamSelectionExtensionAdapter legacySamSelection;
   private final String powerOnDataRegex;
 
   /**
@@ -40,7 +40,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
    * @since 0.1.0
    */
   LegacySamResourceProfileExtensionAdapter(
-      LegacySamSelectionExtension samSelectionExtension, String powerOnDataRegex) {
+      LegacySamSelectionExtensionAdapter samSelectionExtension, String powerOnDataRegex) {
     this.legacySamSelection = samSelectionExtension;
     this.powerOnDataRegex = powerOnDataRegex;
   }

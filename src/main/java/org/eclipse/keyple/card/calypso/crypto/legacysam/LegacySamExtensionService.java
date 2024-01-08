@@ -78,7 +78,12 @@ public final class LegacySamExtensionService implements KeypleCardExtension {
   public CardResourceProfileExtension createLegacySamResourceProfileExtension(
       LegacySamSelectionExtension legacySamSelection) {
     Assert.getInstance().notNull(legacySamSelection, "Legacy SAM selection");
-    return new LegacySamResourceProfileExtensionAdapter(legacySamSelection, null);
+    if (!(legacySamSelection instanceof LegacySamSelectionExtensionAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided 'legacySamSelection' must be an instance of 'LegacySamSelectionExtensionAdapter'");
+    }
+    return new LegacySamResourceProfileExtensionAdapter(
+        (LegacySamSelectionExtensionAdapter) legacySamSelection, null);
   }
 
   /**
@@ -96,7 +101,12 @@ public final class LegacySamExtensionService implements KeypleCardExtension {
     Assert.getInstance()
         .notNull(legacySamSelection, "Legacy SAM selection")
         .notEmpty(powerOnDataRegex, "powerOnDataRegex");
-    return new LegacySamResourceProfileExtensionAdapter(legacySamSelection, powerOnDataRegex);
+    if (!(legacySamSelection instanceof LegacySamSelectionExtensionAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided 'legacySamSelection' must be an instance of 'LegacySamSelectionExtensionAdapter'");
+    }
+    return new LegacySamResourceProfileExtensionAdapter(
+        (LegacySamSelectionExtensionAdapter) legacySamSelection, powerOnDataRegex);
   }
 
   /**

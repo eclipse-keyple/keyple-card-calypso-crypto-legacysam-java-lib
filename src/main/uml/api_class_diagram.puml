@@ -1,6 +1,6 @@
 @startuml
 title
-    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.4.+ (2023-09-19)
+    Keyple - keyple-card-calypso-crypto-legacysam-java-lib - 0.5.+ (2024-01-08)
 end title
 
 ' == THEME ==
@@ -60,24 +60,24 @@ legend top
 end legend
 
 package "org.eclipse.keyple.card.calypso.crypto.legacysam" as legacysam {
-    +class "<<<back:cyan>KeypleCardExtension</back>>>\n<color:blue>**final** LegacySamExtensionService" as LegacySamExtensionService <<green>> {
+    +class "<<<back:cyan>KeypleCardExtension</back>>>\n**final** LegacySamExtensionService" as LegacySamExtensionService <<green>> {
         --
         +{static} LegacySamExtensionService getInstance ()
 
-        +<color:blue>ContextSetting getContextSetting ()
+        +ContextSetting getContextSetting ()
 
         +<back:lightgreen>LegacySamApiFactory</back> getLegacySamApiFactory ()
 
-        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen><color:blue>LegacySamSelectionExtension</color></back> legacySamSelectionExtension)
-        +<color:blue><back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension)
+        +<back:orange>CardResourceProfileExtension</back> createLegacySamResourceProfileExtension (<back:lightgreen>LegacySamSelectionExtension</back> legacySamSelectionExtension, String powerOnDataRegex)
 
         -- **KeypleCardExtension** --
         +String getCommonApiVersion ()
         +String getReaderApiVersion ()
         +String getCardApiVersion ()
     }
-    +interface "<color:blue>ContextSetting" as ContextSetting {
-        +<color:blue>ContextSetting setContactReaderPayloadCapacity (int payloadCapacity)
+    +interface "ContextSetting" as ContextSetting {
+        +ContextSetting setContactReaderPayloadCapacity (int payloadCapacity)
     }
     +class "**final** LegacySamUtil" as LegacySamUtil <<green>> {
         +{static} String buildPowerOnDataFilter (<back:lightgreen>LegacySam.ProductType</back> productType, String serialNumberRegex)
