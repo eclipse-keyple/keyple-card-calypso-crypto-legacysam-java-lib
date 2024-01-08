@@ -91,21 +91,24 @@ final class LegacySamSelectionExtensionAdapter
   public CardSelectionRequestSpi getCardSelectionRequest() {
 
     List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
-    // Do not add command for now when using an Unlock Data provider
-    if (unlockSettingType == UnlockSettingType.UNSET
-        || unlockSettingType == UnlockSettingType.UNLOCK_DATA) {
-      if (unlockSettingType == UnlockSettingType.UNLOCK_DATA) {
+    switch (unlockSettingType) {
+      case UNLOCK_DATA: // NOSONAR
+        // prepare the UNLOCK command and put it in first position
         CommandUnlock commandUnlock = new CommandUnlock(unlockProductType, unlockDataBytes);
         commandUnlock.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
-        // prepare the UNLOCK command and put it in first position
         commands.add(0, commandUnlock);
-      }
-      for (Command command : commands) {
-        cardSelectionApduRequests.add(command.getApduRequest());
-      }
-    } else if (unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
-      commandGetChallenge = new CommandGetChallenge(context, 8);
-      cardSelectionApduRequests.add(commandGetChallenge.getApduRequest());
+        // no break
+      case UNSET:
+        for (Command command : commands) {
+          cardSelectionApduRequests.add(command.getApduRequest());
+        }
+        break;
+      case DYNAMIC_MODE_PROVIDER:
+        // Do not add command for now when using an Unlock Data provider
+        commandGetChallenge = new CommandGetChallenge(context, 8);
+        cardSelectionApduRequests.add(commandGetChallenge.getApduRequest());
+        break;
+      default:
     }
     if (cardSelectionApduRequests.isEmpty()) {
       return new CardSelectionRequestAdapter(null);
