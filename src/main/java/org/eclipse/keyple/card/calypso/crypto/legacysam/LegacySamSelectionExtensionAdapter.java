@@ -57,6 +57,9 @@ final class LegacySamSelectionExtensionAdapter
   private final List<Command> commands;
   private CardReader targetSamReader;
   private CommandGetChallenge commandGetChallenge;
+  private UnlockSettingType unlockSettingType;
+  private LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider;
+  private LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider;
 
   private enum UnlockSettingType {
     UNSET,
@@ -64,10 +67,6 @@ final class LegacySamSelectionExtensionAdapter
     STATIC_MODE_PROVIDER,
     DYNAMIC_MODE_PROVIDER
   }
-
-  private UnlockSettingType unlockSettingType = UnlockSettingType.UNSET;
-  private LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider;
-  private LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider;
 
   /**
    * Creates a {@link LegacySamSelectionExtension}.
@@ -78,6 +77,7 @@ final class LegacySamSelectionExtensionAdapter
     legacySamAdapter = new LegacySamAdapter(LegacySam.ProductType.SAM_C1);
     context = new CommandContextDto(legacySamAdapter, null, null);
     commands = new ArrayList<Command>();
+    unlockSettingType = UnlockSettingType.UNSET;
   }
 
   /**
