@@ -52,11 +52,11 @@ final class LegacySamSelectionExtensionAdapter
   private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
   private static final String MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET =
       "A setting to unlock the SAM has already been set";
-  LegacySamAdapter legacySamAdapter;
-  CommandContextDto context;
+  private final LegacySamAdapter legacySamAdapter;
+  private final CommandContextDto context;
   private final List<Command> commands;
   private CardReader targetSamReader;
-  private CommandGetChallenge getChallengeCommand;
+  private CommandGetChallenge commandGetChallenge;
 
   private enum UnlockSettingType {
     UNSET,
@@ -96,8 +96,8 @@ final class LegacySamSelectionExtensionAdapter
         cardSelectionApduRequests.add(command.getApduRequest());
       }
     } else if (unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
-      getChallengeCommand = new CommandGetChallenge(context, 8);
-      cardSelectionApduRequests.add(getChallengeCommand.getApduRequest());
+      commandGetChallenge = new CommandGetChallenge(context, 8);
+      cardSelectionApduRequests.add(commandGetChallenge.getApduRequest());
     }
     if (cardSelectionApduRequests.isEmpty()) {
       return new CardSelectionRequestAdapter(null);
@@ -115,7 +115,7 @@ final class LegacySamSelectionExtensionAdapter
   public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi)
       throws ParseException {
     try {
-      initializeLegacySamAdapter(cardSelectionResponseApi);
+      legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
       CardResponseApi cardResponse = handleUnlockCommand(cardSelectionResponseApi);
       List<ApduResponseApi> apduResponses = validateAndFetchResponses(cardResponse);
       processApduResponses(apduResponses);
@@ -123,15 +123,6 @@ final class LegacySamSelectionExtensionAdapter
       throw new ParseException("Invalid card response: " + e.getMessage(), e);
     }
     return validateAndReturnLegacySam(cardSelectionResponseApi);
-  }
-
-  /**
-   * Initializes the LegacySamAdapter with the given CardSelectionResponseApi.
-   *
-   * @param cardSelectionResponseApi The response to the initial card selection request.
-   */
-  private void initializeLegacySamAdapter(CardSelectionResponseApi cardSelectionResponseApi) {
-    legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
   }
 
   /**
@@ -151,7 +142,7 @@ final class LegacySamSelectionExtensionAdapter
       if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER) {
         unlockData = staticUnlockDataProvider.getUnlockData(legacySamAdapter.getSerialNumber());
       } else {
-        getChallengeCommand.parseResponse(cardResponse.getApduResponses().get(0));
+        commandGetChallenge.parseResponse(cardResponse.getApduResponses().get(0));
         unlockData =
             dynamicUnlockDataProvider.getUnlockData(
                 legacySamAdapter.getSerialNumber(), legacySamAdapter.popChallenge());
