@@ -60,6 +60,8 @@ final class LegacySamSelectionExtensionAdapter
   private UnlockSettingType unlockSettingType;
   private LegacySamStaticUnlockDataProviderSpi staticUnlockDataProvider;
   private LegacySamDynamicUnlockDataProviderSpi dynamicUnlockDataProvider;
+  private byte[] unlockDataBytes;
+  private LegacySam.ProductType unlockProductType;
 
   private enum UnlockSettingType {
     UNSET,
@@ -92,6 +94,12 @@ final class LegacySamSelectionExtensionAdapter
     // Do not add command for now when using an Unlock Data provider
     if (unlockSettingType == UnlockSettingType.UNSET
         || unlockSettingType == UnlockSettingType.UNLOCK_DATA) {
+      if (unlockSettingType == UnlockSettingType.UNLOCK_DATA) {
+        CommandUnlock commandUnlock = new CommandUnlock(unlockProductType, unlockDataBytes);
+        commandUnlock.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
+        // prepare the UNLOCK command and put it in first position
+        commands.add(0, commandUnlock);
+      }
       for (Command command : commands) {
         cardSelectionApduRequests.add(command.getApduRequest());
       }
@@ -142,6 +150,7 @@ final class LegacySamSelectionExtensionAdapter
     CardResponseApi cardResponse = cardSelectionResponseApi.getCardResponse();
     if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER
         || unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
+
       byte[] unlockData;
       if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER) {
         unlockData = staticUnlockDataProvider.getUnlockData(legacySamAdapter.getSerialNumber());
@@ -253,10 +262,8 @@ final class LegacySamSelectionExtensionAdapter
         .isTrue(unlockData.length() == 32, "unlock data length")
         .isHexString(unlockData, "unlockData")
         .notNull(productType, "productType");
-    CommandUnlock unlockCommand = new CommandUnlock(productType, HexUtil.toByteArray(unlockData));
-    unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
-    // prepare the UNLOCK command and put it in first position
-    commands.add(0, unlockCommand);
+    unlockProductType = productType;
+    unlockDataBytes = HexUtil.toByteArray(unlockData);
     unlockSettingType = UnlockSettingType.UNLOCK_DATA;
     return this;
   }
