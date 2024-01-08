@@ -124,7 +124,6 @@ final class LegacySamSelectionExtensionAdapter
     if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
         && cardSelectionResponseApi.getSelectApplicationResponse() == null
         && cardSelectionResponseApi.getPowerOnData() == null) {
-
       throw new ParseException(
           "Unable to create a LegacySam: no power-on data and no FCI provided.");
     }
