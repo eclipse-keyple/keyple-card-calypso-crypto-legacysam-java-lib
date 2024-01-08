@@ -70,26 +70,26 @@ public final class LegacySamExtensionService implements KeypleCardExtension {
   /**
    * Returns a {@link CardResourceProfileExtension} to be used with the card resource service.
    *
-   * @param legacySamSelection The legacy SAM selection extension to use.
+   * @param legacySamSelectionExtension The legacy SAM selection extension to use.
    * @return A not null reference.
    * @throws IllegalArgumentException If no SAM selection is provided.
    * @since 0.2.0
    */
   public CardResourceProfileExtension createLegacySamResourceProfileExtension(
-      LegacySamSelectionExtension legacySamSelection) {
-    Assert.getInstance().notNull(legacySamSelection, "Legacy SAM selection");
-    if (!(legacySamSelection instanceof LegacySamSelectionExtensionAdapter)) {
+      LegacySamSelectionExtension legacySamSelectionExtension) {
+    Assert.getInstance().notNull(legacySamSelectionExtension, "Legacy SAM selection");
+    if (!(legacySamSelectionExtension instanceof LegacySamSelectionExtensionAdapter)) {
       throw new IllegalArgumentException(
-          "The provided 'legacySamSelection' must be an instance of 'LegacySamSelectionExtensionAdapter'");
+          "The provided 'legacySamSelectionExtension' must be an instance of 'LegacySamSelectionExtensionAdapter'");
     }
     return new LegacySamResourceProfileExtensionAdapter(
-        (LegacySamSelectionExtensionAdapter) legacySamSelection, null);
+        (LegacySamSelectionExtensionAdapter) legacySamSelectionExtension, null);
   }
 
   /**
    * Returns a {@link CardResourceProfileExtension} to be used with the card resource service.
    *
-   * @param legacySamSelection The legacy SAM selection extension to use.
+   * @param legacySamSelectionExtension The legacy SAM selection extension to use.
    * @param powerOnDataRegex A regular expression.
    * @return A not null reference.
    * @throws IllegalArgumentException If no SAM selection is provided.
@@ -97,16 +97,16 @@ public final class LegacySamExtensionService implements KeypleCardExtension {
    * @since 0.2.0
    */
   public CardResourceProfileExtension createLegacySamResourceProfileExtension(
-      LegacySamSelectionExtension legacySamSelection, String powerOnDataRegex) {
+      LegacySamSelectionExtension legacySamSelectionExtension, String powerOnDataRegex) {
     Assert.getInstance()
-        .notNull(legacySamSelection, "Legacy SAM selection")
+        .notNull(legacySamSelectionExtension, "Legacy SAM selection")
         .notEmpty(powerOnDataRegex, "powerOnDataRegex");
-    if (!(legacySamSelection instanceof LegacySamSelectionExtensionAdapter)) {
+    if (!(legacySamSelectionExtension instanceof LegacySamSelectionExtensionAdapter)) {
       throw new IllegalArgumentException(
-          "The provided 'legacySamSelection' must be an instance of 'LegacySamSelectionExtensionAdapter'");
+          "The provided 'legacySamSelectionExtension' must be an instance of 'LegacySamSelectionExtensionAdapter'");
     }
     return new LegacySamResourceProfileExtensionAdapter(
-        (LegacySamSelectionExtensionAdapter) legacySamSelection, powerOnDataRegex);
+        (LegacySamSelectionExtensionAdapter) legacySamSelectionExtension, powerOnDataRegex);
   }
 
   /**

@@ -421,7 +421,7 @@ final class LegacySamSelectionExtensionAdapter
    * @return The current instance.
    * @since 0.5.0
    */
-  LegacySamSelectionExtension setSamCardReader(CardReader targetSamReader) {
+  LegacySamSelectionExtension setSamReader(CardReader targetSamReader) {
     this.targetSamReader = targetSamReader;
     return this;
   }
