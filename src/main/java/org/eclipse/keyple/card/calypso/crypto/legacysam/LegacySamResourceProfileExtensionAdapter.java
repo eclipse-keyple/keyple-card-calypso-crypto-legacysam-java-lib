@@ -32,7 +32,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamResourceProfileExtensionAdapter.class);
 
-  private final LegacySamSelectionExtension legacySamSelection;
+  private final LegacySamSelectionExtensionAdapter legacySamSelectionExtension;
   private final String powerOnDataRegex;
 
   /**
@@ -40,8 +40,8 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
    * @since 0.1.0
    */
   LegacySamResourceProfileExtensionAdapter(
-      LegacySamSelectionExtension samSelectionExtension, String powerOnDataRegex) {
-    this.legacySamSelection = samSelectionExtension;
+      LegacySamSelectionExtensionAdapter samSelectionExtension, String powerOnDataRegex) {
+    this.legacySamSelectionExtension = samSelectionExtension;
     this.powerOnDataRegex = powerOnDataRegex;
   }
 
@@ -61,7 +61,8 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
       cardSelector.filterByPowerOnData(powerOnDataRegex);
     }
     CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();
-    samCardSelectionManager.prepareSelection(cardSelector, legacySamSelection);
+    legacySamSelectionExtension.setSamReader(reader);
+    samCardSelectionManager.prepareSelection(cardSelector, legacySamSelectionExtension);
     CardSelectionResult samCardSelectionResult = null;
     try {
       samCardSelectionResult = samCardSelectionManager.processCardSelectionScenario(reader);

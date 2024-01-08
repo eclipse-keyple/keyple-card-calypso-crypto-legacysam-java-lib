@@ -51,7 +51,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private final Map<Integer, CounterIncrementAccess> countersIncrementConfig =
       new HashMap<Integer, CounterIncrementAccess>();
   private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<Integer, Integer>();
-  private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParamterMap =
+  private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParameterMap =
       new HashMap<SystemKeyType, KeyParameterAdapter>(); // NOSONAR JSON serializer
   private byte[] challenge;
 
@@ -383,7 +383,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.3.0
    */
   void setSystemKeyParameter(SystemKeyType systemKeyType, KeyParameterAdapter keyParameter) {
-    systemKeyParamterMap.put(systemKeyType, keyParameter);
+    systemKeyParameterMap.put(systemKeyType, keyParameter);
   }
 
   /**
@@ -393,7 +393,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    */
   @Override
   public KeyParameter getSystemKeyParameter(SystemKeyType systemKeyType) {
-    return systemKeyParamterMap.get(systemKeyType);
+    return systemKeyParameterMap.get(systemKeyType);
   }
 
   /**
