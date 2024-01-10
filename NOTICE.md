@@ -45,7 +45,7 @@ Keypop Calypso Card API
 
 * License: [MIT](https://opensource.org/licenses/MIT)
 * Sources: https://github.com/eclipse-keypop/keypop-calypso-card-java-api
-*
+
 Keypop Calypso Crypto Legacy SAM API
 
 * License: [MIT](https://opensource.org/licenses/MIT)

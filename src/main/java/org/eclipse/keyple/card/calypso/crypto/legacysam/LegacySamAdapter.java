@@ -64,7 +64,9 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.4.0
    */
   LegacySamAdapter(ProductType productType) {
-    this.samProductType = productType;
+    samProductType = productType;
+    // CL-CLA-SAM.1
+    classByte = computeClassByte(samProductType);
   }
 
   /**
@@ -158,7 +160,11 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
       softwareRevision = 0;
     }
     // CL-CLA-SAM.1
-    classByte = samProductType == ProductType.SAM_S1DX ? (byte) 0x94 : (byte) 0x80;
+    classByte = computeClassByte(samProductType);
+  }
+
+  private static byte computeClassByte(ProductType productType) {
+    return productType == ProductType.SAM_S1DX ? (byte) 0x94 : (byte) 0x80;
   }
 
   /**

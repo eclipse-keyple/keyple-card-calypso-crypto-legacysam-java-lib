@@ -150,9 +150,15 @@ final class LegacySamSelectionExtensionAdapter
    */
   private CardResponseApi getCardResponse(CardSelectionResponseApi cardSelectionResponseApi)
       throws AbstractApduException, CommandException {
+
     CardResponseApi cardResponse = cardSelectionResponseApi.getCardResponse();
+
     if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER
         || unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
+
+      if (targetSamReader == null) {
+        throw new IllegalStateException("targetSamReader is not set");
+      }
 
       byte[] unlockData;
       if (unlockSettingType == UnlockSettingType.STATIC_MODE_PROVIDER) {
