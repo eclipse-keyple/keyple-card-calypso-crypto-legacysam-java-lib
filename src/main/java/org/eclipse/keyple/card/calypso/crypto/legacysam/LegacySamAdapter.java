@@ -163,7 +163,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
     classByte = computeClassByte(samProductType);
   }
 
-  private byte computeClassByte(ProductType productType) {
+  private static byte computeClassByte(ProductType productType) {
     return productType == ProductType.SAM_S1DX ? (byte) 0x94 : (byte) 0x80;
   }
 
