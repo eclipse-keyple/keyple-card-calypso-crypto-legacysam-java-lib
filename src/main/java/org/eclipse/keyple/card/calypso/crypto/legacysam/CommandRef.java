@@ -42,8 +42,9 @@ enum CommandRef {
   PSO_VERIFY_SIGNATURE("PSO Verify Signature", (byte) 0x2A),
   SAM_DATA_CIPHER("SAM Data Cipher", (byte) 0x16),
   WRITE_CEILINGS("Write Ceilings", (byte) 0xD8),
-  ;
-
+  GET_DATA("Get Data", (byte) 0xCA),
+  PSO_COMPUTE_CERTIFICATE("PSO Compute Certificate", (byte) 0x2A),
+  CARD_GENERATE_ASYMMETRIC_KEY_PAIR("Card Generate Asymmetric Key Pair", (byte) 0x46);
   /** The name. */
   private final String name;
 

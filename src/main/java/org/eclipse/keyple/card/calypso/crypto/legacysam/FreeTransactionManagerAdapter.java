@@ -18,6 +18,7 @@ import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keypop.card.ProxyReaderApi;
@@ -50,6 +51,41 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   FreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
     super(targetSamReader, targetSam, null, null);
     samKeyDiversifier = targetSam.getSerialNumber();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareGetTag(GetDataTag tag) {
+    Assert.getInstance().notNull(tag, "tag");
+    addTargetSamCommand(new CommandGetData(getContext(), tag));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareGenerateCardAsymmetricKeyPair(
+      KeyPairContainer keyPairContainer) {
+    addTargetSamCommand(new CommandCardGenerateAsymmetricKeyPair(getContext(), keyPairContainer));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareComputeCardCertificate(CardCertificateComputationData data) {
+    addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
+    return this;
   }
 
   /**

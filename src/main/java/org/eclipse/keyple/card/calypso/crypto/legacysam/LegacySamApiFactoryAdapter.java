@@ -134,6 +134,26 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
   /**
    * {@inheritDoc}
    *
+   * @since 0.6.0
+   */
+  @Override
+  public KeyPairContainer createKeyPairContainer() {
+    return new DtoAdapters.KeyPairContainerAdapter();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public CardCertificateComputationData createCardCertificateComputationData() {
+    return new DtoAdapters.CardCertificateComputationDataAdapter();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.4.0
    */
   @Override
