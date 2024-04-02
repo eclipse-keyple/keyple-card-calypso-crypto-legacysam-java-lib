@@ -11,7 +11,6 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import java.nio.ByteBuffer;
 import java.util.*;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -22,8 +21,6 @@ import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.eclipse.keypop.card.spi.CardSelectionRequestSpi;
-
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstant.TagData.CARD_PUBLIC_KEY_DATA;
 
 /**
  * Contains all DTO adapters.
@@ -854,6 +851,7 @@ final class DtoAdapters {
    * @since 0.6.0
    */
   static class CardCertificateComputationDataAdapter implements CardCertificateComputationData {
+
     private byte[] cardPublicKey;
     long startDateBcd;
     long endDateBcd;
@@ -956,53 +954,61 @@ final class DtoAdapters {
     }
 
     /**
-     * Generates the public key data for the card certificate generation.
-     *
-     * @return A byte array containing the public key data.
-     * @since 0.6.0
-     */
-    byte[] generateCardPublicKeyData() {
-      // allocate buffer size according to the presence of cardPublicKey
-      ByteBuffer cardPublicKeyData = ByteBuffer.allocate(cardPublicKey == null ? 66 : 130);
-      // BER-TLV header
-      cardPublicKeyData.put(CARD_PUBLIC_KEY_DATA.getHeader());
-      // AID length
-      cardPublicKeyData.put((byte) aid.length);
-      // AID
-      cardPublicKeyData.put(aid);
-      // AID padding
-      for (int i = 0; i < LegacySamConstant.AID_SIZE_MAX - aid.length; i++) {
-        cardPublicKeyData.put((byte) 0);
-      }
-      // serial number
-      cardPublicKeyData.put(serialNumber);
-      // RFU
-      cardPublicKeyData.putInt(0);
-      // start date
-      cardPublicKeyData.putInt((int) startDateBcd);
-      // end date
-      cardPublicKeyData.putInt((int) endDateBcd);
-      // Rights (RFU)
-      cardPublicKeyData.put((byte) 0);
-      // Startup information
-      cardPublicKeyData.put(startupInfo);
-      // RFU
-      cardPublicKeyData.put(new byte[18]);
-      // public key if provided
-      if (cardPublicKey != null) {
-        cardPublicKeyData.put(cardPublicKey);
-      }
-      return cardPublicKeyData.array();
-    }
-
-    /**
      * Sets the computed certificate.
      *
      * @param cardCertificate A 316-byte byte array.
      * @since 0.6.0
      */
-    public void setCertificate(byte[] cardCertificate) {
+    void setCertificate(byte[] cardCertificate) {
       this.certificate = cardCertificate;
+    }
+
+    /**
+     * @return The card's public key or null if the key is not set.
+     * @since 0.6.0
+     */
+    byte[] getCardPublicKey() {
+      return cardPublicKey;
+    }
+
+    /**
+     * @return The start date in BCD format.
+     * @since 0.6.0
+     */
+    long getStartDateBcd() {
+      return startDateBcd;
+    }
+
+    /**
+     * @return The end date in BCD format.
+     * @since 0.6.0
+     */
+    long getEndDateBcd() {
+      return endDateBcd;
+    }
+
+    /**
+     * @return The card AID.
+     * @since 0.6.0
+     */
+    byte[] getAid() {
+      return aid;
+    }
+
+    /**
+     * @return The card serial number.
+     * @since 0.6.0
+     */
+    byte[] getSerialNumber() {
+      return serialNumber;
+    }
+
+    /**
+     * @return The card startup information.
+     * @since 0.6.0
+     */
+    byte[] getStartupInfo() {
+      return startupInfo;
     }
   }
 }

@@ -12,7 +12,9 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstant.TagData.CARD_PUBLIC_KEY_DATA;
 
+import java.nio.ByteBuffer;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,7 +78,54 @@ final class CommandPsoComputeCertificate extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(
-            ApduUtil.build(cla, inst, p1, p2, this.data.generateCardPublicKeyData(), (byte) 0xFF)));
+            ApduUtil.build(cla, inst, p1, p2, generateCardPublicKeyData(this.data), (byte) 0xFF)));
+  }
+
+  /**
+   * Generates the public key data for the card certificate generation.
+   *
+   * @return A byte array containing the public key data.
+   */
+  private byte[] generateCardPublicKeyData(CardCertificateComputationDataAdapter data) {
+    // BER-TLV header
+    byte[] header = CARD_PUBLIC_KEY_DATA.getHeader();
+    // allocate buffer size according to the presence of cardPublicKey, adjust length byte
+    // accordingly
+    ByteBuffer cardPublicKeyData;
+    if (data.getCardPublicKey() == null) {
+      cardPublicKeyData = ByteBuffer.allocate(66);
+    } else {
+      cardPublicKeyData = ByteBuffer.allocate(66 + LegacySamConstant.ECC_PUBLIC_KEY_SIZE);
+      header[2] += LegacySamConstant.ECC_PUBLIC_KEY_SIZE; // adjust length
+    }
+    cardPublicKeyData.put(header);
+    // AID length
+    cardPublicKeyData.put((byte) data.getAid().length);
+    // AID
+    cardPublicKeyData.put(data.getAid());
+    // AID padding
+    for (int i = 0; i < LegacySamConstant.AID_SIZE_MAX - data.getAid().length; i++) {
+      cardPublicKeyData.put((byte) 0);
+    }
+    // serial number
+    cardPublicKeyData.put(data.getSerialNumber());
+    // RFU
+    cardPublicKeyData.putInt(0);
+    // start date
+    cardPublicKeyData.putInt((int) data.getStartDateBcd());
+    // end date
+    cardPublicKeyData.putInt((int) data.getEndDateBcd());
+    // Rights (RFU)
+    cardPublicKeyData.put((byte) 0);
+    // Startup information
+    cardPublicKeyData.put(data.getStartupInfo());
+    // RFU
+    cardPublicKeyData.put(new byte[18]);
+    // public key if provided
+    if (data.getCardPublicKey() != null) {
+      cardPublicKeyData.put(data.getCardPublicKey());
+    }
+    return cardPublicKeyData.array();
   }
 
   /**
