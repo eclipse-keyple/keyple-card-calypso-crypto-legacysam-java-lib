@@ -45,6 +45,7 @@ enum CommandRef {
   GET_DATA("Get Data", (byte) 0xCA),
   PSO_COMPUTE_CERTIFICATE("PSO Compute Certificate", (byte) 0x2A),
   CARD_GENERATE_ASYMMETRIC_KEY_PAIR("Card Generate Asymmetric Key Pair", (byte) 0x46);
+
   /** The name. */
   private final String name;
 
