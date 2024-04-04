@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 import java.util.*;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
@@ -126,6 +127,14 @@ public final class FreeTransactionManagerAdapterTest {
           + "FAF4404142430445464748494AC4"
           + SAM_SERIAL_NUMBER
           + "FAFF408000009000";
+
+  private static final String CA_CERTIFICATE =
+      "90010BA000000291A0000101B00100000000000000000000000000000000020B"
+          + "A000000291A00100024001000000000000000000AEC8E0EA000000002024022200000000090100000000FF00000000000000000000000000000000000000AE0E22FC13DA303EDEC0B02E89FC5BCDD1CED8123BAD3877C2C68BDB162C5C63DF6FA9BE454ADD615D42D1FD4372A87F0368F0F2603C6CB12CFE3583891D2DA71185FC9E3EB9894BD60447CA88200ED35E42AB08EC8606E0782D6005AEE9D282EE1B98510E39D747C5070E383E8519720CD79F123B584E3DB31E05A6348369347EF0D8C4E38A4553C26B518F235E4459534A990C680F596A19DF87C08F8124B8EA64E1245A38BA31A2D400B36CEC7E72C5EE4EDD4C3FA7D2C8BB2A631609C341EF9187FF80D21CF417EBE9328D07CA64F4AA40250B285559041BC64D24F5CCCC90B06C8EFFF0C80BADAB4D2D2ABBD21241490805A27AF1B41A282D67D61885CBDD23F87271ABD1989C954B3146AE38AE2581DEFE8D48840F9075B9430CDD8ECB1916";
+  private static final String C_GET_DATA_CA_CERTIFICATE = "80CADF43FF";
+
+  private static final String R_GET_DATA_CA_CERTIFICATE = "DF43820180" + CA_CERTIFICATE + "9000";
+
   private final Map<SystemKeyType, Byte> systemKeyTypeToKifMap =
       new HashMap<SystemKeyType, Byte>() {
         {
@@ -2062,5 +2071,31 @@ public final class FreeTransactionManagerAdapterTest {
         .transmitCardRequest(
             argThat(new CardRequestMatcher(cardRequest2)), any(ChannelControl.class));
     verifyNoMoreInteractions(samReader);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareGetData_whenTagIsNull_shouldThrowIAE() {
+    samTransactionManager.prepareGetTag(null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareGetData_whenTagIsCorrect_shouldBeSuccessful() {
+    CardRequestSpi cardRequest = createCardRequest(C_GET_DATA_CA_CERTIFICATE);
+    CardResponseApi cardResponse = createCardResponse(R_GET_DATA_CA_CERTIFICATE);
+
+    when(samReader.transmitCardRequest(
+            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+        .thenReturn(cardResponse);
+    samTransactionManager.prepareGetTag(GetDataTag.CA_CERTIFICATE).processCommands();
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareGenerateCardAsymmetricKeyPair_whenKeyPairContainerIsNull_shouldThrowIAE() {
+    samTransactionManager.prepareGenerateCardAsymmetricKeyPair(null);
+  }
+
+  @Test(expected = IllegalArgumentException.class)
+  public void prepareComputeCardCertificate_whenDataIsNull_shouldThrowIAE() {
+    samTransactionManager.prepareComputeCardCertificate(null);
   }
 }

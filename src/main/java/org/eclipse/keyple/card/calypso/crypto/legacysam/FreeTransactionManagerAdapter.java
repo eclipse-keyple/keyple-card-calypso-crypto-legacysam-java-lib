@@ -73,6 +73,11 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public FreeTransactionManager prepareGenerateCardAsymmetricKeyPair(
       KeyPairContainer keyPairContainer) {
+    Assert.getInstance().notNull(keyPairContainer, "keyPairContainer");
+    if (!(keyPairContainer instanceof KeyPairContainerAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided keyPairContainer must be an instance of 'KeyPairContainerAdapter'");
+    }
     addTargetSamCommand(new CommandCardGenerateAsymmetricKeyPair(getContext(), keyPairContainer));
     return this;
   }
@@ -84,6 +89,11 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
    */
   @Override
   public FreeTransactionManager prepareComputeCardCertificate(CardCertificateComputationData data) {
+    Assert.getInstance().notNull(data, "data");
+    if (!(data instanceof CardCertificateComputationDataAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided data must be an instance of 'CardCertificateComputationDataAdapter'");
+    }
     addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
     return this;
   }
