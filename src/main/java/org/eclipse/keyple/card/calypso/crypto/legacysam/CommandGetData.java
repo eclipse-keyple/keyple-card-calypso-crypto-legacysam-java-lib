@@ -108,13 +108,9 @@ final class CommandGetData extends Command {
           throw new DataAccessException("Inconsistent BER-TLV tag");
         }
       }
-      if (tag == GetDataTag.CA_CERTIFICATE) {
-        getContext()
-            .getTargetSam()
-            .setCaCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
-      } else if (tag == null) {
-        throw new NullPointerException();
-      }
+      getContext()
+          .getTargetSam()
+          .setCaCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
     } else {
       throw new UnexpectedResponseLengthException("Incorrect response length: " + dataOut.length);
     }
