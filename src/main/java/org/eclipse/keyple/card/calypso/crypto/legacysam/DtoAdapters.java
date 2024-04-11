@@ -855,8 +855,8 @@ final class DtoAdapters {
   static class CardCertificateComputationDataAdapter implements CardCertificateComputationData {
 
     private byte[] cardPublicKey;
-    long startDateBcd;
-    long endDateBcd;
+    private long startDateBcd;
+    private long endDateBcd;
     private byte[] aid;
     private byte[] serialNumber;
     private byte[] startupInfo;

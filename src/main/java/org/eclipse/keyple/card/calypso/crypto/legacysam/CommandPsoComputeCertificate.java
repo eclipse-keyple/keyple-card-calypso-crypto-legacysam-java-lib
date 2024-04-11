@@ -68,7 +68,10 @@ final class CommandPsoComputeCertificate extends Command {
    */
   CommandPsoComputeCertificate(CommandContextDto context, CardCertificateComputationData data) {
 
-    super(CommandRef.PSO_COMPUTE_CERTIFICATE, 0, context);
+    super(
+        CommandRef.PSO_COMPUTE_CERTIFICATE,
+        LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getTotalLength(),
+        context);
     this.data = (CardCertificateComputationDataAdapter) data;
 
     final byte cla = context.getTargetSam().getClassByte();
@@ -167,18 +170,14 @@ final class CommandPsoComputeCertificate extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
-      if (LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getLength() != dataOut.length) {
-        // check BER-TLV header
-        byte[] header = LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getHeader();
-        for (int i = 0; i < header.length; i++) {
-          if (dataOut[i] != header[i]) {
-            throw new DataAccessException("Inconsistent BER-TLV tag");
-          }
+      // check BER-TLV header
+      byte[] header = LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getHeader();
+      for (int i = 0; i < header.length; i++) {
+        if (dataOut[i] != header[i]) {
+          throw new DataAccessException("Inconsistent BER-TLV tag");
         }
-        data.setCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
-      } else {
-        throw new UnexpectedResponseLengthException("Incorrect response length: " + dataOut.length);
       }
+      data.setCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
     }
   }
 }
