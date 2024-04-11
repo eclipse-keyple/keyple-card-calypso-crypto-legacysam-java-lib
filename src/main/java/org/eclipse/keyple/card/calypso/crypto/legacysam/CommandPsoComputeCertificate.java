@@ -96,7 +96,7 @@ final class CommandPsoComputeCertificate extends Command {
       cardPublicKeyData = ByteBuffer.allocate(66);
     } else {
       cardPublicKeyData = ByteBuffer.allocate(66 + LegacySamConstants.ECC_PUBLIC_KEY_SIZE);
-      header[2] += LegacySamConstants.ECC_PUBLIC_KEY_SIZE; // adjust length
+      header[2] = 127; // change default length
     }
     cardPublicKeyData.put(header);
     // AID length
