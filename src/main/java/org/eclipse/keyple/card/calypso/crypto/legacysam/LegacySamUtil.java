@@ -18,10 +18,10 @@ import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
  *
  * @since 0.4.0
  */
-final class LegacySamUtils {
+public final class LegacySamUtil {
 
   /** Private constructor */
-  private LegacySamUtils() {}
+  private LegacySamUtil() {}
 
   /**
    * Create a regular expression to be used as "Power on data" filter in the selection process.

@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2022 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -70,7 +70,7 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
     final byte p2 = (byte) 0x00;
     final byte[] oid = HexUtil.toByteArray("06082A8648CE3D030107");
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, oid, (byte) 0xFF)));
+    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, oid, (byte) 0x63)));
   }
 
   /**

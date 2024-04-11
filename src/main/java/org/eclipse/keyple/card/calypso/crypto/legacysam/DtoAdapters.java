@@ -885,7 +885,7 @@ final class DtoAdapters {
     public CardCertificateComputationData setStartDate(LocalDate startDate) {
       Assert.getInstance().notNull(startDate, "startDate");
       startDateBcd =
-          LegacySamUtils.convertDateToBcdLong(
+          LegacySamUtil.convertDateToBcdLong(
               startDate.getYear(), startDate.getMonthValue(), startDate.getDayOfMonth());
       return this;
     }
@@ -899,7 +899,7 @@ final class DtoAdapters {
     public CardCertificateComputationData setEndDate(LocalDate endDate) {
       Assert.getInstance().notNull(endDate, "endDate");
       endDateBcd =
-          LegacySamUtils.convertDateToBcdLong(
+          LegacySamUtil.convertDateToBcdLong(
               endDate.getYear(), endDate.getMonthValue(), endDate.getDayOfMonth());
       return this;
     }
