@@ -31,13 +31,12 @@ final class CommandWriteCeilings extends Command {
   private final transient TargetSamContextDto targetSamContext; // NOSONAR
   private final transient byte[] plainData = new byte[30]; // NOSONAR
   private final transient Map<Integer, CounterIncrementAccess> // NOSONAR
-      counterNumberToManualCounterIncrementAuthorizedMap =
-          new HashMap<Integer, CounterIncrementAccess>();
+      counterNumberToManualCounterIncrementAuthorizedMap = new HashMap<>();
   private final transient int counterFileRecordNumber; // NOSONAR
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
     m.put(
         0x6985,
@@ -118,7 +117,7 @@ final class CommandWriteCeilings extends Command {
     super(CommandRef.WRITE_CEILINGS, 0, context);
 
     this.targetSamContext = targetSamContext;
-    counterFileRecordNumber = LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber];
+    counterFileRecordNumber = LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber];
 
     plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
     addCounter(counterNumber, ceilingValue, counterIncrementAccess);

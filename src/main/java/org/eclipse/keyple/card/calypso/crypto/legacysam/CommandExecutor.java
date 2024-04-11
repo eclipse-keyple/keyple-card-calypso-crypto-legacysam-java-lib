@@ -52,7 +52,7 @@ final class CommandExecutor {
     if (commands.isEmpty()) {
       return;
     }
-    List<Command> cardRequestCommands = new ArrayList<Command>();
+    List<Command> cardRequestCommands = new ArrayList<>();
     for (Command command : commands) {
       if (command.isControlSamRequiredToFinalizeRequest()) {
         executeCommands(cardRequestCommands, samReader, false);
@@ -144,7 +144,7 @@ final class CommandExecutor {
    * @since 0.3.0
    */
   private static List<ApduRequestSpi> getApduRequests(List<? extends Command> commands) {
-    List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
+    List<ApduRequestSpi> apduRequests = new ArrayList<>();
     if (commands != null) {
       for (Command command : commands) {
         apduRequests.add(command.getApduRequest());

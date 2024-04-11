@@ -93,4 +93,25 @@ public final class LegacySamUtil {
     }
     return atrRegex;
   }
+
+  /**
+   * Converts the provided date into a long. It is in BCD format 0xYYYYMMDD, where YYYY represents
+   * the four-digit year, MM the two-digit month, and DD the two-digit day.
+   *
+   * @param year The year (0-9999).
+   * @param month The month (1-99).
+   * @param day The day (1-99).
+   * @return A long in BCD format.
+   * @since 0.6.0
+   */
+  static long convertDateToBcdLong(int year, int month, int day) {
+    long bcdYear =
+        ((long) (year / 1000) << 12)
+            | ((year / 100 % 10) << 8)
+            | ((year % 100 / 10) << 4)
+            | (year % 10);
+    long bcdMonth = ((long) (month / 10) << 4) | (month % 10);
+    long bcdDay = ((long) (day / 10) << 4) | (day % 10);
+    return (bcdYear << 16) | (bcdMonth << 8) | bcdDay;
+  }
 }

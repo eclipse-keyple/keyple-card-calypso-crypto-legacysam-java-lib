@@ -11,66 +11,69 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.ApduRequestAdapter;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.CommandContextDto;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the SAM Select Diversifier APDU command.
+ * Builds the Get Challenge APDU command.
  *
- * @since 0.1.0
+ * @since 0.6.0
  */
-final class CommandSelectDiversifier extends Command {
+final class CommandGetData extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Le.", IllegalParameterException.class));
     m.put(
-        0x6985,
-        new StatusProperties(
-            "Preconditions not satisfied: the SAM is locked.", AccessForbiddenException.class));
+        0x6A88,
+        new StatusProperties("Data referenced by P1-P2 not available.", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
+  private final GetDataTag tag;
+  private final LegacySamConstants.TagInfo tagInfo;
+
   /**
-   * Instantiates a new CommandSelectDiversifier.
+   * Instantiates a new CmdSamGetChallenge.
    *
    * @param context The command context.
-   * @param diversifier The key diversifier.
-   * @since 0.1.0
+   * @param tag The tag to retrieve the data for.
+   * @since 0.6.0
    */
-  CommandSelectDiversifier(CommandContextDto context, byte[] diversifier) {
+  CommandGetData(CommandContextDto context, GetDataTag tag) {
+    super(CommandRef.GET_DATA, getExpectedTotalLength(tag), context);
 
-    super(CommandRef.SELECT_DIVERSIFIER, 0, context);
-
-    // Format the diversifier on 4 or 8 bytes if needed.
-    if (diversifier.length != 4 && diversifier.length != 8) {
-      int newLength = diversifier.length < 4 ? 4 : 8;
-      byte[] tmp = new byte[newLength];
-      System.arraycopy(diversifier, 0, tmp, newLength - diversifier.length, diversifier.length);
-      diversifier = tmp;
-    }
+    this.tag = tag;
+    this.tagInfo = LegacySamConstants.TagInfo.valueOf(tag.name());
 
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
                 context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
-                (byte) 0,
-                (byte) 0,
-                diversifier,
-                null)));
+                tagInfo.getMsb(),
+                tagInfo.getLsb(),
+                null,
+                (byte) Math.min(tagInfo.getLength(), 255))));
+  }
+
+  private static int getExpectedTotalLength(GetDataTag tag) {
+    return LegacySamConstants.TagInfo.valueOf(tag.name()).getTotalLength();
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.6.0
    */
   @Override
   void finalizeRequest() {
@@ -80,7 +83,7 @@ final class CommandSelectDiversifier extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.6.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -90,17 +93,28 @@ final class CommandSelectDiversifier extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.6.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
+    byte[] dataOut = apduResponse.getDataOut();
+    // check BER-TLV header
+    byte[] header = tagInfo.getHeader();
+    for (int i = 0; i < header.length; i++) {
+      if (dataOut[i] != header[i]) {
+        throw new DataAccessException("Inconsistent BER-TLV tag");
+      }
+    }
+    getContext()
+        .getTargetSam()
+        .setCaCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.6.0
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {

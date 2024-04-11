@@ -109,7 +109,7 @@ class SymmetricCryptoCardTransactionManagerFactoryAdapter
 
   private void processCommand(Command command)
       throws SymmetricCryptoException, SymmetricCryptoIOException {
-    List<byte[]> transactionAuditData = new ArrayList<byte[]>();
+    List<byte[]> transactionAuditData = new ArrayList<>();
     try {
       // Get the list of C-APDU to transmit
       List<ApduRequestSpi> apduRequests =

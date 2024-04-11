@@ -31,7 +31,7 @@ abstract class CommonTransactionManagerAdapter {
   private final LegacySamAdapter targetSam;
   private final ProxyReaderApi controlSamReader;
   private final LegacySamAdapter controlSam;
-  private final List<Command> targetSamCommands = new ArrayList<Command>();
+  private final List<Command> targetSamCommands = new ArrayList<>();
 
   /**
    * Constructor

@@ -18,6 +18,7 @@ import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.ByteArrayUtil;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keypop.card.ProxyReaderApi;
@@ -50,6 +51,51 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   FreeTransactionManagerAdapter(ProxyReaderApi targetSamReader, LegacySamAdapter targetSam) {
     super(targetSamReader, targetSam, null, null);
     samKeyDiversifier = targetSam.getSerialNumber();
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareGetData(GetDataTag tag) {
+    Assert.getInstance().notNull(tag, "tag");
+    addTargetSamCommand(new CommandGetData(getContext(), tag));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareGenerateCardAsymmetricKeyPair(
+      KeyPairContainer keyPairContainer) {
+    Assert.getInstance().notNull(keyPairContainer, "keyPairContainer");
+    if (!(keyPairContainer instanceof KeyPairContainerAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided keyPairContainer must be an instance of 'KeyPairContainerAdapter'");
+    }
+    addTargetSamCommand(new CommandCardGenerateAsymmetricKeyPair(getContext(), keyPairContainer));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public FreeTransactionManager prepareComputeCardCertificate(CardCertificateComputationData data) {
+    Assert.getInstance().notNull(data, "data");
+    if (!(data instanceof CardCertificateComputationDataAdapter)) {
+      throw new IllegalArgumentException(
+          "The provided data must be an instance of 'CardCertificateComputationDataAdapter'");
+    }
+    addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
+    return this;
   }
 
   /**
@@ -260,23 +306,23 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     Assert.getInstance()
         .isInRange(
             counterNumber,
-            LegacySamConstant.MIN_COUNTER_NUMBER,
-            LegacySamConstant.MAX_COUNTER_NUMBER,
+            LegacySamConstants.MIN_COUNTER_NUMBER,
+            LegacySamConstants.MAX_COUNTER_NUMBER,
             "counterNumber");
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandReadCounter
           && ((CommandReadCounter) command).getCounterFileRecordNumber()
-              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
+              == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
     addTargetSamCommand(
         new CommandReadCounter(
-            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+            getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
     addTargetSamCommand(
         new CommandReadCounterCeiling(
-            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+            getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -303,7 +349,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public String exportTargetSamContextForAsyncTransaction() {
 
-    List<Command> commands = new ArrayList<Command>();
+    List<Command> commands = new ArrayList<>();
 
     // read system key parameters if not available
     if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
@@ -380,17 +426,17 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     }
 
     // compute needed counter file records
-    Set<Integer> counterFileRecordNumbers = new HashSet<Integer>(3);
+    Set<Integer> counterFileRecordNumbers = new HashSet<>(3);
     if (counterPersonalization != 0) {
       counterFileRecordNumbers.add(
-          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
+          LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
     }
     if (counterKeyManagement != 0) {
       counterFileRecordNumbers.add(
-          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
+          LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
     }
     if (counterReloading != 0) {
-      counterFileRecordNumbers.add(LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
+      counterFileRecordNumbers.add(LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
     }
 
     // read counters

@@ -47,13 +47,13 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private byte softwareVersion;
   private byte softwareRevision;
   private byte classByte;
-  private final SortedMap<Integer, Integer> counters = new TreeMap<Integer, Integer>();
-  private final Map<Integer, CounterIncrementAccess> countersIncrementConfig =
-      new HashMap<Integer, CounterIncrementAccess>();
-  private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<Integer, Integer>();
+  private final SortedMap<Integer, Integer> counters = new TreeMap<>();
+  private final Map<Integer, CounterIncrementAccess> countersIncrementConfig = new HashMap<>();
+  private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParameterMap =
-      new HashMap<SystemKeyType, KeyParameterAdapter>(); // NOSONAR JSON serializer
+      new HashMap<>(); // NOSONAR JSON serializer
   private byte[] challenge;
+  private byte[] caCertificate;
 
   /**
    * Constructor.
@@ -403,6 +403,16 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public byte[] getCaCertificate() {
+    return caCertificate;
+  }
+
+  /**
    * Gets the object content as a Json string.
    *
    * @return A not empty string.
@@ -432,5 +442,15 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
     byte[] res = challenge;
     challenge = null;
     return res;
+  }
+
+  /**
+   * Sets the CA certificate retrieved from the SAM.
+   *
+   * @param caCertificate The 384 bytes of the CA certificate.
+   * @since 0.6.0
+   */
+  void setCaCertificate(byte[] caCertificate) {
+    this.caCertificate = caCertificate;
   }
 }

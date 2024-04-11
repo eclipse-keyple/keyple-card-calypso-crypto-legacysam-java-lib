@@ -48,7 +48,7 @@ class CardTransactionUtil {
    * @since 2.0.0
    */
   static List<ApduRequestSpi> getApduRequests(List<Command> commands) {
-    List<ApduRequestSpi> apduRequests = new ArrayList<ApduRequestSpi>();
+    List<ApduRequestSpi> apduRequests = new ArrayList<>();
     if (commands != null) {
       for (Command command : commands) {
         apduRequests.add(command.getApduRequest());
