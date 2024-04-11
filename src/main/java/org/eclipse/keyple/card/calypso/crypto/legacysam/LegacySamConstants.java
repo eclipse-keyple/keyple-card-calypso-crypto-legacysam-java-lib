@@ -41,7 +41,7 @@ final class LegacySamConstants {
    *
    * @since 0.6.0
    */
-  enum TagData {
+  enum TagInfo {
     CA_CERTIFICATE(0xDF43, CA_CERTIFICATE_SIZE, HexUtil.toByteArray("DF43820180")),
     CARD_PUBLIC_KEY_DATA(0xDF25, 60, HexUtil.toByteArray("DF253F")),
     GENERATED_CARD_ECC_KEY_PAIR(0xDF3C, 96, HexUtil.toByteArray("DF3C60")),
@@ -55,7 +55,7 @@ final class LegacySamConstants {
     private final byte msb;
 
     /** Constructor. */
-    TagData(int value, int length, byte[] header) {
+    TagInfo(int value, int length, byte[] header) {
       this.value = value;
       this.length = length;
       this.header = header;
@@ -64,27 +64,27 @@ final class LegacySamConstants {
       this.totalLength = length + header.length;
     }
 
-    public int getValue() {
+    int getValue() {
       return value;
     }
 
-    public int getLength() {
+    int getLength() {
       return length;
     }
 
-    public int getTotalLength() {
+    int getTotalLength() {
       return totalLength;
     }
 
-    public byte[] getHeader() {
+    byte[] getHeader() {
       return header;
     }
 
-    public byte getLsb() {
+    byte getLsb() {
       return lsb;
     }
 
-    public byte getMsb() {
+    byte getMsb() {
       return msb;
     }
   }

@@ -40,7 +40,7 @@ final class CommandGetData extends Command {
   }
 
   private final GetDataTag tag;
-  private final LegacySamConstants.TagData tagData;
+  private final LegacySamConstants.TagInfo tagInfo;
 
   /**
    * Instantiates a new CmdSamGetChallenge.
@@ -53,21 +53,21 @@ final class CommandGetData extends Command {
     super(CommandRef.GET_DATA, getExpectedTotalLength(tag), context);
 
     this.tag = tag;
-    this.tagData = LegacySamConstants.TagData.valueOf(tag.name());
+    this.tagInfo = LegacySamConstants.TagInfo.valueOf(tag.name());
 
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
                 context.getTargetSam().getClassByte(),
                 getCommandRef().getInstructionByte(),
-                tagData.getMsb(),
-                tagData.getLsb(),
+                tagInfo.getMsb(),
+                tagInfo.getLsb(),
                 null,
-                (byte) Math.min(tagData.getLength(), 255))));
+                (byte) Math.min(tagInfo.getLength(), 255))));
   }
 
   private static int getExpectedTotalLength(GetDataTag tag) {
-    return LegacySamConstants.TagData.valueOf(tag.name()).getTotalLength();
+    return LegacySamConstants.TagInfo.valueOf(tag.name()).getTotalLength();
   }
 
   /**
@@ -100,7 +100,7 @@ final class CommandGetData extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     // check BER-TLV header
-    byte[] header = tagData.getHeader();
+    byte[] header = tagInfo.getHeader();
     for (int i = 0; i < header.length; i++) {
       if (dataOut[i] != header[i]) {
         throw new DataAccessException("Inconsistent BER-TLV tag");

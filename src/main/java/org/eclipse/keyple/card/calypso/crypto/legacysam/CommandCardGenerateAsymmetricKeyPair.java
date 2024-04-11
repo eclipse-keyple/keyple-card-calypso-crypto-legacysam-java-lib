@@ -113,9 +113,9 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
-      if (LegacySamConstants.TagData.GENERATED_CARD_ECC_KEY_PAIR.getLength() != dataOut.length) {
+      if (LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getLength() != dataOut.length) {
         // check BER-TLV header
-        byte[] header = LegacySamConstants.TagData.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
+        byte[] header = LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
         for (int i = 0; i < header.length; i++) {
           if (dataOut[i] != header[i]) {
             throw new DataAccessException("Inconsistent BER-TLV tag");

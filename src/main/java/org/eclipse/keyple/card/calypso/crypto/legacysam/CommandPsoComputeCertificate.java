@@ -12,7 +12,7 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.TagData.CARD_PUBLIC_KEY_DATA;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.TagInfo.CARD_PUBLIC_KEY_DATA;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -70,7 +70,7 @@ final class CommandPsoComputeCertificate extends Command {
 
     super(
         CommandRef.PSO_COMPUTE_CERTIFICATE,
-        LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getTotalLength(),
+        LegacySamConstants.TagInfo.GENERATED_CARD_CERTIFICATE.getTotalLength(),
         context);
     this.data = (CardCertificateComputationDataAdapter) data;
 
@@ -171,7 +171,7 @@ final class CommandPsoComputeCertificate extends Command {
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
       // check BER-TLV header
-      byte[] header = LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getHeader();
+      byte[] header = LegacySamConstants.TagInfo.GENERATED_CARD_CERTIFICATE.getHeader();
       for (int i = 0; i < header.length; i++) {
         if (dataOut[i] != header[i]) {
           throw new DataAccessException("Inconsistent BER-TLV tag");
