@@ -50,10 +50,10 @@ final class CommandGetData extends Command {
    * @since 0.6.0
    */
   CommandGetData(CommandContextDto context, GetDataTag tag) {
-    super(CommandRef.GET_DATA, 0, context);
+    super(CommandRef.GET_DATA, getExpectedTotalLength(tag), context);
 
     this.tag = tag;
-    this.tagData = mapToInternalGetDataTag(tag);
+    this.tagData = LegacySamConstants.TagData.valueOf(tag.name());
 
     setApduRequest(
         new ApduRequestAdapter(
@@ -66,9 +66,8 @@ final class CommandGetData extends Command {
                 (byte) Math.min(tagData.getLength(), 255))));
   }
 
-  /** Maps a tag provided by the Keypop layer to an internal tag. */
-  private LegacySamConstants.TagData mapToInternalGetDataTag(GetDataTag getDataTag) {
-    return LegacySamConstants.TagData.valueOf(getDataTag.name());
+  private static int getExpectedTotalLength(GetDataTag tag) {
+    return LegacySamConstants.TagData.valueOf(tag.name()).getTotalLength();
   }
 
   /**
@@ -100,20 +99,16 @@ final class CommandGetData extends Command {
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
-    if (tagData.getLength() != dataOut.length) {
-      // check BER-TLV header
-      byte[] header = tagData.getHeader();
-      for (int i = 0; i < header.length; i++) {
-        if (dataOut[i] != header[i]) {
-          throw new DataAccessException("Inconsistent BER-TLV tag");
-        }
+    // check BER-TLV header
+    byte[] header = tagData.getHeader();
+    for (int i = 0; i < header.length; i++) {
+      if (dataOut[i] != header[i]) {
+        throw new DataAccessException("Inconsistent BER-TLV tag");
       }
-      getContext()
-          .getTargetSam()
-          .setCaCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
-    } else {
-      throw new UnexpectedResponseLengthException("Incorrect response length: " + dataOut.length);
     }
+    getContext()
+        .getTargetSam()
+        .setCaCertificate(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
   }
 
   /**
