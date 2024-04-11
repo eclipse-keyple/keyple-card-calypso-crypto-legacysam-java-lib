@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import java.time.LocalDate;
 import java.util.*;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.json.JsonUtil;
@@ -882,12 +883,11 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setStartDate(int year, int month, int day) {
-      Assert.getInstance()
-          .isInRange(year, 0, 9999, "year")
-          .isInRange(month, 1, 99, "month")
-          .isInRange(day, 1, 99, "day");
-      startDateBcd = LegacySamUtil.convertDateToBcdLong(year, month, day);
+    public CardCertificateComputationData setStartDate(LocalDate startDate) {
+      Assert.getInstance().notNull(startDate, "startDate");
+      startDateBcd =
+          LegacySamUtils.convertDateToBcdLong(
+              startDate.getYear(), startDate.getMonthValue(), startDate.getDayOfMonth());
       return this;
     }
 
@@ -897,12 +897,11 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setEndDate(int year, int month, int day) {
-      Assert.getInstance()
-          .isInRange(year, 0, 9999, "year")
-          .isInRange(month, 1, 99, "month")
-          .isInRange(day, 1, 99, "day");
-      endDateBcd = LegacySamUtil.convertDateToBcdLong(year, month, day);
+    public CardCertificateComputationData setEndDate(LocalDate endDate) {
+      Assert.getInstance().notNull(endDate, "endDate");
+      endDateBcd =
+          LegacySamUtils.convertDateToBcdLong(
+              endDate.getYear(), endDate.getMonthValue(), endDate.getDayOfMonth());
       return this;
     }
 

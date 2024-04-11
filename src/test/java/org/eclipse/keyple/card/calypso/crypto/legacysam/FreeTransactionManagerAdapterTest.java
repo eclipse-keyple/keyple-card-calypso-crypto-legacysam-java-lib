@@ -2074,7 +2074,7 @@ public final class FreeTransactionManagerAdapterTest {
 
   @Test(expected = IllegalArgumentException.class)
   public void prepareGetData_whenTagIsNull_shouldThrowIAE() {
-    samTransactionManager.prepareGetTag(null);
+    samTransactionManager.prepareGetData(null);
   }
 
   // TODO

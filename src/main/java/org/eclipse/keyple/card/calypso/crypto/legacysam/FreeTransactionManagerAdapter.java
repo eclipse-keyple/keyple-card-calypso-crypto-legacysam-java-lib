@@ -59,7 +59,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
    * @since 0.6.0
    */
   @Override
-  public FreeTransactionManager prepareGetTag(GetDataTag tag) {
+  public FreeTransactionManager prepareGetData(GetDataTag tag) {
     Assert.getInstance().notNull(tag, "tag");
     addTargetSamCommand(new CommandGetData(getContext(), tag));
     return this;
