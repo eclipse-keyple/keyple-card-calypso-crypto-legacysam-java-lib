@@ -61,7 +61,10 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
   CommandCardGenerateAsymmetricKeyPair(
       CommandContextDto context, KeyPairContainer keyPairContainer) {
 
-    super(CommandRef.CARD_GENERATE_ASYMMETRIC_KEY_PAIR, 0, context);
+    super(
+        CommandRef.CARD_GENERATE_ASYMMETRIC_KEY_PAIR,
+        LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getTotalLength(),
+        context);
     this.keyPairContainer = (DtoAdapters.KeyPairContainerAdapter) keyPairContainer;
 
     final byte cla = context.getTargetSam().getClassByte();
@@ -113,18 +116,14 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
-      if (LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getLength() != dataOut.length) {
-        // check BER-TLV header
-        byte[] header = LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
-        for (int i = 0; i < header.length; i++) {
-          if (dataOut[i] != header[i]) {
-            throw new DataAccessException("Inconsistent BER-TLV tag");
-          }
+      // check BER-TLV header
+      byte[] header = LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
+      for (int i = 0; i < header.length; i++) {
+        if (dataOut[i] != header[i]) {
+          throw new DataAccessException("Inconsistent BER-TLV tag");
         }
-        keyPairContainer.setKeyPair(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
-      } else {
-        throw new UnexpectedResponseLengthException("Incorrect response length: " + dataOut.length);
       }
+      keyPairContainer.setKeyPair(Arrays.copyOfRange(dataOut, header.length, dataOut.length));
     }
   }
 }
