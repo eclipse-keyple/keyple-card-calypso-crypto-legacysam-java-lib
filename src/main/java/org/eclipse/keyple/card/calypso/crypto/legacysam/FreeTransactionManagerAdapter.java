@@ -306,23 +306,23 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     Assert.getInstance()
         .isInRange(
             counterNumber,
-            LegacySamConstant.MIN_COUNTER_NUMBER,
-            LegacySamConstant.MAX_COUNTER_NUMBER,
+            LegacySamConstants.MIN_COUNTER_NUMBER,
+            LegacySamConstants.MAX_COUNTER_NUMBER,
             "counterNumber");
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandReadCounter
           && ((CommandReadCounter) command).getCounterFileRecordNumber()
-              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
+              == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
     addTargetSamCommand(
         new CommandReadCounter(
-            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+            getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
     addTargetSamCommand(
         new CommandReadCounterCeiling(
-            getContext(), LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+            getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -349,7 +349,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public String exportTargetSamContextForAsyncTransaction() {
 
-    List<Command> commands = new ArrayList<Command>();
+    List<Command> commands = new ArrayList<>();
 
     // read system key parameters if not available
     if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.PERSONALIZATION) == null) {
@@ -426,17 +426,17 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     }
 
     // compute needed counter file records
-    Set<Integer> counterFileRecordNumbers = new HashSet<Integer>(3);
+    Set<Integer> counterFileRecordNumbers = new HashSet<>(3);
     if (counterPersonalization != 0) {
       counterFileRecordNumbers.add(
-          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
+          LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterPersonalization]);
     }
     if (counterKeyManagement != 0) {
       counterFileRecordNumbers.add(
-          LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
+          LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterKeyManagement]);
     }
     if (counterReloading != 0) {
-      counterFileRecordNumbers.add(LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
+      counterFileRecordNumbers.add(LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterReloading]);
     }
 
     // read counters

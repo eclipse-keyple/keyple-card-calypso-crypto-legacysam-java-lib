@@ -11,8 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.shouldHaveThrown;
+import static org.assertj.core.api.Assertions.*;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.argThat;
@@ -294,7 +293,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.setData(new byte[16], (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test
@@ -309,7 +308,7 @@ public final class FreeTransactionManagerAdapterTest {
 
     data.setData(new byte[206], (byte) 1, (byte) 2)
         .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -358,7 +357,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.setSignatureSize(8);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test
@@ -371,7 +370,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.setSignatureSize(8);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -417,7 +416,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.withSamTraceabilityMode(2 * 8, SamTraceabilityMode.FULL_SERIAL_NUMBER);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -467,7 +466,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.setKeyDiversifier(new byte[8]);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test
@@ -481,7 +480,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareComputeSignature(data);
 
     data.setKeyDiversifier(new byte[8]);
-    samTransactionManager.prepareComputeSignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareComputeSignature(data));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -999,7 +998,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setData(new byte[16], new byte[8], (byte) 1, (byte) 2);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test
@@ -1015,7 +1014,7 @@ public final class FreeTransactionManagerAdapterTest {
 
     data.setData(new byte[206], new byte[8], (byte) 1, (byte) 2)
         .withSamTraceabilityMode(0, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, null);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1074,7 +1073,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setData(new byte[8], new byte[8], (byte) 1, (byte) 2);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test
@@ -1086,7 +1085,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setData(new byte[10], new byte[8], (byte) 1, (byte) 2);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1132,7 +1131,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.withSamTraceabilityMode(2 * 8, SamTraceabilityMode.FULL_SERIAL_NUMBER, null);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test(expected = IllegalArgumentException.class)
@@ -1182,7 +1181,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setKeyDiversifier(new byte[8]);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test
@@ -1196,7 +1195,7 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager.prepareVerifySignature(data);
 
     data.setKeyDiversifier(new byte[8]);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test(expected = IllegalStateException.class)
@@ -1231,7 +1230,7 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(PSO_MESSAGE_SAM_TRACEABILITY), new byte[8], (byte) 1, (byte) 2)
             .withSamTraceabilityMode(
                 8, SamTraceabilityMode.TRUNCATED_SERIAL_NUMBER, samRevocationServiceSpi);
-    samTransactionManager.prepareVerifySignature(data);
+    assertThatNoException().isThrownBy(() -> samTransactionManager.prepareVerifySignature(data));
   }
 
   @Test(expected = SamRevokedException.class)

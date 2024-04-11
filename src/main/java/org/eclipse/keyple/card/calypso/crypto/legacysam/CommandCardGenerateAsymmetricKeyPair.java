@@ -32,7 +32,7 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
     m.put(
         0x6985,
@@ -113,9 +113,9 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
-      if (LegacySamConstant.TagData.GENERATED_CARD_ECC_KEY_PAIR.getLength() != dataOut.length) {
+      if (LegacySamConstants.TagData.GENERATED_CARD_ECC_KEY_PAIR.getLength() != dataOut.length) {
         // check BER-TLV header
-        byte[] header = LegacySamConstant.TagData.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
+        byte[] header = LegacySamConstants.TagData.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
         for (int i = 0; i < header.length; i++) {
           if (dataOut[i] != header[i]) {
             throw new DataAccessException("Inconsistent BER-TLV tag");

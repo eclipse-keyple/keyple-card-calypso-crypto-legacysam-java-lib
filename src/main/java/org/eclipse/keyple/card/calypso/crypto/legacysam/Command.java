@@ -44,7 +44,7 @@ abstract class Command {
   static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    HashMap<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>();
+    HashMap<Integer, StatusProperties> m = new HashMap<>();
     m.put(0x6D00, new StatusProperties("Instruction unknown.", IllegalParameterException.class));
     m.put(0x6E00, new StatusProperties("Class not supported.", IllegalParameterException.class));
     m.put(0x9000, new StatusProperties("Success"));

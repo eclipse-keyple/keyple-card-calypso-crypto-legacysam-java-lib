@@ -495,7 +495,7 @@ final class DtoAdapters {
      */
     ApduRequestAdapter(byte[] apdu) {
       this.apdu = apdu;
-      successfulStatusWords = new HashSet<Integer>();
+      successfulStatusWords = new HashSet<>();
       successfulStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
     }
 
@@ -651,7 +651,7 @@ final class DtoAdapters {
      */
     CardSelectionRequestAdapter(CardRequestSpi cardRequest) {
       this.cardRequest = cardRequest;
-      successfulSelectionStatusWords = new LinkedHashSet<Integer>(1);
+      successfulSelectionStatusWords = new LinkedHashSet<>(1);
       successfulSelectionStatusWords.add(DEFAULT_SUCCESSFUL_CODE);
     }
 
@@ -697,12 +697,11 @@ final class DtoAdapters {
     private final boolean isDynamicMode;
     private final Map<SystemKeyType, Integer> systemKeyTypeToCounterNumberMap =
         //  enummap is not suitable for the gson serializer
-        new HashMap<SystemKeyType, Integer>(3); // NOSONAR
+        new HashMap<>(3); // NOSONAR
     private final Map<SystemKeyType, Byte> systemKeyTypeToKvcMap =
         //  enummap is not suitable for the gson serializer
-        new HashMap<SystemKeyType, Byte>(3); // NOSONAR
-    private final Map<Integer, Integer> counterNumberToCounterValueMap =
-        new HashMap<Integer, Integer>(3);
+        new HashMap<>(3); // NOSONAR
+    private final Map<Integer, Integer> counterNumberToCounterValueMap = new HashMap<>(3);
 
     /**
      * Constructs a new instance with the specified serial number and dynamic mode flag.

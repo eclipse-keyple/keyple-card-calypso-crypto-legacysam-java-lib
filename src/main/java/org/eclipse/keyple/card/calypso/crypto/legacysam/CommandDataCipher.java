@@ -30,7 +30,7 @@ final class CommandDataCipher extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
     m.put(
         0x6900,

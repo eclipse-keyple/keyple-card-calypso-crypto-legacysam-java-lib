@@ -31,7 +31,7 @@ final class CommandGetData extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Le.", IllegalParameterException.class));
     m.put(
         0x6A88,
@@ -40,7 +40,7 @@ final class CommandGetData extends Command {
   }
 
   private final GetDataTag tag;
-  private final LegacySamConstant.TagData tagData;
+  private final LegacySamConstants.TagData tagData;
 
   /**
    * Instantiates a new CmdSamGetChallenge.
@@ -67,8 +67,8 @@ final class CommandGetData extends Command {
   }
 
   /** Maps a tag provided by the Keypop layer to an internal tag. */
-  private LegacySamConstant.TagData mapToInternalGetDataTag(GetDataTag getDataTag) {
-    return LegacySamConstant.TagData.valueOf(getDataTag.name());
+  private LegacySamConstants.TagData mapToInternalGetDataTag(GetDataTag getDataTag) {
+    return LegacySamConstants.TagData.valueOf(getDataTag.name());
   }
 
   /**

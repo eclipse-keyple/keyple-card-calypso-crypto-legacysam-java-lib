@@ -12,7 +12,7 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstant.TagData.CARD_PUBLIC_KEY_DATA;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.TagData.CARD_PUBLIC_KEY_DATA;
 
 import java.nio.ByteBuffer;
 import java.util.Arrays;
@@ -32,7 +32,7 @@ final class CommandPsoComputeCertificate extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
-    Map<Integer, StatusProperties> m = new HashMap<Integer, StatusProperties>(Command.STATUS_TABLE);
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
     m.put(
         0x6900,
@@ -95,8 +95,8 @@ final class CommandPsoComputeCertificate extends Command {
     if (data.getCardPublicKey() == null) {
       cardPublicKeyData = ByteBuffer.allocate(66);
     } else {
-      cardPublicKeyData = ByteBuffer.allocate(66 + LegacySamConstant.ECC_PUBLIC_KEY_SIZE);
-      header[2] += LegacySamConstant.ECC_PUBLIC_KEY_SIZE; // adjust length
+      cardPublicKeyData = ByteBuffer.allocate(66 + LegacySamConstants.ECC_PUBLIC_KEY_SIZE);
+      header[2] += LegacySamConstants.ECC_PUBLIC_KEY_SIZE; // adjust length
     }
     cardPublicKeyData.put(header);
     // AID length
@@ -104,9 +104,8 @@ final class CommandPsoComputeCertificate extends Command {
     // AID
     cardPublicKeyData.put(data.getAid());
     // AID padding
-    for (int i = 0; i < LegacySamConstant.AID_SIZE_MAX - data.getAid().length; i++) {
-      cardPublicKeyData.put((byte) 0);
-    }
+    cardPublicKeyData.position(
+        cardPublicKeyData.position() + LegacySamConstants.AID_SIZE_MAX - data.getAid().length);
     // serial number
     cardPublicKeyData.put(data.getSerialNumber());
     // RFU
@@ -168,9 +167,9 @@ final class CommandPsoComputeCertificate extends Command {
     setResponseAndCheckStatus(apduResponse);
     byte[] dataOut = apduResponse.getDataOut();
     if (dataOut.length > 0) {
-      if (LegacySamConstant.TagData.GENERATED_CARD_CERTIFICATE.getLength() != dataOut.length) {
+      if (LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getLength() != dataOut.length) {
         // check BER-TLV header
-        byte[] header = LegacySamConstant.TagData.GENERATED_CARD_CERTIFICATE.getHeader();
+        byte[] header = LegacySamConstants.TagData.GENERATED_CARD_CERTIFICATE.getHeader();
         for (int i = 0; i < header.length; i++) {
           if (dataOut[i] != header[i]) {
             throw new DataAccessException("Inconsistent BER-TLV tag");

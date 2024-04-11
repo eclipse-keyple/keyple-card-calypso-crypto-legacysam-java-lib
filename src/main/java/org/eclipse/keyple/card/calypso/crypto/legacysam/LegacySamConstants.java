@@ -18,9 +18,9 @@ import org.eclipse.keyple.core.util.HexUtil;
  *
  * @since 2.0.0
  */
-final class LegacySamConstant {
+final class LegacySamConstants {
 
-  private LegacySamConstant() {}
+  private LegacySamConstants() {}
 
   static final int MIN_COUNTER_NUMBER = 0;
   static final int MAX_COUNTER_NUMBER = 26;

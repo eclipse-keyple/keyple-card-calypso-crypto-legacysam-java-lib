@@ -61,13 +61,13 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
     Assert.getInstance()
         .isInRange(
             counterNumber,
-            LegacySamConstant.MIN_COUNTER_CEILING_NUMBER,
-            LegacySamConstant.MAX_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MAX_COUNTER_CEILING_NUMBER,
             "counterNumber")
         .isInRange(
             ceilingValue,
-            LegacySamConstant.MIN_COUNTER_CEILING_VALUE,
-            LegacySamConstant.MAX_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MAX_COUNTER_CEILING_VALUE,
             "ceilingValue");
 
     addTargetSamCommand(
@@ -88,19 +88,19 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
     Assert.getInstance()
         .isInRange(
             counterNumber,
-            LegacySamConstant.MIN_COUNTER_CEILING_NUMBER,
-            LegacySamConstant.MAX_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MAX_COUNTER_CEILING_NUMBER,
             "counterNumber")
         .isInRange(
             ceilingValue,
-            LegacySamConstant.MIN_COUNTER_CEILING_VALUE,
-            LegacySamConstant.MAX_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MAX_COUNTER_CEILING_VALUE,
             "ceilingValue");
 
     for (Command command : getTargetSamCommands()) {
       if (command instanceof CommandWriteCeilings
           && ((CommandWriteCeilings) command).getCounterFileRecordNumber()
-              == LegacySamConstant.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
+              == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         ((CommandWriteCeilings) command)
             .addCounter(counterNumber, ceilingValue, counterIncrementAccess);
         return this;
@@ -127,7 +127,7 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
     }
     JsonObject jsonObject = new JsonObject();
 
-    List<String> cardCommandTypes = new ArrayList<String>(commands.size());
+    List<String> cardCommandTypes = new ArrayList<>(commands.size());
     for (Command command : commands) {
       cardCommandTypes.add(command.getClass().getName());
     }

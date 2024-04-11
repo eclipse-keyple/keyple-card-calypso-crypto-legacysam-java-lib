@@ -12,7 +12,7 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
-import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstant.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.*;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -78,7 +78,7 @@ final class LegacySamSelectionExtensionAdapter
   LegacySamSelectionExtensionAdapter() {
     legacySamAdapter = new LegacySamAdapter(LegacySam.ProductType.SAM_C1);
     context = new CommandContextDto(legacySamAdapter, null, null);
-    commands = new ArrayList<Command>();
+    commands = new ArrayList<>();
     unlockSettingType = UnlockSettingType.UNSET;
   }
 
@@ -90,7 +90,7 @@ final class LegacySamSelectionExtensionAdapter
   @Override
   public CardSelectionRequestSpi getCardSelectionRequest() {
 
-    List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
+    List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<>();
     switch (unlockSettingType) {
       case UNLOCK_DATA: // NOSONAR
         // prepare the UNLOCK command and put it in first position
@@ -175,7 +175,7 @@ final class LegacySamSelectionExtensionAdapter
       unlockCommand.getApduRequest().addSuccessfulStatusWord(SW_NOT_LOCKED);
       commands.add(0, unlockCommand);
 
-      List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<ApduRequestSpi>();
+      List<ApduRequestSpi> cardSelectionApduRequests = new ArrayList<>();
       for (Command command : commands) {
         cardSelectionApduRequests.add(command.getApduRequest());
       }

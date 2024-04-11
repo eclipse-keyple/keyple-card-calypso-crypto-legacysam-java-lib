@@ -52,7 +52,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
   private final boolean isExtendedModeRequired;
   private final int maxCardApduLengthSupported;
   private final List<byte[]> transactionAuditData;
-  private final List<Command> samCommands = new ArrayList<Command>();
+  private final List<Command> samCommands = new ArrayList<>();
 
   /* Dynamic fields */
   private byte[] currentKeyDiversifier;
@@ -698,7 +698,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
     private final byte[] openSecureSessionDataOut;
     private final byte sessionKif;
     private final byte sessionKvc;
-    private final List<byte[]> cardApdus = new ArrayList<byte[]>();
+    private final List<byte[]> cardApdus = new ArrayList<>();
     private boolean isDigestInitDone;
     boolean isRequest = true;
 
