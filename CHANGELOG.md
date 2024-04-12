@@ -5,9 +5,18 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.6.0] - 2024-04-12
 ### Changed
 - Java source and target levels `1.6` -> `1.8`
 ### Upgraded
+- Keypop Reader API `2.0.0` -> `2.0.1`
+- Keypop Card API `2.0.0` -> `2.0.1`
+- Keypop Calypso Card API `2.0.0` -> `2.1.0`
+- Keypop Calypso Crypto Legacy SAM API `0.4.0` -> `0.5.0`
+- Keypop Calypso Crypto Symmetric API `0.1.0` -> `0.1.1`
+- Keyple Common API `2.0.0` -> `2.0.1`
+- Keyple Util Lib `2.3.1` -> `2.4.0`
 - Gradle `6.8.3` -> `7.6.4`
 
 ## [0.5.0] - 2024-01-10
@@ -58,7 +67,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.5.0...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.6.0...HEAD
+[0.6.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.5.0...0.6.0
 [0.5.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.4.0...0.5.0
 [0.4.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.3.0...0.4.0
 [0.3.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.2.0...0.3.0
