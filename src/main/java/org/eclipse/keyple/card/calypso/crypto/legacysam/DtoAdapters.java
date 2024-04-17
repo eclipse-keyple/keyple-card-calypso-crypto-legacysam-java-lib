@@ -852,7 +852,8 @@ final class DtoAdapters {
    *
    * @since 0.6.0
    */
-  static class CardCertificateComputationDataAdapter implements CardCertificateComputationData {
+  static class LegacyCardCertificateComputationDataAdapter
+      implements LegacyCardCertificateComputationData {
 
     private byte[] cardPublicKey;
     private long startDateBcd;
@@ -868,7 +869,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setCardPublicKey(byte[] cardPublicKey) {
+    public LegacyCardCertificateComputationData setCardPublicKey(byte[] cardPublicKey) {
       Assert.getInstance()
           .notNull(cardPublicKey, "cardPublicKey")
           .isEqual(cardPublicKey.length, 64, "cardPublicKey");
@@ -882,7 +883,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setStartDate(LocalDate startDate) {
+    public LegacyCardCertificateComputationData setStartDate(LocalDate startDate) {
       Assert.getInstance().notNull(startDate, "startDate");
       startDateBcd =
           LegacySamUtil.convertDateToBcdLong(
@@ -896,7 +897,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setEndDate(LocalDate endDate) {
+    public LegacyCardCertificateComputationData setEndDate(LocalDate endDate) {
       Assert.getInstance().notNull(endDate, "endDate");
       endDateBcd =
           LegacySamUtil.convertDateToBcdLong(
@@ -910,7 +911,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setCardAid(byte[] aid) {
+    public LegacyCardCertificateComputationData setCardAid(byte[] aid) {
       Assert.getInstance().notNull(aid, "aid").isInRange(aid.length, 5, 16, "aid length");
       this.aid = aid;
       return this;
@@ -922,7 +923,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setCardSerialNumber(byte[] serialNumber) {
+    public LegacyCardCertificateComputationData setCardSerialNumber(byte[] serialNumber) {
       Assert.getInstance()
           .notNull(serialNumber, "serialNumber")
           .isEqual(serialNumber.length, 8, "serialNumber length");
@@ -936,7 +937,7 @@ final class DtoAdapters {
      * @since 0.6.0
      */
     @Override
-    public CardCertificateComputationData setCardStartupInfo(byte[] startupInfo) {
+    public LegacyCardCertificateComputationData setCardStartupInfo(byte[] startupInfo) {
       Assert.getInstance()
           .notNull(startupInfo, "startupInfo")
           .isEqual(startupInfo.length, 7, "startupInfo length");

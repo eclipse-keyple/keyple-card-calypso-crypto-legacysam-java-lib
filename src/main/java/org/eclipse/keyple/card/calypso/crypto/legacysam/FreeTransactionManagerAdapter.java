@@ -88,11 +88,12 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
    * @since 0.6.0
    */
   @Override
-  public FreeTransactionManager prepareComputeCardCertificate(CardCertificateComputationData data) {
+  public FreeTransactionManager prepareComputeCardCertificate(
+      LegacyCardCertificateComputationData data) {
     Assert.getInstance().notNull(data, "data");
-    if (!(data instanceof CardCertificateComputationDataAdapter)) {
+    if (!(data instanceof LegacyCardCertificateComputationDataAdapter)) {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'CardCertificateComputationDataAdapter'");
+          "The provided data must be an instance of 'LegacyCardCertificateComputationDataAdapter'");
     }
     addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
     return this;

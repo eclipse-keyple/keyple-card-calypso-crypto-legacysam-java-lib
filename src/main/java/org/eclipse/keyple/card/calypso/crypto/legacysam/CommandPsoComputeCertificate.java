@@ -19,7 +19,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.CardCertificateComputationData;
+import org.eclipse.keypop.calypso.crypto.legacysam.transaction.LegacyCardCertificateComputationData;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
@@ -53,7 +53,7 @@ final class CommandPsoComputeCertificate extends Command {
     STATUS_TABLE = m;
   }
 
-  private final CardCertificateComputationDataAdapter data;
+  private final LegacyCardCertificateComputationDataAdapter data;
 
   /**
    * Instantiates a new instance based on the provided "Card Public Key Data" data object.
@@ -66,13 +66,14 @@ final class CommandPsoComputeCertificate extends Command {
    *     not.
    * @since 0.1.0
    */
-  CommandPsoComputeCertificate(CommandContextDto context, CardCertificateComputationData data) {
+  CommandPsoComputeCertificate(
+      CommandContextDto context, LegacyCardCertificateComputationData data) {
 
     super(
         CommandRef.PSO_COMPUTE_CERTIFICATE,
         LegacySamConstants.TagInfo.GENERATED_CARD_CERTIFICATE.getTotalLength(),
         context);
-    this.data = (CardCertificateComputationDataAdapter) data;
+    this.data = (LegacyCardCertificateComputationDataAdapter) data;
 
     final byte cla = context.getTargetSam().getClassByte();
     final byte inst = getCommandRef().getInstructionByte();
@@ -89,7 +90,7 @@ final class CommandPsoComputeCertificate extends Command {
    *
    * @return A byte array containing the public key data.
    */
-  private byte[] generateCardPublicKeyData(CardCertificateComputationDataAdapter data) {
+  private byte[] generateCardPublicKeyData(LegacyCardCertificateComputationDataAdapter data) {
     // BER-TLV header
     byte[] header = CARD_PUBLIC_KEY_DATA.getHeader();
     // allocate buffer size according to the presence of cardPublicKey, adjust length byte
