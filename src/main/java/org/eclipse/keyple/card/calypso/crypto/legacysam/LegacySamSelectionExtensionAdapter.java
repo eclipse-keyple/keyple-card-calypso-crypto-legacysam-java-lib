@@ -19,6 +19,7 @@ import java.util.Collections;
 import java.util.List;
 import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySamSelectionExtension;
@@ -393,6 +394,18 @@ final class LegacySamSelectionExtensionAdapter
       commands.add(new CommandReadCounter(context, i));
       commands.add(new CommandReadCounterCeiling(context, i));
     }
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareGetData(GetDataTag tag) {
+    Assert.getInstance().notNull(tag, "tag");
+    commands.add(new CommandGetData(context, tag));
     return this;
   }
 

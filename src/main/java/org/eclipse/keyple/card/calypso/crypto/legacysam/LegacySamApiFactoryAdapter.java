@@ -147,8 +147,8 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
    * @since 0.6.0
    */
   @Override
-  public CardCertificateComputationData createCardCertificateComputationData() {
-    return new DtoAdapters.CardCertificateComputationDataAdapter();
+  public LegacyCardCertificateComputationData createLegacyCardCertificateComputationData() {
+    return new DtoAdapters.LegacyCardCertificateComputationDataAdapter();
   }
 
   /**
