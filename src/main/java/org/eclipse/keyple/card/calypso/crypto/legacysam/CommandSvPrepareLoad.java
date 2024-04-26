@@ -29,14 +29,13 @@ final class CommandSvPrepareLoad extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
     m.put(0x6A00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
     m.put(
-        0x6A80,
-        new StatusProperties("Incorrect incoming data.", IncorrectInputDataException.class));
+        0x6A80, new StatusProperties("Incorrect incoming data", IncorrectInputDataException.class));
     m.put(
         0x6A83,
         new StatusProperties(

@@ -20,8 +20,6 @@ import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommand
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Utility class to factorize command management.
@@ -29,13 +27,12 @@ import org.slf4j.LoggerFactory;
  * @since 0.3.0
  */
 final class CommandExecutor {
-  private static final Logger logger = LoggerFactory.getLogger(CommandExecutor.class);
-  private static final String MSG_CARD_READER_COMMUNICATION_ERROR =
-      "A communication error with the card reader occurred ";
-  private static final String MSG_CARD_COMMUNICATION_ERROR =
-      "A communication error with the card occurred ";
-  private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
+  private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
+      "A communication error with the SAM reader occurred ";
+  private static final String MSG_SAM_COMMUNICATION_ERROR =
+      "A communication error with the SAM occurred ";
+  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
+  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands";
 
   private CommandExecutor() {}
 
@@ -119,8 +116,8 @@ final class CommandExecutor {
         command.parseResponse(apduResponses.get(i));
       } catch (CommandException e) {
         throw new UnexpectedCommandStatusException(
-            MSG_CARD_COMMAND_ERROR
-                + "while processing responses to card commands: "
+            MSG_SAM_COMMAND_ERROR
+                + "while processing responses to SAM commands: "
                 + command.getCommandRef(),
             e);
       }
@@ -167,13 +164,10 @@ final class CommandExecutor {
       cardResponse = samReader.transmitCardRequest(cardRequest, channelControl);
     } catch (ReaderBrokenCommunicationException e) {
       throw new ReaderIOException(
-          MSG_CARD_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
+          MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
     } catch (CardBrokenCommunicationException e) {
-      throw new SamIOException(MSG_CARD_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
+      throw new SamIOException(MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
     } catch (UnexpectedStatusWordException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("A card command has failed: {}", e.getMessage());
-      }
       cardResponse = e.getCardResponse();
     }
     return cardResponse;

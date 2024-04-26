@@ -29,7 +29,7 @@ final class CommandDigestClose extends Command {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
     STATUS_TABLE = m;
   }
 

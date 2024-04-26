@@ -32,25 +32,24 @@ final class CommandSamDataCipher extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
         new StatusProperties(
             "Preconditions not satisfied:\n"
                 + "- The SAM is locked.\n"
-                + "- Ciphering key: ciphering forbidden (CipherEnableBit of PAR1 is 0).",
+                + "- Ciphering key: ciphering forbidden (CipherEnableBit of PAR1 is 0)",
             AccessForbiddenException.class));
     m.put(
         0x6A00,
-        new StatusProperties("Incorrect P1 (!=%0xxxxx0) or P2.", IllegalParameterException.class));
+        new StatusProperties("Incorrect P1 (!=%0xxxxx0) or P2", IllegalParameterException.class));
     m.put(
         0x6A83,
-        new StatusProperties(
-            "Record not found: key to read not found.", DataAccessException.class));
+        new StatusProperties("Record not found: key to read not found", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
@@ -64,7 +63,7 @@ final class CommandSamDataCipher extends Command {
    *     {@link DataType#ONE_CEILING_VALUE} or {@link DataType#PARAMETERS_RECORD}).
    * @param dataType The type of data to be ciphered.
    * @param plainData The data to be ciphered, preceded by a byte containing the encryption key KVC
-   *     (30 bytes). bytes).
+   *     (30 bytes).
    * @since 0.3.0
    */
   CommandSamDataCipher(

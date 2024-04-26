@@ -84,7 +84,7 @@ public final class LegacySamUtil {
           applicationTypeMask = "E1";
           break;
         default:
-          throw new IllegalArgumentException("Unknown SAM subtype.");
+          throw new IllegalArgumentException("Unknown SAM subtype");
       }
       atrRegex = "3B(.{6}|.{10})805A..80" + applicationTypeMask + ".{6}" + snRegex + "829000";
     } else {

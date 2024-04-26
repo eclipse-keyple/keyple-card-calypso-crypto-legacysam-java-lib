@@ -32,14 +32,13 @@ final class CommandGetData extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Le.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Le", IllegalParameterException.class));
     m.put(
         0x6A88,
-        new StatusProperties("Data referenced by P1-P2 not available.", DataAccessException.class));
+        new StatusProperties("Data referenced by P1-P2 not available", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
-  private final GetDataTag tag;
   private final LegacySamConstants.TagInfo tagInfo;
 
   /**
@@ -52,7 +51,6 @@ final class CommandGetData extends Command {
   CommandGetData(CommandContextDto context, GetDataTag tag) {
     super(CommandRef.GET_DATA, getExpectedTotalLength(tag), context);
 
-    this.tag = tag;
     this.tagInfo = LegacySamConstants.TagInfo.valueOf(tag.name());
 
     setApduRequest(

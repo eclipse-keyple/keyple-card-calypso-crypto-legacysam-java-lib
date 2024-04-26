@@ -35,7 +35,7 @@ class CardTransactionUtil {
       "A communication error with the SAM reader occurred ";
   private static final String MSG_SAM_COMMUNICATION_ERROR =
       "A communication error with the SAM occurred ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands.";
+  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands";
   static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
 
   private CardTransactionUtil() {}
@@ -92,9 +92,6 @@ class CardTransactionUtil {
                   + getTransactionAuditDataAsString(transactionAuditData, sam),
               e));
     } catch (UnexpectedStatusWordException e) {
-      if (logger.isDebugEnabled()) {
-        logger.debug("A SAM command has failed: {}", e.getMessage());
-      }
       cardResponse = e.getCardResponse();
     }
     saveTransactionAuditData(cardRequest, cardResponse, transactionAuditData);

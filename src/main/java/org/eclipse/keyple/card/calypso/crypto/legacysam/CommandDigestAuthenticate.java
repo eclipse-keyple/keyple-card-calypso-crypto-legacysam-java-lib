@@ -27,11 +27,11 @@ final class CommandDigestAuthenticate extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
     STATUS_TABLE = m;
   }
 

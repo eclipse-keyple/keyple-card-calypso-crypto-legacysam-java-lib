@@ -92,7 +92,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
     // in the case of a SAM, the power-on data corresponds to the ATR of the card.
     powerOnData = cardSelectionResponse.getPowerOnData();
     if (powerOnData == null) {
-      throw new IllegalStateException("ATR should not be empty.");
+      throw new IllegalStateException("ATR should not be empty");
     }
 
     serialNumber = new byte[4];
@@ -138,17 +138,15 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
       System.arraycopy(atrSubElements, 6, serialNumber, 0, 4);
       if (logger.isTraceEnabled()) {
         logger.trace(
-            String.format(
-                "SAM %s PLATFORM = %02Xh, APPTYPE = %02Xh, APPSUBTYPE = %02Xh, SWISSUER = %02Xh, SWVERSION = "
-                    + "%02Xh, SWREVISION = %02Xh",
-                samProductType.name(),
-                platform,
-                applicationType,
-                applicationSubType,
-                softwareIssuer,
-                softwareVersion,
-                softwareRevision));
-        logger.trace("SAM SERIALNUMBER = {}", HexUtil.toHex(serialNumber));
+            "SAM {}, SERIAL_NUMBER={}h, PLATFORM={}h, APP_TYPE={}h, APP_SUBTYPE={}h, SW_ISSUER={}h, SW_VERSION={}h, SW_REVISION={}h",
+            samProductType.name(),
+            HexUtil.toHex(serialNumber),
+            HexUtil.toHex(platform),
+            HexUtil.toHex(applicationType),
+            HexUtil.toHex(applicationSubType),
+            HexUtil.toHex(softwareIssuer),
+            HexUtil.toHex(softwareVersion),
+            HexUtil.toHex(softwareRevision));
       }
     } else {
       samProductType = ProductType.UNKNOWN;

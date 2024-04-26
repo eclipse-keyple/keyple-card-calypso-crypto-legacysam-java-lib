@@ -150,6 +150,6 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
   @Override
   public AsyncTransactionCreatorManager processCommands() {
     throw new UnsupportedOperationException(
-        "processCommands() is not allowed during the creation of an asynchronous transaction.");
+        "processCommands() is not allowed during the creation of an asynchronous transaction");
   }
 }

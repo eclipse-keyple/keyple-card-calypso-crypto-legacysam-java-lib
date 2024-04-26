@@ -50,7 +50,7 @@ final class LegacySamSelectionExtensionAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamSelectionExtensionAdapter.class);
   private static final int SW_NOT_LOCKED = 0x6985;
-  private static final String MSG_CARD_COMMAND_ERROR = "A card command error occurred ";
+  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
   private static final String MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET =
       "A setting to unlock the SAM has already been set";
   private final LegacySamAdapter legacySamAdapter;
@@ -131,13 +131,13 @@ final class LegacySamSelectionExtensionAdapter
       CardResponseApi cardResponse = getCardResponse(cardSelectionResponseApi);
       parseCardResponse(cardResponse);
     } catch (Exception e) {
-      throw new ParseException("Invalid card response: " + e.getMessage(), e);
+      throw new ParseException("Invalid SAM response: " + e.getMessage(), e);
     }
     if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
         && cardSelectionResponseApi.getSelectApplicationResponse() == null
         && cardSelectionResponseApi.getPowerOnData() == null) {
       throw new ParseException(
-          "Unable to create a LegacySam: no power-on data and no FCI provided.");
+          "Unable to create a LegacySam: no power-on data and no FCI provided");
     }
     return legacySamAdapter;
   }
@@ -202,7 +202,7 @@ final class LegacySamSelectionExtensionAdapter
             : Collections.<ApduResponseApi>emptyList();
 
     if (commands.size() != apduResponses.size()) {
-      throw new IllegalStateException("Mismatch in the number of requests/responses.");
+      throw new IllegalStateException("Mismatch in the number of requests/responses");
     }
     if (!commands.isEmpty()) {
       parseApduResponses(commands, apduResponses);
@@ -238,8 +238,8 @@ final class LegacySamSelectionExtensionAdapter
           logger.warn("SAM not locked or already unlocked");
         } else {
           throw new UnexpectedCommandStatusException(
-              MSG_CARD_COMMAND_ERROR
-                  + "while processing responses to card commands: "
+              MSG_SAM_COMMAND_ERROR
+                  + "while processing responses to SAM commands: "
                   + commands.get(i).getCommandRef(),
               e);
         }

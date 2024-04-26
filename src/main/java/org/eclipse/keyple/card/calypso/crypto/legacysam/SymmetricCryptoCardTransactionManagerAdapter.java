@@ -419,13 +419,13 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         } catch (CommandException e) {
           CommandRef commandRef = samCommands.get(i).getCommandRef();
           if (commandRef == CommandRef.DIGEST_AUTHENTICATE && e instanceof SecurityDataException) {
-            throw new InvalidCardMacException("Invalid card signature.");
+            throw new InvalidCardMacException("Invalid card signature");
           } else if ((commandRef == CommandRef.PSO_VERIFY_SIGNATURE
                   || commandRef == CommandRef.DATA_CIPHER)
               && e instanceof SecurityDataException) {
-            throw new InvalidSignatureException("Invalid signature.", e);
+            throw new InvalidSignatureException("Invalid signature", e);
           } else if (commandRef == CommandRef.SV_CHECK && e instanceof SecurityDataException) {
-            throw new InvalidCardMacException("Invalid SV card signature.");
+            throw new InvalidCardMacException("Invalid SV card signature");
           }
           String sw =
               samCommands.get(i).getApduResponse() != null
@@ -677,7 +677,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         if (dataAdapter.getSamRevocationService().isSamRevoked(samSerialNumber, samCounterValue)) {
           throw new SamRevokedException(
               String.format(
-                  "SAM with serial number '%s' and counter value '%d' is revoked.",
+                  "SAM with serial number [%s] and counter value [%d] is revoked",
                   HexUtil.toHex(samSerialNumber), samCounterValue));
         }
       }

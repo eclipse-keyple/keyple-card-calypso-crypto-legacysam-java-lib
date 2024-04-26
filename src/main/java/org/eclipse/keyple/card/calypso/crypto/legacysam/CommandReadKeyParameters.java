@@ -29,17 +29,16 @@ final class CommandReadKeyParameters extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
-    m.put(0x6A00, new StatusProperties("Incorrect P2.", IllegalParameterException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
+    m.put(0x6A00, new StatusProperties("Incorrect P2", IllegalParameterException.class));
     m.put(
         0x6A83,
-        new StatusProperties(
-            "Record not found: key to read not found.", DataAccessException.class));
-    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed.", null));
+        new StatusProperties("Record not found: key to read not found", DataAccessException.class));
+    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed", null));
     STATUS_TABLE = m;
   }
 

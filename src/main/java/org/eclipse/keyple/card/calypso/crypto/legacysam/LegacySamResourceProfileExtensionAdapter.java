@@ -67,7 +67,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
     try {
       samCardSelectionResult = samCardSelectionManager.processCardSelectionScenario(reader);
     } catch (Exception e) {
-      logger.warn("An exception occurred while selecting the SAM: '{}'.", e.getMessage(), e);
+      logger.error("SAM selection failed: {}", e.getMessage(), e);
     }
 
     if (samCardSelectionResult != null) {

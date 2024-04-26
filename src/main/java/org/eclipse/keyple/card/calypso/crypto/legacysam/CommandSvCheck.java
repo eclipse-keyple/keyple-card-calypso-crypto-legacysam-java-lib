@@ -27,10 +27,9 @@ final class CommandSvCheck extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
-    m.put(
-        0x6985, new StatusProperties("No active SV transaction.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect SV signature.", SecurityDataException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
+    m.put(0x6985, new StatusProperties("No active SV transaction", AccessForbiddenException.class));
+    m.put(0x6988, new StatusProperties("Incorrect SV signature", SecurityDataException.class));
     STATUS_TABLE = m;
   }
 
@@ -47,7 +46,7 @@ final class CommandSvCheck extends Command {
     super(CommandRef.SV_CHECK, 0, context);
 
     if (svCardSignature != null && (svCardSignature.length != 3 && svCardSignature.length != 6)) {
-      throw new IllegalArgumentException("Invalid svCardSignature.");
+      throw new IllegalArgumentException("Invalid svCardSignature");
     }
 
     byte cla = context.getTargetSam().getClassByte();

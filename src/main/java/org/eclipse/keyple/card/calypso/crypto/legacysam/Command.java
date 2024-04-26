@@ -45,8 +45,8 @@ abstract class Command {
 
   static {
     HashMap<Integer, StatusProperties> m = new HashMap<>();
-    m.put(0x6D00, new StatusProperties("Instruction unknown.", IllegalParameterException.class));
-    m.put(0x6E00, new StatusProperties("Class not supported.", IllegalParameterException.class));
+    m.put(0x6D00, new StatusProperties("Instruction unknown", IllegalParameterException.class));
+    m.put(0x6E00, new StatusProperties("Class not supported", IllegalParameterException.class));
     m.put(0x9000, new StatusProperties("Success"));
     STATUS_TABLE = m;
   }
@@ -57,7 +57,7 @@ abstract class Command {
   private ApduRequestAdapter apduRequest;
   private transient ApduResponseApi apduResponse; // NOSONAR
   private final transient CommandContextDto context; // NOSONAR
-  private final transient List<Command> controlSamCommands = new ArrayList<Command>(2); // NOSONAR
+  private final transient List<Command> controlSamCommands = new ArrayList<>(2); // NOSONAR
 
   /**
    * Constructor dedicated for the building of referenced Calypso commands

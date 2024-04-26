@@ -29,27 +29,27 @@ final class CommandWriteKey extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
-    m.put(0x6A00, new StatusProperties("P1 or P2 incorrect.", IllegalParameterException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
+    m.put(0x6A00, new StatusProperties("P1 or P2 incorrect", IllegalParameterException.class));
     m.put(
         0x6A80,
         new StatusProperties(
-            "Incorrect plain or decrypted data.", IncorrectInputDataException.class));
+            "Incorrect plain or decrypted data", IncorrectInputDataException.class));
     m.put(
         0x6A83,
         new StatusProperties(
-            "Record not found: deciphering key not found.", DataAccessException.class));
+            "Record not found: deciphering key not found", DataAccessException.class));
     m.put(
         0x6A87,
-        new StatusProperties("Lc inconsistent with P1 or P2.", IncorrectInputDataException.class));
+        new StatusProperties("Lc inconsistent with P1 or P2", IncorrectInputDataException.class));
     STATUS_TABLE = m;
   }
 
