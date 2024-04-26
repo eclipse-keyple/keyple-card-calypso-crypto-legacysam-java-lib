@@ -37,7 +37,7 @@ final class CommandWriteCeilings extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6985,
         new StatusProperties(
@@ -46,14 +46,14 @@ final class CommandWriteCeilings extends Command {
                 + "- In P1, b7 is equal to 1.\n"
                 + "- CipherEnableBit of PAR1 is 0.\n"
                 + "- Dynamic mode and the outgoing challenge is unavailable.\n"
-                + "- Static mode and StaticCipherEnableBit=0.",
+                + "- Static mode and StaticCipherEnableBit=0",
             AccessForbiddenException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
-    m.put(0x6A00, new StatusProperties("Incorrect P2.", IllegalParameterException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
+    m.put(0x6A00, new StatusProperties("Incorrect P2", IllegalParameterException.class));
     m.put(
         0x6A80,
         new StatusProperties(
@@ -61,12 +61,12 @@ final class CommandWriteCeilings extends Command {
                 + "- Full ceiling record update (P2≠B8h) with DES/DESX key44 and at "
                 + "least one ceiling is increased by more than 131,071.\n"
                 + "- One ceiling update (P2=B8h): reference>26, or the 25 last data "
-                + "bytes are not all null.",
+                + "bytes are not all null",
             IncorrectInputDataException.class));
     m.put(
         0x6A83,
         new StatusProperties(
-            "Record not found: deciphering key not found.", DataAccessException.class));
+            "Record not found: deciphering key not found", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
@@ -217,7 +217,7 @@ final class CommandWriteCeilings extends Command {
                 .getCounterIncrementAccess((counterFileRecordNumber * 9) + i);
         if (config == null) {
           throw new IllegalStateException(
-              "Unable to determine counter incrementation configuration.");
+              "Unable to determine counter incrementation configuration");
         }
       }
       if (config == CounterIncrementAccess.FREE_COUNTING_ENABLED

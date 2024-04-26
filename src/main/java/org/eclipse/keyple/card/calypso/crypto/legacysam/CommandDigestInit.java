@@ -27,19 +27,18 @@ final class CommandDigestInit extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6A00, new StatusProperties("Incorrect P2.", IllegalParameterException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
+    m.put(0x6A00, new StatusProperties("Incorrect P2", IllegalParameterException.class));
     m.put(
         0x6A83,
-        new StatusProperties(
-            "Record not found: signing key not found.", DataAccessException.class));
+        new StatusProperties("Record not found: signing key not found", DataAccessException.class));
     STATUS_TABLE = m;
   }
 

@@ -38,9 +38,9 @@ final class CommandDigestInternalAuthenticate extends Command {
                 + "- Session not opened in Extended mode.\n"
                 + "- Session opened in Verification mode.\n"
                 + "- Authentication not allowed by the key (not an AES key).\n"
-                + "- 250th occurrence since session start.",
+                + "- 250th occurrence since session start",
             AccessForbiddenException.class));
-    m.put(0x6B00, new StatusProperties("Incorrect P1.", IllegalParameterException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1", IllegalParameterException.class));
 
     STATUS_TABLE = m;
   }

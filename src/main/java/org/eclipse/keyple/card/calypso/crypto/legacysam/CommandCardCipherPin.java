@@ -27,14 +27,14 @@ final class CommandCardCipherPin extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
     m.put(0x6A00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
     m.put(
         0x6A83,
@@ -72,11 +72,11 @@ final class CommandCardCipherPin extends Command {
     super(CommandRef.CARD_CIPHER_PIN, 0, context);
 
     if (currentPin == null || currentPin.length != 4) {
-      throw new IllegalArgumentException("Bad current PIN value.");
+      throw new IllegalArgumentException("Bad current PIN value");
     }
 
     if (newPin != null && newPin.length != 4) {
-      throw new IllegalArgumentException("Bad new PIN value.");
+      throw new IllegalArgumentException("Bad new PIN value");
     }
 
     byte cla = context.getTargetSam().getClassByte();

@@ -32,25 +32,23 @@ final class CommandPsoVerifySignature extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6982,
         new StatusProperties(
-            "Busy status: the command is temporarily unavailable.",
-            SecurityContextException.class));
+            "Busy status: the command is temporarily unavailable", SecurityContextException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
-    m.put(0x6988, new StatusProperties("Incorrect signature.", SecurityDataException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
     m.put(
         0x6A80,
         new StatusProperties(
-            "Incorrect parameters in incoming data.", IncorrectInputDataException.class));
+            "Incorrect parameters in incoming data", IncorrectInputDataException.class));
     m.put(
         0x6A83,
-        new StatusProperties(
-            "Record not found: signing key not found.", DataAccessException.class));
-    m.put(0x6B00, new StatusProperties("Incorrect P1 or P2.", IllegalParameterException.class));
+        new StatusProperties("Record not found: signing key not found", DataAccessException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
     STATUS_TABLE = m;
   }
 
@@ -161,7 +159,7 @@ final class CommandPsoVerifySignature extends Command {
       data.setSignatureValid(true);
     } catch (SecurityDataException e) {
       data.setSignatureValid(false);
-      throw new InvalidSignatureException("Invalid signature.", e);
+      throw new InvalidSignatureException("Invalid signature", e);
     }
   }
 }

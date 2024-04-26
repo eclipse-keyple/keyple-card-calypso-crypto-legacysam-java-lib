@@ -29,11 +29,11 @@ final class CommandSelectDiversifier extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6985,
         new StatusProperties(
-            "Preconditions not satisfied: the SAM is locked.", AccessForbiddenException.class));
+            "Preconditions not satisfied: the SAM is locked", AccessForbiddenException.class));
     STATUS_TABLE = m;
   }
 

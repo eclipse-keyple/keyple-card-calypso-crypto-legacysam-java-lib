@@ -29,7 +29,7 @@ final class CommandGetChallenge extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Le.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Le", IllegalParameterException.class));
     STATUS_TABLE = m;
   }
 

@@ -33,23 +33,23 @@ final class CommandPsoComputeCertificate extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
-        new StatusProperties("Preconditions not satisfied.", AccessForbiddenException.class));
+        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
     m.put(
         0x6A80,
         new StatusProperties(
-            "Incorrect value in the incoming data.", IncorrectInputDataException.class));
+            "Incorrect value in the incoming data", IncorrectInputDataException.class));
     m.put(
         0x6A88,
         new StatusProperties(
-            "Unknown incoming data object (incorrect tag).", DataAccessException.class));
-    m.put(0x6B00, new StatusProperties("Incorrect P1 or P2.", IllegalParameterException.class));
+            "Unknown incoming data object (incorrect tag)", DataAccessException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
     STATUS_TABLE = m;
   }
 

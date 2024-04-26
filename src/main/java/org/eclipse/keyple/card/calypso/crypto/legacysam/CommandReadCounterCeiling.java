@@ -35,9 +35,9 @@ final class CommandReadCounterCeiling extends Command {
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
-    m.put(0x6A00, new StatusProperties("Incorrect P1 or P2.", IllegalParameterException.class));
-    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed."));
+            "An event counter cannot be incremented", CounterOverflowException.class));
+    m.put(0x6A00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
+    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed"));
     STATUS_TABLE = m;
   }
 

@@ -270,7 +270,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
         if (dataAdapter.getSamRevocationService().isSamRevoked(samSerialNumber, samCounterValue)) {
           throw new SamRevokedException(
               String.format(
-                  "SAM with serial number '%s' and counter value '%d' is revoked.",
+                  "SAM with serial number [%s] and counter value [%d] is revoked",
                   HexUtil.toHex(samSerialNumber), samCounterValue));
         }
       }

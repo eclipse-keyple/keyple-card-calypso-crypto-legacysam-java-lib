@@ -31,11 +31,11 @@ final class CommandDataCipher extends Command {
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc.", IllegalParameterException.class));
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
         0x6900,
         new StatusProperties(
-            "An event counter cannot be incremented.", CounterOverflowException.class));
+            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(
         0x6985,
         new StatusProperties(
@@ -44,13 +44,13 @@ final class CommandDataCipher extends Command {
                 + "- Cipher or sign forbidden (DataCipherEnableBit of PAR5 is 0).\n"
                 + "- Ciphering or signing mode, and ciphering forbidden (CipherEnableBit of PAR1 is 0).\n"
                 + "- Decipher mode, and deciphering forbidden (DecipherDataEnableBit of PAR1 is 0).\n"
-                + "- AES key.",
+                + "- AES key",
             AccessForbiddenException.class));
     m.put(
         0x6A83,
         new StatusProperties(
-            "Record not found: ciphering key not found.", DataAccessException.class));
-    m.put(0x6B00, new StatusProperties("Incorrect P1.", IllegalParameterException.class));
+            "Record not found: ciphering key not found", DataAccessException.class));
+    m.put(0x6B00, new StatusProperties("Incorrect P1", IllegalParameterException.class));
     STATUS_TABLE = m;
   }
 
@@ -159,7 +159,7 @@ final class CommandDataCipher extends Command {
             Arrays.equals(computedSignature, signatureVerificationData.getSignature()));
       }
       if (signatureVerificationData != null && !signatureVerificationData.isSignatureValid()) {
-        throw new InvalidSignatureException("Invalid signature.");
+        throw new InvalidSignatureException("Invalid signature");
       }
     }
   }
