@@ -33,7 +33,7 @@ dependencies {
     implementation("org.eclipse.keypop:keypop-calypso-crypto-symmetric-java-api:0.1.1")
     implementation("org.eclipse.keypop:keypop-calypso-crypto-legacysam-java-api:0.6.0")
     implementation("org.eclipse.keyple:keyple-common-java-api:2.0.1")
-    implementation("org.eclipse.keyple:keyple-service-resource-java-lib:3.0.2-SNAPSHOT") {isChanging=true}
+    implementation("org.eclipse.keyple:keyple-service-resource-java-lib:3.0.2")
     implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.0")
     implementation("org.slf4j:slf4j-api:1.7.32")
     implementation("com.google.code.gson:gson:2.10.1")
