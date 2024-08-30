@@ -351,6 +351,16 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
+   * @since 0.7.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadSamParameters() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.4.0
    */
   @Override
@@ -358,6 +368,26 @@ final class LegacySamSelectionExtensionAdapter
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
     commands.add(new CommandReadKeyParameters(context, systemKeyType));
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadWorkKeyParameters(int recordNumber) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadWorkKeyParameters(byte kif, byte kvc) {
+    return null;
   }
 
   /**

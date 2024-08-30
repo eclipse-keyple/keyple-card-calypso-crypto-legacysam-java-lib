@@ -380,6 +380,26 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
+   * {@inheritDoc}
+   *
+   * @since 0.6.0
+   */
+  @Override
+  public byte[] getCaCertificate() {
+    return caCertificate;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public byte[] getSamParameters() {
+    return new byte[0];
+  }
+
+  /**
    * Set the {@link KeyParameter} for specified {@link SystemKeyType}.
    *
    * @param systemKeyType The system key type.
@@ -403,11 +423,21 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 0.6.0
+   * @since 0.7.0
    */
   @Override
-  public byte[] getCaCertificate() {
-    return caCertificate;
+  public KeyParameter getWorkKeyParameter(int recordNumber) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public KeyParameter getWorkKeyParameter(byte kif, byte kvc) {
+    return null;
   }
 
   /**

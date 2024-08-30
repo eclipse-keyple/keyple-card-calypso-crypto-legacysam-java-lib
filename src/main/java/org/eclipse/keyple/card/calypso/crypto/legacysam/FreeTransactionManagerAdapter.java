@@ -288,6 +288,16 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
+   * @since 0.7.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadSamParameters() {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.3.0
    */
   @Override
@@ -295,6 +305,26 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
     addTargetSamCommand(new CommandReadKeyParameters(getContext(), systemKeyType));
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadWorkKeyParameters(int recordNumber) {
+    return null;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.7.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadWorkKeyParameters(byte kif, byte kvc) {
+    return null;
   }
 
   /**
