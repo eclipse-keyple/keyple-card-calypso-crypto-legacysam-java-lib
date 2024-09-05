@@ -410,6 +410,20 @@ final class LegacySamSelectionExtensionAdapter
   }
 
   /**
+   * Schedules the execution of a "Get Challenge" command.
+   *
+   * <p>Once this command is processed, the challenge (as an 8-byte byte array) can be access using
+   * the {@link LegacySamAdapter#popChallenge()} method.
+   *
+   * @return The current instance.
+   * @since 0.8.0
+   */
+  LegacySamSelectionExtension prepareGetChallenge() {
+    commands.add(new CommandGetChallenge(context, 8));
+    return this;
+  }
+
+  /**
    * Provides the {@link CardReader} for communicating with the SAM during the unlocking process
    * when involving a static or a dynamic unlock data providers.
    *

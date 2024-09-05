@@ -53,16 +53,27 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
   @Override
   public SmartCard matches(CardReader reader, ReaderApiFactory readerApiFactory) {
 
+    // Is SAM inserted?
     if (!reader.isCardPresent()) {
       return null;
     }
+
+    // Init the SAM selector
     BasicCardSelector cardSelector = readerApiFactory.createBasicCardSelector();
     if (powerOnDataRegex != null) {
       cardSelector.filterByPowerOnData(powerOnDataRegex);
     }
-    CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();
+
+    // Associate the provided reader to the prepared LegacySAM selection extension and prepare an
+    // additional "Get Challenge" command for network optimization.
     legacySamSelectionExtension.setSamReader(reader);
+    legacySamSelectionExtension.prepareGetChallenge();
+
+    // Prepare the SAM selection scenario
+    CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();
     samCardSelectionManager.prepareSelection(cardSelector, legacySamSelectionExtension);
+
+    // Process the SAM selection scenario
     CardSelectionResult samCardSelectionResult = null;
     try {
       samCardSelectionResult = samCardSelectionManager.processCardSelectionScenario(reader);
@@ -70,10 +81,22 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
       logger.error("SAM selection failed: {}", e.getMessage(), e);
     }
 
-    if (samCardSelectionResult != null) {
-      return samCardSelectionResult.getActiveSmartCard();
-    }
+    return samCardSelectionResult != null ? samCardSelectionResult.getActiveSmartCard() : null;
+  }
 
-    return null;
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.8.0
+   */
+  @Override
+  public SmartCard matches(SmartCard smartCard) {
+    if (!(smartCard instanceof LegacySamAdapter)) {
+      return null;
+    }
+    if (powerOnDataRegex != null && !smartCard.getPowerOnData().matches(powerOnDataRegex)) {
+      return null;
+    }
+    return smartCard;
   }
 }

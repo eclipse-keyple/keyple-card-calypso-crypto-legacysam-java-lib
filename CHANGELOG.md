@@ -5,6 +5,11 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Added
+- Added an optimization to the SAM resource profile extension which consists in automatically adding the 
+  **Get Challenge** command when selecting the SAM.
+### Upgraded
+- Keyple Service Resource Library `3.0.2` -> `3.1.0`
 
 ## [0.7.1] - 2024-06-25
 ### Fixed
