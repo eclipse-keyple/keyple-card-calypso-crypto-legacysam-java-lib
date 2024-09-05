@@ -67,7 +67,7 @@ class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExt
     // Associate the provided reader to the prepared LegacySAM selection extension and prepare an
     // additional "Get Challenge" command for network optimization.
     legacySamSelectionExtension.setSamReader(reader);
-    legacySamSelectionExtension.prepareGetChallenge();
+    legacySamSelectionExtension.prepareGetChallengeIfNeeded();
 
     // Prepare the SAM selection scenario
     CardSelectionManager samCardSelectionManager = readerApiFactory.createCardSelectionManager();

@@ -410,7 +410,8 @@ final class LegacySamSelectionExtensionAdapter
   }
 
   /**
-   * Schedules the execution of a "Get Challenge" command.
+   * Schedules the execution of a "Get Challenge" command if the last command is not a "Get
+   * Challenge" command.
    *
    * <p>Once this command is processed, the challenge (as an 8-byte byte array) can be access using
    * the {@link LegacySamAdapter#popChallenge()} method.
@@ -418,8 +419,11 @@ final class LegacySamSelectionExtensionAdapter
    * @return The current instance.
    * @since 0.8.0
    */
-  LegacySamSelectionExtension prepareGetChallenge() {
-    commands.add(new CommandGetChallenge(context, 8));
+  LegacySamSelectionExtension prepareGetChallengeIfNeeded() {
+    if (commands.isEmpty()
+        || commands.get(commands.size() - 1).getCommandRef() != CommandRef.GET_CHALLENGE) {
+      commands.add(new CommandGetChallenge(context, 8));
+    }
     return this;
   }
 
