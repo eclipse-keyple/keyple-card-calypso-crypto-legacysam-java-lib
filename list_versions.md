@@ -1,6 +1,6 @@
 | Version | Documents |
 |:---:|---|
-| 0.8.0-SNAPSHOT | [API documentation](0.8.0-SNAPSHOT)<br>[API class diagram](0.8.0-SNAPSHOT/api_class_diagram.svg) |
+| 0.8.0 | [API documentation](0.8.0)<br>[API class diagram](0.8.0/api_class_diagram.svg) |
 | 0.7.1 | [API documentation](0.7.1)<br>[API class diagram](0.7.1/api_class_diagram.svg) |
 | 0.7.0 | [API documentation](0.7.0)<br>[API class diagram](0.7.0/api_class_diagram.svg) |
 | 0.6.0 | [API documentation](0.6.0)<br>[API class diagram](0.6.0/api_class_diagram.svg) |
