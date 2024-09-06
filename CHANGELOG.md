@@ -5,11 +5,13 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.8.0] - 2024-09-06
 ### Added
 - Added an optimization to the SAM resource profile extension which consists in automatically adding the 
   **Get Challenge** command when selecting the SAM.
 ### Upgraded
-- Keyple Service Resource Library `3.0.2` -> `3.1.0`
+- Keyple Service Resource Library `3.0.2` -> `3.1.0` (optimization of network exchanges)
 
 ## [0.7.1] - 2024-06-25
 ### Fixed
@@ -84,7 +86,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.1...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.8.0...HEAD
+[0.8.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.0...0.7.1
 [0.7.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.6.0...0.7.0
 [0.6.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.5.0...0.6.0
