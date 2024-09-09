@@ -57,12 +57,16 @@ final class CommandWriteKey extends Command {
    * Instantiates a new CommandWriteKey.
    *
    * @param context The command context.
-   * @param writingMode the writing mode (P1).
+   * @param targetSamContext The target SAM context.
    * @param keyReference the key reference (P2).
    * @param keyData the key data.
    * @since 0.9.0
    */
-  CommandWriteKey(CommandContextDto context, byte writingMode, byte keyReference, byte[] keyData) {
+  CommandWriteKey(
+      CommandContextDto context,
+      TargetSamContextDto targetSamContext,
+      byte keyReference,
+      byte[] keyData) {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
@@ -72,8 +76,8 @@ final class CommandWriteKey extends Command {
       throw new IllegalArgumentException("Key data null!");
     }
 
-    if (keyData.length < 48 || keyData.length > 80) {
-      throw new IllegalArgumentException("Key data should be between 40 and 80 bytes long!");
+    if (keyData.length != 48 && keyData.length != 80) {
+      throw new IllegalArgumentException("Key data should be between 40 or 80 bytes long!");
     }
 
     setApduRequest(
@@ -81,7 +85,7 @@ final class CommandWriteKey extends Command {
             ApduUtil.build(
                 cla,
                 getCommandRef().getInstructionByte(),
-                writingMode,
+                (byte) (targetSamContext.isDynamicMode() ? 0x08 : 0x00),
                 keyReference,
                 keyData,
                 null)));
