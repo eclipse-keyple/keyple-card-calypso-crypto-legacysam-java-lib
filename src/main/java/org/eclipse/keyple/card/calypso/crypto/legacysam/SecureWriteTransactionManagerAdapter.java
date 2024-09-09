@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import org.eclipse.keyple.core.util.Assert;
 import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SecureWriteTransactionManager;
@@ -19,10 +20,12 @@ import org.eclipse.keypop.card.ProxyReaderApi;
 /**
  * Adapter of {@link SecureWriteTransactionManager}.
  *
- * @since 0.7.0
+ * @since 0.9.0
  */
 public class SecureWriteTransactionManagerAdapter extends CommonTransactionManagerAdapter
     implements SecureWriteTransactionManager {
+
+  private final DtoAdapters.TargetSamContextDto targetSamContext;
 
   /**
    * Constructor
@@ -38,66 +41,139 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
       ProxyReaderApi controlSamReader,
       LegacySamAdapter controlSam) {
     super(targetSamReader, targetSam, controlSamReader, controlSam);
+    targetSamContext =
+        new DtoAdapters.TargetSamContextDto(getContext().getTargetSam().getSerialNumber(), false);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager prepareWriteSamParameters(byte[] parameters) {
-    return null;
+    Assert.getInstance()
+        .notNull(parameters, "parameters")
+        .isEqual(parameters.length, LegacySamConstants.SAM_PARAMETERS_LENGTH, "parameters.length");
+    if (targetSamContext.isDynamicMode()) {
+      addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    }
+    addTargetSamCommand(new CommandWriteSamParameters(getContext(), targetSamContext, parameters));
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager prepareTransferSystemKey(
       SystemKeyType systemKeyType, byte[] systemKeyParameters) {
-    return null;
+    Assert.getInstance()
+        .notNull(systemKeyType, "systemKeyType")
+        .notNull(systemKeyParameters, "systemKeyParameters")
+        .isEqual(
+            systemKeyParameters.length,
+            LegacySamConstants.KEY_PARAMETERS_LENGTH,
+            "systemKeyParameters.length");
+    // TODO
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKey(
       byte kif, byte kvc, byte[] workKeyParameters, int recordNumber) {
-    return null;
+    Assert.getInstance()
+        .notNull(workKeyParameters, "workKeyParameters")
+        .isEqual(
+            workKeyParameters.length,
+            LegacySamConstants.KEY_PARAMETERS_LENGTH,
+            "workKeyParameters.length");
+    // TODO
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager prepareWriteCounterCeiling(
       int counterNumber, int ceilingValue) {
-    return null;
+
+    Assert.getInstance()
+        .isInRange(
+            counterNumber,
+            LegacySamConstants.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MAX_COUNTER_CEILING_NUMBER,
+            "counterNumber")
+        .isInRange(
+            ceilingValue,
+            LegacySamConstants.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MAX_COUNTER_CEILING_VALUE,
+            "ceilingValue");
+
+    if (targetSamContext.isDynamicMode()) {
+      addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    }
+    addTargetSamCommand(
+        new CommandWriteCeilings(getContext(), targetSamContext, counterNumber, ceilingValue));
+
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager prepareWriteCounterConfiguration(
       int counterNumber, int ceilingValue, CounterIncrementAccess counterIncrementAccess) {
-    return null;
+
+    Assert.getInstance()
+        .isInRange(
+            counterNumber,
+            LegacySamConstants.MIN_COUNTER_CEILING_NUMBER,
+            LegacySamConstants.MAX_COUNTER_CEILING_NUMBER,
+            "counterNumber")
+        .isInRange(
+            ceilingValue,
+            LegacySamConstants.MIN_COUNTER_CEILING_VALUE,
+            LegacySamConstants.MAX_COUNTER_CEILING_VALUE,
+            "ceilingValue");
+
+    for (Command command : getTargetSamCommands()) {
+      if (command instanceof CommandWriteCeilings
+          && ((CommandWriteCeilings) command).getCounterFileRecordNumber()
+              == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
+        ((CommandWriteCeilings) command)
+            .addCounter(counterNumber, ceilingValue, counterIncrementAccess);
+        return this;
+      }
+    }
+
+    if (targetSamContext.isDynamicMode()) {
+      addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    }
+    addTargetSamCommand(
+        new CommandWriteCeilings(
+            getContext(), targetSamContext, counterNumber, ceilingValue, counterIncrementAccess));
+
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public SecureWriteTransactionManager processCommands() {

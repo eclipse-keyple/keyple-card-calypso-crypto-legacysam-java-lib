@@ -13,6 +13,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
@@ -35,14 +36,14 @@ final class CommandReadKeyParameters extends Command {
         new StatusProperties(
             "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(0x6A00, new StatusProperties("Incorrect P2", IllegalParameterException.class));
-    m.put(
-        0x6A83,
-        new StatusProperties("Record not found: key to read not found", DataAccessException.class));
+    m.put(0x6A83, new StatusProperties("Record not found: key to read not found", null));
     m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed", null));
     STATUS_TABLE = m;
   }
 
   private SystemKeyType systemKeyType;
+  private Short kifKvc;
+  private int recordNumber = -1;
 
   /**
    * Instantiates a new instance to read the parameters of a system key.
@@ -98,6 +99,7 @@ final class CommandReadKeyParameters extends Command {
     final byte p1 = 0;
     final byte p2 = (byte) 0xF0;
     byte[] dataIn = {kif, kvc};
+    kifKvc = (short) ((kif << 8) | (kvc & 0xFF));
 
     setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
   }
@@ -111,15 +113,18 @@ final class CommandReadKeyParameters extends Command {
    */
   CommandReadKeyParameters(CommandContextDto context, int recordNumber) {
 
-    super(CommandRef.READ_KEY_PARAMETERS, 32, context);
+    super(CommandRef.READ_KEY_PARAMETERS, 0, context);
 
     byte cla = context.getTargetSam().getClassByte();
     byte inst = getCommandRef().getInstructionByte();
     final byte p1 = 0;
     byte p2 = (byte) recordNumber;
     byte[] dataIn = {0x00, 0x00};
+    this.recordNumber = recordNumber;
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(0x6A83));
   }
 
   /**
@@ -160,12 +165,29 @@ final class CommandReadKeyParameters extends Command {
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
     setResponseAndCheckStatus(apduResponse);
+    if (recordNumber != -1) {
+      //  accessing by record numbers
+      if (apduResponse.getStatusWord() == 0x6A83) {
+        // ignore missing keys
+        return;
+      }
+      // length isn't automatically checked in this case
+      if (apduResponse.getDataOut().length != 32) {
+        throw new UnexpectedResponseLengthException(
+            String.format(
+                "Incorrect APDU response length (expected: 32, actual: %d)",
+                apduResponse.getDataOut().length));
+      }
+    }
+    KeyParameterAdapter keyParameterAdapter =
+        new KeyParameterAdapter(Arrays.copyOfRange(apduResponse.getApdu(), 8, 21));
+    LegacySamAdapter legacySamAdapter = getContext().getTargetSam();
     if (systemKeyType != null) {
-      byte[] keyParameter = new byte[13];
-      System.arraycopy(apduResponse.getApdu(), 8, keyParameter, 0, 13);
-      getContext()
-          .getTargetSam()
-          .setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
+      legacySamAdapter.setSystemKeyParameter(systemKeyType, keyParameterAdapter);
+    } else if (kifKvc != null) {
+      legacySamAdapter.setWorkKeyParameter(kifKvc, keyParameterAdapter);
+    } else {
+      legacySamAdapter.setWorkKeyParameter(recordNumber, keyParameterAdapter);
     }
   }
 }

@@ -175,7 +175,11 @@ final class CommandWriteCeilings extends Command {
     // add commands
     addControlSamCommand(
         new CommandSelectDiversifier(controlSamContext, targetSamContext.getSerialNumber()));
-    addControlSamCommand(new CommandGiveRandom(controlSamContext, computeChallenge()));
+    byte[] challenge =
+        targetSamContext.isDynamicMode()
+            ? getContext().getTargetSam().popChallenge()
+            : LegacySamUtil.computeStaticModeChallenge(targetSamContext, SystemKeyType.RELOADING);
+    addControlSamCommand(new CommandGiveRandom(controlSamContext, challenge));
     if (counterFileRecordNumber != -1) {
       computePlainData();
     }
@@ -189,8 +193,8 @@ final class CommandWriteCeilings extends Command {
             plainData);
     addControlSamCommand(commandSamDataCipher);
     processControlSamCommand();
-    final byte cla = (byte) 0x80;
-    final byte inst = (byte) 0xD8;
+    final byte cla = getContext().getTargetSam().getClassByte();
+    final byte inst = CommandRef.WRITE_CEILINGS.getInstructionByte();
     byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
     setApduRequest(
         new ApduRequestAdapter(
@@ -226,32 +230,6 @@ final class CommandWriteCeilings extends Command {
       }
     }
     ByteArrayUtil.copyBytes(configBits, plainData, 28, 2);
-  }
-
-  /** Computes the challenge to be sent to the control SAM from the target SAM context. */
-  private byte[] computeChallenge() {
-
-    // compute the challenge
-    byte[] challenge = new byte[8];
-    if (targetSamContext.getSystemKeyTypeToCounterNumberMap() != null) {
-      Integer reloadingKeyCounterNumber =
-          targetSamContext.getSystemKeyTypeToCounterNumberMap().get(SystemKeyType.RELOADING);
-      if (reloadingKeyCounterNumber != null) {
-        ByteArrayUtil.copyBytes(
-            targetSamContext.getCounterNumberToCounterValueMap().get(reloadingKeyCounterNumber),
-            challenge,
-            5,
-            3);
-        // increment counter
-        targetSamContext
-            .getCounterNumberToCounterValueMap()
-            .put(
-                reloadingKeyCounterNumber,
-                targetSamContext.getCounterNumberToCounterValueMap().get(reloadingKeyCounterNumber)
-                    + 1);
-      }
-    }
-    return challenge;
   }
 
   /**

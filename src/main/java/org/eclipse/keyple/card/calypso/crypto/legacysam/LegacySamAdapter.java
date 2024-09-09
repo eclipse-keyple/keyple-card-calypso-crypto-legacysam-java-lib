@@ -11,10 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.SortedMap;
-import java.util.TreeMap;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.eclipse.keyple.core.util.HexUtil;
@@ -23,6 +20,7 @@ import org.eclipse.keypop.calypso.crypto.legacysam.CounterIncrementAccess;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.KeyParameter;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
+import org.eclipse.keypop.calypso.crypto.legacysam.sam.SamParameters;
 import org.eclipse.keypop.card.CardSelectionResponseApi;
 import org.eclipse.keypop.card.spi.SmartCardSpi;
 import org.slf4j.Logger;
@@ -52,8 +50,11 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParameterMap =
       new HashMap<>(); // NOSONAR JSON serializer
+  private final Map<Integer, KeyParameterAdapter> workKeyParameterByRecordNumber = new HashMap<>();
+  private final Map<Short, KeyParameterAdapter> workKeyParameterByKifKvc = new HashMap<>();
   private byte[] challenge;
   private byte[] caCertificate;
+  private SamParametersAdapter samParameters;
 
   /**
    * Constructor.
@@ -392,11 +393,21 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
-  public byte[] getSamParameters() {
-    return new byte[0];
+  public SamParameters getSamParameters() {
+    return this.samParameters;
+  }
+
+  /**
+   * Set the {@link KeyParameter} for specified {@link SystemKeyType}.
+   *
+   * @param samParameters The {@link SamParametersAdapter}.
+   * @since 0.3.0
+   */
+  void setSamParameters(SamParametersAdapter samParameters) {
+    this.samParameters = samParameters;
   }
 
   /**
@@ -421,23 +432,45 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * {@inheritDoc}
+   * Set the {@link KeyParameter} for work key identified by its record number.
    *
-   * @since 0.7.0
+   * @param recordNumber The key record number.
+   * @param keyParameter The {@link KeyParameterAdapter}.
+   * @since 0.9.0
    */
-  @Override
-  public KeyParameter getWorkKeyParameter(int recordNumber) {
-    return null;
+  void setWorkKeyParameter(int recordNumber, KeyParameterAdapter keyParameter) {
+    workKeyParameterByRecordNumber.put(recordNumber, keyParameter);
+  }
+
+  /**
+   * Set the {@link KeyParameter} for work key identified by its KIF/KVC.
+   *
+   * @param kifKvc The combined KIF/KVC of the key.
+   * @param keyParameter The {@link KeyParameterAdapter}.
+   * @since 0.9.0
+   */
+  void setWorkKeyParameter(Short kifKvc, KeyParameterAdapter keyParameter) {
+    workKeyParameterByKifKvc.put(kifKvc, keyParameter);
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
+   */
+  @Override
+  public KeyParameter getWorkKeyParameter(int recordNumber) {
+    return workKeyParameterByRecordNumber.get(recordNumber);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
    */
   @Override
   public KeyParameter getWorkKeyParameter(byte kif, byte kvc) {
-    return null;
+    return workKeyParameterByKifKvc.get((short) ((kif << 8) | (kvc & 0xFF)));
   }
 
   /**

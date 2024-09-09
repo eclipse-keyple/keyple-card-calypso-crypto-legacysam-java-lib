@@ -351,7 +351,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadSamParameters() {
@@ -373,7 +373,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadWorkKeyParameters(int recordNumber) {
@@ -383,7 +383,7 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadWorkKeyParameters(byte kif, byte kvc) {
