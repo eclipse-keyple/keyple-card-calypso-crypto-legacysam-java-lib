@@ -12,6 +12,8 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.MAX_KEY_RECORD_NUMBER;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.MIN_KEY_RECORD_NUMBER;
 
 import java.util.*;
 import org.eclipse.keyple.core.util.Assert;
@@ -288,11 +290,12 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public FreeTransactionManager prepareReadSamParameters() {
-    return null;
+    addTargetSamCommand(new CommandReadSamParameters(getContext()));
+    return this;
   }
 
   /**
@@ -310,21 +313,25 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public FreeTransactionManager prepareReadWorkKeyParameters(int recordNumber) {
-    return null;
+    Assert.getInstance()
+        .isInRange(recordNumber, MIN_KEY_RECORD_NUMBER, MAX_KEY_RECORD_NUMBER, "recordNumber");
+    addTargetSamCommand(new CommandReadKeyParameters(getContext(), recordNumber));
+    return this;
   }
 
   /**
    * {@inheritDoc}
    *
-   * @since 0.7.0
+   * @since 0.9.0
    */
   @Override
   public FreeTransactionManager prepareReadWorkKeyParameters(byte kif, byte kvc) {
-    return null;
+    addTargetSamCommand(new CommandReadKeyParameters(getContext(), kif, kvc));
+    return this;
   }
 
   /**

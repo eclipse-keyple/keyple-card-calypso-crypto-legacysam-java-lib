@@ -22,6 +22,8 @@ final class LegacySamConstants {
 
   private LegacySamConstants() {}
 
+  static final int MIN_KEY_RECORD_NUMBER = 1;
+  static final int MAX_KEY_RECORD_NUMBER = 126;
   static final int MIN_COUNTER_NUMBER = 0;
   static final int MAX_COUNTER_NUMBER = 26;
   static final int MIN_COUNTER_CEILING_NUMBER = 0;
@@ -34,6 +36,8 @@ final class LegacySamConstants {
   static final byte AID_SIZE_MAX = 16;
   static final int CA_CERTIFICATE_SIZE = 384;
   static final int ECC_PUBLIC_KEY_SIZE = 64;
+  static final int SAM_PARAMETERS_LENGTH = 29;
+  static final int KEY_PARAMETERS_LENGTH = 10;
 
   /**
    * Enum representing the different tags used in Get Data APDU command and providing precomputed

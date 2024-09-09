@@ -21,7 +21,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
 /**
  * Builds the Write Key APDU command.
  *
- * @since 0.1.0
+ * @since 0.9.0
  */
 final class CommandWriteKey extends Command {
 
@@ -60,7 +60,7 @@ final class CommandWriteKey extends Command {
    * @param writingMode the writing mode (P1).
    * @param keyReference the key reference (P2).
    * @param keyData the key data.
-   * @since 0.1.0
+   * @since 0.9.0
    */
   CommandWriteKey(CommandContextDto context, byte writingMode, byte keyReference, byte[] keyData) {
 
@@ -90,7 +90,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   void finalizeRequest() {
@@ -100,7 +100,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -110,7 +110,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
@@ -120,7 +120,7 @@ final class CommandWriteKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.9.0
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {
