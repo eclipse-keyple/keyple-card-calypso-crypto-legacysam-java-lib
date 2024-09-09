@@ -23,7 +23,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
 /**
  * Builds the "Read Key Parameters" SAM command.
  *
- * @since 0.3.0
+ * @since 0.9.0
  */
 final class CommandReadKeyParameters extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
@@ -54,7 +54,7 @@ final class CommandReadKeyParameters extends Command {
    *
    * @param context The command context.
    * @param systemKeyType The type of the system key.
-   * @since 0.3.0
+   * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, SystemKeyType systemKeyType) {
 
@@ -94,7 +94,7 @@ final class CommandReadKeyParameters extends Command {
    * @param context The command context.
    * @param kif The KIF of the key.
    * @param kvc The KIF of the key.
-   * @since 0.3.0
+   * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, byte kif, byte kvc) {
 
@@ -117,7 +117,7 @@ final class CommandReadKeyParameters extends Command {
    *
    * @param context The command context.
    * @param recordNumber the record number
-   * @since 0.3.0
+   * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, int recordNumber) {
 
@@ -139,7 +139,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {
@@ -149,7 +149,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   void finalizeRequest() {
@@ -159,7 +159,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -169,7 +169,7 @@ final class CommandReadKeyParameters extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.3.0
+   * @since 0.9.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
