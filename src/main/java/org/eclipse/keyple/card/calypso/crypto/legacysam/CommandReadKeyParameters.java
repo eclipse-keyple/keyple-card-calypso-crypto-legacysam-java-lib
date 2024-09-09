@@ -28,6 +28,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
 final class CommandReadKeyParameters extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
   private static final int SW_KEY_NOT_FOUND = 0x6A83;
+  private static final int SW_DATA_NOT_SIGNED_WARNING = 0x6200;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
@@ -82,7 +83,9 @@ final class CommandReadKeyParameters extends Command {
     }
     byte[] dataIn = {0x00, 0x00};
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
   }
 
   /**
@@ -104,7 +107,9 @@ final class CommandReadKeyParameters extends Command {
     byte[] dataIn = {kif, kvc};
     kifKvc = (short) ((kif << 8) | (kvc & 0xFF));
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
   }
 
   /**
@@ -127,6 +132,7 @@ final class CommandReadKeyParameters extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING)
             .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
   }
 
