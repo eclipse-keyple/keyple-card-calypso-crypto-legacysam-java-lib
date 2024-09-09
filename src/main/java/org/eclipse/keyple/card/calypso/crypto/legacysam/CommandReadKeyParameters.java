@@ -47,7 +47,7 @@ final class CommandReadKeyParameters extends Command {
 
   private SystemKeyType systemKeyType;
   private Short kifKvc;
-  private int recordNumber = -1;
+  private int recordNumber;
 
   /**
    * Instantiates a new instance to read the parameters of a system key.
