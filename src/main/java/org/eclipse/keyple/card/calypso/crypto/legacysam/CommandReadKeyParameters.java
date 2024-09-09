@@ -27,6 +27,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
  */
 final class CommandReadKeyParameters extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
+  private static final int SW_KEY_NOT_FOUND = 0x6A83;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
@@ -36,8 +37,10 @@ final class CommandReadKeyParameters extends Command {
         new StatusProperties(
             "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(0x6A00, new StatusProperties("Incorrect P2", IllegalParameterException.class));
-    m.put(0x6A83, new StatusProperties("Record not found: key to read not found", null));
-    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed", null));
+    m.put(
+        0x6A83,
+        new StatusProperties("Record not found: key to read not found", DataAccessException.class));
+    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed"));
     STATUS_TABLE = m;
   }
 
@@ -113,7 +116,7 @@ final class CommandReadKeyParameters extends Command {
    */
   CommandReadKeyParameters(CommandContextDto context, int recordNumber) {
 
-    super(CommandRef.READ_KEY_PARAMETERS, 0, context);
+    super(CommandRef.READ_KEY_PARAMETERS, 32, context);
 
     byte cla = context.getTargetSam().getClassByte();
     byte inst = getCommandRef().getInstructionByte();
@@ -124,7 +127,7 @@ final class CommandReadKeyParameters extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
-            .addSuccessfulStatusWord(0x6A83));
+            .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
   }
 
   /**
@@ -164,20 +167,10 @@ final class CommandReadKeyParameters extends Command {
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
-    setResponseAndCheckStatus(apduResponse);
-    if (recordNumber != -1) {
-      //  accessing by record numbers
-      if (apduResponse.getStatusWord() == 0x6A83) {
-        // ignore missing keys
-        return;
-      }
-      // length isn't automatically checked in this case
-      if (apduResponse.getDataOut().length != 32) {
-        throw new UnexpectedResponseLengthException(
-            String.format(
-                "Incorrect APDU response length (expected: 32, actual: %d)",
-                apduResponse.getDataOut().length));
-      }
+    try {
+      setResponseAndCheckStatus(apduResponse);
+    } catch (DataAccessException e) {
+      return;
     }
     KeyParameterAdapter keyParameterAdapter =
         new KeyParameterAdapter(Arrays.copyOfRange(apduResponse.getApdu(), 8, 21));
