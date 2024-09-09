@@ -77,7 +77,11 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
             systemKeyParameters.length,
             LegacySamConstants.KEY_PARAMETERS_LENGTH,
             "systemKeyParameters.length");
-    // TODO
+    if (targetSamContext.isDynamicMode()) {
+      addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    }
+    addTargetSamCommand(
+        new CommandWriteKey(getContext(), targetSamContext, (byte) 0xC0, systemKeyParameters));
     return this;
   }
 
@@ -94,8 +98,14 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
         .isEqual(
             workKeyParameters.length,
             LegacySamConstants.KEY_PARAMETERS_LENGTH,
-            "workKeyParameters.length");
-    // TODO
+            "workKeyParameters.length")
+        .isInRange(recordNumber, 1, 126, "recordNumber");
+    if (targetSamContext.isDynamicMode()) {
+      addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    }
+    addTargetSamCommand(
+        new CommandWriteKey(
+            getContext(), targetSamContext, (byte) recordNumber, workKeyParameters));
     return this;
   }
 
