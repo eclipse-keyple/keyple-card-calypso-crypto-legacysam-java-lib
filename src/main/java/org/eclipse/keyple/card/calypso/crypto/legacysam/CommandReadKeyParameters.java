@@ -93,7 +93,7 @@ final class CommandReadKeyParameters extends Command {
    *
    * @param context The command context.
    * @param kif The KIF of the key.
-   * @param kvc The KIF of the key.
+   * @param kvc The KVC of the key.
    * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, byte kif, byte kvc) {
