@@ -28,6 +28,7 @@ final class CommandReadCounter extends Command {
 
   private final int counterFileRecordNumber;
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
+  private static final int SW_DATA_NOT_SIGNED_WARNING = 0x6200;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
@@ -56,8 +57,9 @@ final class CommandReadCounter extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(
-            ApduUtil.build(
-                cla, getCommandRef().getInstructionByte(), (byte) 0x00, p2, null, (byte) 0x00)));
+                ApduUtil.build(
+                    cla, getCommandRef().getInstructionByte(), (byte) 0x00, p2, null, (byte) 0x00))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
   }
 
   /**

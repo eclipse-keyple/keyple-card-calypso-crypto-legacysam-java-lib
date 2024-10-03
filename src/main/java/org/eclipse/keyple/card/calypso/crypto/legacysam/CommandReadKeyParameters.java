@@ -85,7 +85,9 @@ final class CommandReadKeyParameters extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
-            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING)
+            .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
+    addSubName(this.systemKeyType.name());
   }
 
   /**
@@ -110,6 +112,7 @@ final class CommandReadKeyParameters extends Command {
     setApduRequest(
         new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
             .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
+    addSubName("Work key");
   }
 
   /**
@@ -134,6 +137,7 @@ final class CommandReadKeyParameters extends Command {
         new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
             .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING)
             .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
+    addSubName("Work key");
   }
 
   /**
