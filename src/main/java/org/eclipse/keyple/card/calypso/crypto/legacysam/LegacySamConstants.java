@@ -11,7 +11,10 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import java.util.EnumMap;
+import java.util.Map;
 import org.eclipse.keyple.core.util.HexUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 
 /**
  * Constants related to Calypso cards.
@@ -36,8 +39,41 @@ final class LegacySamConstants {
   static final byte AID_SIZE_MAX = 16;
   static final int CA_CERTIFICATE_SIZE = 384;
   static final int ECC_PUBLIC_KEY_SIZE = 64;
+  static final int PLAIN_CEILING_DATA_BLOCK_SIZE = 30;
+  static final int KEY_DATA_BLOCK_SIZE = 48;
+  static final int LOCK_FILE_SIZE = 29;
   static final int SAM_PARAMETERS_LENGTH = 29;
   static final int KEY_PARAMETERS_LENGTH = 10;
+  static final int LOCK_VALUE_LENGTH = 16;
+
+  static final byte TARGET_IS_SYSTEM_KEY_FILE = (byte) 0xC0;
+  static final byte TARGET_IS_LOCK_FILE = (byte) 0xE0;
+
+  static final byte FIRST_EVENT_CEILING_RECORD_REFERENCE = (byte) 0xB1;
+  static final byte SINGLE_CEILING_REFERENCE = (byte) 0xB8;
+
+  static final byte LOCK_KIF = (byte) 0xEF;
+
+  static final byte DYNAMIC_MODE_CIPHERING = (byte) 0x00;
+  static final byte STATIC_MODE_CIPHERING = (byte) 0x08;
+
+  /** Mapper for SystemKeyType to kif values. */
+  static class SystemKeyTypeKifMapper {
+    private static final Map<SystemKeyType, Byte> kifMap = new EnumMap<>(SystemKeyType.class);
+
+    private SystemKeyTypeKifMapper() {}
+
+    static {
+      kifMap.put(SystemKeyType.PERSONALIZATION, (byte) 0xE1);
+      kifMap.put(SystemKeyType.KEY_MANAGEMENT, (byte) 0xFD);
+      kifMap.put(SystemKeyType.RELOADING, (byte) 0xE7);
+      kifMap.put(SystemKeyType.AUTHENTICATION, (byte) 0xFA);
+    }
+
+    public static byte getKif(SystemKeyType keyType) {
+      return kifMap.get(keyType);
+    }
+  }
 
   /**
    * Enum representing the different tags used in Get Data APDU command and providing precomputed

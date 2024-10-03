@@ -104,6 +104,30 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
+   * @since 0.9.0
+   */
+  @Override
+  public FreeTransactionManager preparePlainWriteLock(
+      byte lockIndex, byte lockParameters, byte[] lockValue) {
+    Assert.getInstance()
+        .notNull(lockValue, "lockValue")
+        .isEqual(lockValue.length, LegacySamConstants.LOCK_VALUE_LENGTH, "lockValue.length");
+    byte[] lockFile = new byte[LegacySamConstants.LOCK_FILE_SIZE];
+    lockFile[0] = LegacySamConstants.LOCK_KIF;
+    lockFile[1] = lockIndex;
+    lockFile[7] = lockParameters;
+    System.arraycopy(lockValue, 0, lockFile, 13, LegacySamConstants.LOCK_VALUE_LENGTH);
+    byte[] plainDataBlock = new byte[LegacySamConstants.KEY_DATA_BLOCK_SIZE];
+    System.arraycopy(lockFile, 0, plainDataBlock, 8, LegacySamConstants.LOCK_FILE_SIZE);
+    plainDataBlock[38] = LegacySamConstants.TARGET_IS_LOCK_FILE;
+    plainDataBlock[45] = (byte) 0x80;
+    addTargetSamCommand(new CommandWriteKey(getContext(), plainDataBlock));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.1.0
    */
   @Override

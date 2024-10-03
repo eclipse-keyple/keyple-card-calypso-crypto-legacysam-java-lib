@@ -26,7 +26,6 @@ import org.eclipse.keypop.card.ApduResponseApi;
  * @since 0.9.0
  */
 final class CommandWriteSamParameters extends Command {
-  private final transient TargetSamContextDto targetSamContext; // NOSONAR
   private final transient byte[] plainData = new byte[30]; // NOSONAR
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
@@ -64,19 +63,12 @@ final class CommandWriteSamParameters extends Command {
    * Instantiates a new CommandWriteCeilings for writing a single ceiling value.
    *
    * @param context The command context.
-   * @param targetSamContext The target SAM context.
    * @param samParameters The SAM parameters to write.
    * @since 0.9.0
    */
-  CommandWriteSamParameters(
-      CommandContextDto context, TargetSamContextDto targetSamContext, byte[] samParameters) {
+  CommandWriteSamParameters(CommandContextDto context, byte[] samParameters) {
 
     super(CommandRef.WRITE_PARAMETERS, 0, context);
-
-    this.targetSamContext = targetSamContext;
-
-    // build the plain data block to be ciphered later
-    plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.PERSONALIZATION);
     System.arraycopy(samParameters, 0, plainData, 1, samParameters.length);
   }
 
@@ -97,17 +89,16 @@ final class CommandWriteSamParameters extends Command {
    */
   @Override
   void finalizeRequest() {
+    plainData[0] =
+        getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.PERSONALIZATION).getKvc();
     CommandContextDto controlSamContext =
         new CommandContextDto(getContext().getControlSam(), null, null);
     // add commands
     addControlSamCommand(
-        new CommandSelectDiversifier(controlSamContext, targetSamContext.getSerialNumber()));
-    byte[] challenge =
-        targetSamContext.isDynamicMode()
-            ? getContext().getTargetSam().popChallenge()
-            : LegacySamUtil.computeStaticModeChallenge(
-                targetSamContext, SystemKeyType.PERSONALIZATION);
-    addControlSamCommand(new CommandGiveRandom(controlSamContext, challenge));
+        new CommandSelectDiversifier(
+            controlSamContext, getContext().getTargetSam().getSerialNumber()));
+    addControlSamCommand(
+        new CommandGiveRandom(controlSamContext, getContext().getTargetSam().popChallenge()));
     CommandSamDataCipher commandSamDataCipher =
         new CommandSamDataCipher(
             controlSamContext, 0, CommandSamDataCipher.DataType.PARAMETERS_RECORD, plainData);
@@ -115,7 +106,7 @@ final class CommandWriteSamParameters extends Command {
     processControlSamCommand();
     final byte cla = getContext().getTargetSam().getClassByte();
     final byte inst = CommandRef.WRITE_PARAMETERS.getInstructionByte();
-    final byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
+    final byte p1 = LegacySamConstants.DYNAMIC_MODE_CIPHERING;
     final byte p2 = (byte) 0xA0;
     setApduRequest(
         new ApduRequestAdapter(

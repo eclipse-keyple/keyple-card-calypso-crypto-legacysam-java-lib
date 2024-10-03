@@ -42,6 +42,7 @@ enum CommandRef {
   PSO_COMPUTE_SIGNATURE("PSO Compute Signature", (byte) 0x2A),
   PSO_VERIFY_SIGNATURE("PSO Verify Signature", (byte) 0x2A),
   SAM_DATA_CIPHER("SAM Data Cipher", (byte) 0x16),
+  SAM_GENERATE_KEY("SAM Generate Key", (byte) 0x16),
   WRITE_CEILINGS("Write Ceilings", (byte) 0xD8),
   WRITE_PARAMETERS("Write Parameters", (byte) 0xD8),
   GET_DATA("Get Data", (byte) 0xCA),
