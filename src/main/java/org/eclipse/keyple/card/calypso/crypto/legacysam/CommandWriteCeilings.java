@@ -218,7 +218,10 @@ final class CommandWriteCeilings extends Command {
     // add commands
     addControlSamCommand(
         new CommandSelectDiversifier(
-            controlSamContext, targetSamContext == null?getContext().getTargetSam().getSerialNumber():targetSamContext.getSerialNumber()));
+            controlSamContext,
+            targetSamContext == null
+                ? getContext().getTargetSam().getSerialNumber()
+                : targetSamContext.getSerialNumber()));
     byte[] challenge =
         targetSamContext == null
             ? getContext().getTargetSam().popChallenge()
@@ -237,7 +240,7 @@ final class CommandWriteCeilings extends Command {
             plainData);
     addControlSamCommand(commandSamDataCipher);
     processControlSamCommand();
-    final byte cla = (byte)0x80;
+    final byte cla = (byte) 0x80;
     final byte inst = CommandRef.WRITE_CEILINGS.getInstructionByte();
     byte p1 =
         targetSamContext == null

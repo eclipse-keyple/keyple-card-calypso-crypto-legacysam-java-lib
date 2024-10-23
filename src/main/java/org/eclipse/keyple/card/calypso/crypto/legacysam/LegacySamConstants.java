@@ -48,6 +48,7 @@ final class LegacySamConstants {
 
   static final byte TARGET_IS_SYSTEM_KEY_FILE = (byte) 0xC0;
   static final byte TARGET_IS_LOCK_FILE = (byte) 0xE0;
+  static final byte RECORD_CHOSEN_BY_THE_SAM = (byte) 0xF0;
 
   static final byte FIRST_EVENT_CEILING_RECORD_REFERENCE = (byte) 0xB1;
   static final byte SINGLE_CEILING_REFERENCE = (byte) 0xB8;

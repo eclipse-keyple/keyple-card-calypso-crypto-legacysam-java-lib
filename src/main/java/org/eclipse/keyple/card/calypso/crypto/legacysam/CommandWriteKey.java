@@ -12,6 +12,7 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.RECORD_CHOSEN_BY_THE_SAM;
 
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
@@ -26,6 +27,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
 final class CommandWriteKey extends Command {
 
   private final byte targetKeyReference;
+  private final SystemKeyType cipheringKeyType;
   private final byte sourceKeyKif;
   private final byte sourceKeyKvc;
   private final byte[] keyParameters;
@@ -54,7 +56,8 @@ final class CommandWriteKey extends Command {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
-    this.targetKeyReference = LegacySamConstants.TARGET_IS_SYSTEM_KEY_FILE;
+    cipheringKeyType = SystemKeyType.PERSONALIZATION;
+    targetKeyReference = LegacySamConstants.TARGET_IS_SYSTEM_KEY_FILE;
     sourceKeyKif = LegacySamConstants.SystemKeyTypeKifMapper.getKif(systemKeyType);
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -82,7 +85,8 @@ final class CommandWriteKey extends Command {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
-    targetKeyReference = (byte) recordNumber;
+    cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
+    targetKeyReference = recordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) recordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -110,7 +114,8 @@ final class CommandWriteKey extends Command {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
-    targetKeyReference = (byte) recordNumber;
+    cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
+    targetKeyReference = recordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) recordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -132,6 +137,8 @@ final class CommandWriteKey extends Command {
       byte lockParameters,
       boolean isTransferredLockDiversified) {
     super(CommandRef.WRITE_KEY, 0, context);
+
+    cipheringKeyType = SystemKeyType.PERSONALIZATION;
     targetKeyReference = LegacySamConstants.TARGET_IS_LOCK_FILE;
     sourceKeyKif = LegacySamConstants.LOCK_KIF;
     sourceKeyKvc = lockIndex;
@@ -153,7 +160,8 @@ final class CommandWriteKey extends Command {
     super(CommandRef.WRITE_KEY, 0, context);
     writeKeyCommandData = plainLockDataBlock;
     // initialize unused final fields
-    targetKeyReference = 0;
+    cipheringKeyType = null;
+    targetKeyReference = LegacySamConstants.TARGET_IS_LOCK_FILE;
     cipheringKeyKvc = 0;
     sourceKeyKif = 0;
     sourceKeyKvc = 0;
@@ -171,7 +179,7 @@ final class CommandWriteKey extends Command {
     byte p1;
     if (writeKeyCommandData == null) {
       cipheringKeyKvc =
-          getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT).getKvc();
+          getContext().getTargetSam().getSystemKeyParameter(cipheringKeyType).getKvc();
       // it is a key transfer
       CommandContextDto controlSamContext =
           new CommandContextDto(getContext().getControlSam(), null, null);

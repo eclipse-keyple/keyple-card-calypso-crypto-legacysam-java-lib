@@ -101,12 +101,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
     addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
 
     addTargetSamCommand(
-        new CommandWriteKey(
-            getContext(),
-            systemKeyType,
-            LegacySamConstants.TARGET_IS_SYSTEM_KEY_FILE,
-            systemKeyParameters,
-            diversified));
+        new CommandWriteKey(getContext(), systemKeyType, kvc, systemKeyParameters, diversified));
 
     return this;
   }
@@ -119,7 +114,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKey(
       byte kif, byte kvc, byte[] workKeyParameters, int recordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, false);
+    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, false, null);
   }
 
   /**
@@ -130,30 +125,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKeyDiversified(
       byte kif, byte kvc, byte[] workKeyParameters, int recordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, true);
-  }
-
-  private SecureWriteTransactionManager prepareTransferWorkKeyInternal(
-      byte kif, byte kvc, byte[] workKeyParameters, int recordNumber, boolean diversified) {
-
-    Assert.getInstance()
-        .notNull(workKeyParameters, "workKeyParameters")
-        .isEqual(
-            workKeyParameters.length,
-            LegacySamConstants.KEY_PARAMETERS_LENGTH,
-            "workKeyParameters.length")
-        .isInRange(recordNumber, 1, 126, "recordNumber");
-
-    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
-      addTargetSamCommand(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
-    }
-
-    addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
-
-    addTargetSamCommand(
-        new CommandWriteKey(getContext(), kif, kvc, recordNumber, workKeyParameters, diversified));
-
-    return this;
+    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, true, null);
   }
 
   /**
@@ -164,6 +136,17 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKeyDiversified(
       byte kif, byte kvc, byte[] workKeyParameters, int recordNumber, byte[] diversifier) {
+    return prepareTransferWorkKeyInternal(
+        kif, kvc, workKeyParameters, recordNumber, true, diversifier);
+  }
+
+  private SecureWriteTransactionManager prepareTransferWorkKeyInternal(
+      byte kif,
+      byte kvc,
+      byte[] workKeyParameters,
+      int recordNumber,
+      boolean diversified,
+      byte[] diversifier) {
 
     Assert.getInstance()
         .notNull(workKeyParameters, "workKeyParameters")
@@ -171,7 +154,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
             workKeyParameters.length,
             LegacySamConstants.KEY_PARAMETERS_LENGTH,
             "workKeyParameters.length")
-        .isInRange(recordNumber, 1, 126, "recordNumber");
+        .isInRange(recordNumber, 0, 126, "recordNumber");
 
     if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
       addTargetSamCommand(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
@@ -179,8 +162,15 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
 
     addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
 
-    addTargetSamCommand(
-        new CommandWriteKey(getContext(), kif, kvc, recordNumber, workKeyParameters, diversifier));
+    if (diversifier == null) {
+      addTargetSamCommand(
+          new CommandWriteKey(
+              getContext(), kif, kvc, recordNumber, workKeyParameters, diversified));
+    } else {
+      addTargetSamCommand(
+          new CommandWriteKey(
+              getContext(), kif, kvc, recordNumber, workKeyParameters, diversifier));
+    }
 
     return this;
   }
@@ -208,7 +198,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferLockDiversified(
       byte lockIndex, byte lockParameters) {
-    return null;
+    throw new UnsupportedOperationException("Not yet implemented");
   }
 
   /**
@@ -229,7 +219,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
     System.arraycopy(lockValue, 0, lockFile, 13, LegacySamConstants.LOCK_VALUE_LENGTH);
     byte[] plainDataBlock = new byte[LegacySamConstants.KEY_DATA_BLOCK_SIZE];
     System.arraycopy(lockFile, 0, plainDataBlock, 8, LegacySamConstants.LOCK_FILE_SIZE);
-    plainDataBlock[38] = LegacySamConstants.TARGET_IS_LOCK_FILE;
+    plainDataBlock[37] = LegacySamConstants.TARGET_IS_LOCK_FILE;
     plainDataBlock[45] = (byte) 0x80;
     addTargetSamCommand(new CommandWriteKey(getContext(), plainDataBlock));
     return this;
