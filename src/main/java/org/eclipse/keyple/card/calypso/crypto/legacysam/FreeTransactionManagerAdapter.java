@@ -12,6 +12,8 @@
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.MAX_KEY_RECORD_NUMBER;
+import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.MIN_KEY_RECORD_NUMBER;
 
 import java.util.*;
 import org.eclipse.keyple.core.util.Assert;
@@ -96,6 +98,30 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
           "The provided data must be an instance of 'LegacyCardCertificateComputationDataAdapter'");
     }
     addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public FreeTransactionManager preparePlainWriteLock(
+      byte lockIndex, byte lockParameters, byte[] lockValue) {
+    Assert.getInstance()
+        .notNull(lockValue, "lockValue")
+        .isEqual(lockValue.length, LegacySamConstants.LOCK_VALUE_LENGTH, "lockValue.length");
+    byte[] lockFile = new byte[LegacySamConstants.LOCK_FILE_SIZE];
+    lockFile[0] = LegacySamConstants.LOCK_KIF;
+    lockFile[1] = lockIndex;
+    lockFile[7] = lockParameters;
+    System.arraycopy(lockValue, 0, lockFile, 13, LegacySamConstants.LOCK_VALUE_LENGTH);
+    byte[] plainDataBlock = new byte[LegacySamConstants.KEY_DATA_BLOCK_SIZE];
+    System.arraycopy(lockFile, 0, plainDataBlock, 8, LegacySamConstants.LOCK_FILE_SIZE);
+    plainDataBlock[38] = LegacySamConstants.TARGET_IS_LOCK_FILE;
+    plainDataBlock[45] = (byte) 0x80;
+    addTargetSamCommand(new CommandWriteKey(getContext(), plainDataBlock));
     return this;
   }
 
@@ -288,12 +314,47 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
+   * @since 0.9.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadSamParameters() {
+    addTargetSamCommand(new CommandReadSamParameters(getContext()));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.3.0
    */
   @Override
   public FreeTransactionManagerAdapter prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
     addTargetSamCommand(new CommandReadKeyParameters(getContext(), systemKeyType));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadWorkKeyParameters(int recordNumber) {
+    Assert.getInstance()
+        .isInRange(recordNumber, MIN_KEY_RECORD_NUMBER, MAX_KEY_RECORD_NUMBER, "recordNumber");
+    addTargetSamCommand(new CommandReadKeyParameters(getContext(), recordNumber));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public FreeTransactionManager prepareReadWorkKeyParameters(byte kif, byte kvc) {
+    addTargetSamCommand(new CommandReadKeyParameters(getContext(), kif, kvc));
     return this;
   }
 

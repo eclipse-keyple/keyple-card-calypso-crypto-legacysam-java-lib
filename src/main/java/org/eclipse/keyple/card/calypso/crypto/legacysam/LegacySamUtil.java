@@ -11,6 +11,8 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import org.eclipse.keyple.core.util.ByteArrayUtil;
+import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
 
 /**
@@ -113,5 +115,33 @@ public final class LegacySamUtil {
     long bcdMonth = ((long) (month / 10) << 4) | (month % 10);
     long bcdDay = ((long) (day / 10) << 4) | (day % 10);
     return (bcdYear << 16) | (bcdMonth << 8) | bcdDay;
+  }
+
+  /**
+   * Computes a challenge for static mode using the provided SAM context and system key type.
+   *
+   * @param samContext The context containing details about the SAM.
+   * @param systemKeyType The type of system key to use for the challenge.
+   * @return A byte array representing the computed challenge.
+   * @since 0.9.0
+   */
+  static byte[] computeStaticModeChallenge(
+      DtoAdapters.TargetSamContextDto samContext, SystemKeyType systemKeyType) {
+    // compute the challenge
+    byte[] challenge = new byte[8];
+    if (samContext.getSystemKeyTypeToCounterNumberMap() != null) {
+      Integer keyCounterNumber = samContext.getSystemKeyTypeToCounterNumberMap().get(systemKeyType);
+      if (keyCounterNumber != null) {
+        ByteArrayUtil.copyBytes(
+            samContext.getCounterNumberToCounterValueMap().get(keyCounterNumber), challenge, 5, 3);
+        // increment counter
+        samContext
+            .getCounterNumberToCounterValueMap()
+            .put(
+                keyCounterNumber,
+                samContext.getCounterNumberToCounterValueMap().get(keyCounterNumber) + 1);
+      }
+    }
+    return challenge;
   }
 }
