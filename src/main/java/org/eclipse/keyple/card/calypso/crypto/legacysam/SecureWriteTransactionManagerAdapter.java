@@ -113,8 +113,8 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
    */
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKey(
-      byte kif, byte kvc, byte[] workKeyParameters, int recordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, false, null);
+      byte kif, byte kvc, byte[] workKeyParameters, int targetRecordNumber) {
+    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, targetRecordNumber, false, null);
   }
 
   /**
@@ -124,8 +124,8 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
    */
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKeyDiversified(
-      byte kif, byte kvc, byte[] workKeyParameters, int recordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, recordNumber, true, null);
+      byte kif, byte kvc, byte[] workKeyParameters, int targetRecordNumber) {
+    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, targetRecordNumber, true, null);
   }
 
   /**
@@ -135,16 +135,16 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
    */
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKeyDiversified(
-      byte kif, byte kvc, byte[] workKeyParameters, int recordNumber, byte[] diversifier) {
+      byte kif, byte kvc, byte[] workKeyParameters, int targetRecordNumber, byte[] diversifier) {
     return prepareTransferWorkKeyInternal(
-        kif, kvc, workKeyParameters, recordNumber, true, diversifier);
+        kif, kvc, workKeyParameters, targetRecordNumber, true, diversifier);
   }
 
   private SecureWriteTransactionManager prepareTransferWorkKeyInternal(
       byte kif,
       byte kvc,
       byte[] workKeyParameters,
-      int recordNumber,
+      int targetRecordNumber,
       boolean diversified,
       byte[] diversifier) {
 
@@ -154,7 +154,7 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
             workKeyParameters.length,
             LegacySamConstants.KEY_PARAMETERS_LENGTH,
             "workKeyParameters.length")
-        .isInRange(recordNumber, 0, 126, "recordNumber");
+        .isInRange(targetRecordNumber, 0, 126, "targetRecordNumber");
 
     if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
       addTargetSamCommand(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
@@ -165,11 +165,11 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
     if (diversifier == null) {
       addTargetSamCommand(
           new CommandWriteKey(
-              getContext(), kif, kvc, recordNumber, workKeyParameters, diversified));
+              getContext(), kif, kvc, targetRecordNumber, workKeyParameters, diversified));
     } else {
       addTargetSamCommand(
           new CommandWriteKey(
-              getContext(), kif, kvc, recordNumber, workKeyParameters, diversifier));
+              getContext(), kif, kvc, targetRecordNumber, workKeyParameters, diversifier));
     }
 
     return this;

@@ -70,7 +70,7 @@ final class CommandWriteKey extends Command {
    * @param context The command context.
    * @param kif The KIF of the key to transfer.
    * @param kvc The KVC of the key to transfer.
-   * @param recordNumber The number of the record where to write the key.
+   * @param targetRecordNumber The number of the record where to write the key.
    * @param keyParameters The key parameters.
    * @param isTransferredKeyDiversified true if the transferred key needs to be diversified.
    * @since 0.9.0
@@ -79,14 +79,14 @@ final class CommandWriteKey extends Command {
       CommandContextDto context,
       byte kif,
       byte kvc,
-      int recordNumber,
+      int targetRecordNumber,
       byte[] keyParameters,
       boolean isTransferredKeyDiversified) {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
     cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
-    targetKeyReference = recordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) recordNumber;
+    targetKeyReference = targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -99,7 +99,7 @@ final class CommandWriteKey extends Command {
    * @param context The command context.
    * @param kif The KIF of the key to transfer.
    * @param kvc The KVC of the key to transfer.
-   * @param recordNumber The number of the record where to write the key.
+   * @param targetRecordNumber The number of the record where to write the key.
    * @param keyParameters The key parameters.
    * @param diversifier The diversifier to use as ArbitraryDiversifier.
    * @since 0.9.0
@@ -108,14 +108,14 @@ final class CommandWriteKey extends Command {
       CommandContextDto context,
       byte kif,
       byte kvc,
-      int recordNumber,
+      int targetRecordNumber,
       byte[] keyParameters,
       byte[] diversifier) {
 
     super(CommandRef.WRITE_KEY, 0, context);
 
     cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
-    targetKeyReference = recordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) recordNumber;
+    targetKeyReference = targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
