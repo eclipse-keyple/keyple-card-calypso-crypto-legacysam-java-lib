@@ -27,17 +27,6 @@ import org.eclipse.keypop.card.ApduResponseApi;
  */
 final class CommandWriteKey extends Command {
 
-  private final byte targetKeyReference;
-  private final SystemKeyType cipheringKeyType;
-  private final byte sourceKeyKif;
-  private final byte sourceKeyKvc;
-  private final byte[] keyParameters;
-  private final boolean isTransferredObjectDiversified;
-
-  private byte cipheringKeyKvc;
-  private byte[] writeKeyCommandData; // either ciphered or plain data block
-  private byte[] arbitraryDiversifier;
-
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
@@ -104,6 +93,17 @@ final class CommandWriteKey extends Command {
             IncorrectInputDataException.class));
     STATUS_TABLE = m;
   }
+
+  private final byte targetKeyReference;
+  private final SystemKeyType cipheringKeyType;
+  private final byte sourceKeyKif;
+  private final byte sourceKeyKvc;
+  private final byte[] keyParameters;
+  private final boolean isTransferredObjectDiversified;
+
+  private byte cipheringKeyKvc;
+  private byte[] writeKeyCommandData; // either ciphered or plain data block
+  private byte[] arbitraryDiversifier;
 
   /**
    * Constructor
