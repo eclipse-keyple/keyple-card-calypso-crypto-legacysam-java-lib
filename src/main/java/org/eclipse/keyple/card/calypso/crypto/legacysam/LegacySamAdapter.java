@@ -398,14 +398,14 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    */
   @Override
   public SamParameters getSamParameters() {
-    return this.samParameters;
+    return samParameters;
   }
 
   /**
-   * Set the {@link KeyParameter} for specified {@link SystemKeyType}.
+   * Set the SAM parameters.
    *
    * @param samParameters The {@link SamParametersAdapter}.
-   * @since 0.3.0
+   * @since 0.9.0
    */
   void setSamParameters(SamParametersAdapter samParameters) {
     this.samParameters = samParameters;
@@ -433,7 +433,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Set the {@link KeyParameter} for work key identified by its record number.
+   * Set the {@link KeyParameter} for a work key identified by its record number.
    *
    * @param recordNumber The key record number.
    * @param keyParameter The {@link KeyParameterAdapter}.
@@ -444,7 +444,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Set the {@link KeyParameter} for work key identified by its KIF/KVC.
+   * Set the {@link KeyParameter} for a work key identified by its KIF/KVC.
    *
    * @param kifKvc The combined KIF/KVC of the key.
    * @param keyParameter The {@link KeyParameterAdapter}.
