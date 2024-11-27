@@ -401,15 +401,15 @@ final class LegacySamSelectionExtensionAdapter
     Assert.getInstance()
         .isInRange(counterNumber, MIN_COUNTER_NUMBER, MAX_COUNTER_NUMBER, "counterNumber");
     for (Command command : commands) {
-      if (command instanceof CommandReadCounter
-          && ((CommandReadCounter) command).getCounterFileRecordNumber()
+      if (command instanceof CommandReadEventCounter
+          && ((CommandReadEventCounter) command).getCounterFileRecordNumber()
               == COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
-    commands.add(new CommandReadCounter(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
-    commands.add(new CommandReadCounterCeiling(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    commands.add(new CommandReadEventCounter(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    commands.add(new CommandReadCeilings(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -422,8 +422,8 @@ final class LegacySamSelectionExtensionAdapter
   @Override
   public LegacySamSelectionExtension prepareReadAllCountersStatus() {
     for (int i = 0; i < 3; i++) {
-      commands.add(new CommandReadCounter(context, i));
-      commands.add(new CommandReadCounterCeiling(context, i));
+      commands.add(new CommandReadEventCounter(context, i));
+      commands.add(new CommandReadCeilings(context, i));
     }
     return this;
   }

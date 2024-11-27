@@ -33,7 +33,7 @@ enum CommandRef {
   READ_KEY_PARAMETERS("Read Key Parameters", (byte) 0xBC),
   READ_EVENT_COUNTER("Read Event Counter", (byte) 0xBE),
   READ_CEILINGS("Read Ceilings", (byte) 0xBE),
-  READ_SAM_PARAMETERS("Read Parameters", (byte) 0xBE),
+  READ_PARAMETERS("Read Parameters", (byte) 0xBE),
   SV_CHECK("SV Check", (byte) 0x58),
   SV_PREPARE_DEBIT("SV Prepare Debit", (byte) 0x54),
   SV_PREPARE_LOAD("SV Prepare Load", (byte) 0x56),

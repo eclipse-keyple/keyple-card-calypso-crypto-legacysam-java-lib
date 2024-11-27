@@ -24,7 +24,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
  *
  * @since 0.1.0
  */
-final class CommandReadCounter extends Command {
+final class CommandReadEventCounter extends Command {
 
   private final int counterFileRecordNumber;
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
@@ -48,7 +48,7 @@ final class CommandReadCounter extends Command {
    * @param counterFileRecordNumber The number of the counter file record to read (in range [0..2].
    * @since 0.1.0
    */
-  CommandReadCounter(CommandContextDto context, int counterFileRecordNumber) {
+  CommandReadEventCounter(CommandContextDto context, int counterFileRecordNumber) {
 
     super(CommandRef.READ_EVENT_COUNTER, 48, context);
     this.counterFileRecordNumber = counterFileRecordNumber;

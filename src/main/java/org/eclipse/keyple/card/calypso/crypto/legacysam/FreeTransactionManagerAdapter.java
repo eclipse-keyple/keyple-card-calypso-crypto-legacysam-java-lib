@@ -318,7 +318,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
    */
   @Override
   public FreeTransactionManager prepareReadSamParameters() {
-    addTargetSamCommand(new CommandReadSamParameters(getContext()));
+    addTargetSamCommand(new CommandReadParameters(getContext()));
     return this;
   }
 
@@ -372,18 +372,18 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
             LegacySamConstants.MAX_COUNTER_NUMBER,
             "counterNumber");
     for (Command command : getTargetSamCommands()) {
-      if (command instanceof CommandReadCounter
-          && ((CommandReadCounter) command).getCounterFileRecordNumber()
+      if (command instanceof CommandReadEventCounter
+          && ((CommandReadEventCounter) command).getCounterFileRecordNumber()
               == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
     addTargetSamCommand(
-        new CommandReadCounter(
+        new CommandReadEventCounter(
             getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
     addTargetSamCommand(
-        new CommandReadCounterCeiling(
+        new CommandReadCeilings(
             getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
@@ -397,8 +397,8 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public FreeTransactionManagerAdapter prepareReadAllCountersStatus() {
     for (int i = 0; i < 3; i++) {
-      addTargetSamCommand(new CommandReadCounter(getContext(), i));
-      addTargetSamCommand(new CommandReadCounterCeiling(getContext(), i));
+      addTargetSamCommand(new CommandReadEventCounter(getContext(), i));
+      addTargetSamCommand(new CommandReadCeilings(getContext(), i));
     }
     return this;
   }
@@ -503,7 +503,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
 
     // read counters
     for (Integer counterFileRecordNumber : counterFileRecordNumbers) {
-      commands.add(new CommandReadCounter(getContext(), counterFileRecordNumber));
+      commands.add(new CommandReadEventCounter(getContext(), counterFileRecordNumber));
     }
     processTargetSamCommands(commands);
 

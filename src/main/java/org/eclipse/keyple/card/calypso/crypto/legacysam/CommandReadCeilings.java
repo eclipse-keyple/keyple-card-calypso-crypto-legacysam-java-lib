@@ -24,7 +24,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
  *
  * @since 0.1.0
  */
-final class CommandReadCounterCeiling extends Command {
+final class CommandReadCeilings extends Command {
 
   private final int ceilingFileRecordNumber;
 
@@ -49,7 +49,7 @@ final class CommandReadCounterCeiling extends Command {
    * @param ceilingFileRecordNumber The number of the counter file record to read (in range [0..2].
    * @since 0.1.0
    */
-  CommandReadCounterCeiling(CommandContextDto context, int ceilingFileRecordNumber) {
+  CommandReadCeilings(CommandContextDto context, int ceilingFileRecordNumber) {
 
     super(CommandRef.READ_CEILINGS, 48, context);
 

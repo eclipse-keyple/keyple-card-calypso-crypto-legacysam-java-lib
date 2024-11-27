@@ -23,7 +23,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
  *
  * @since 0.9.0
  */
-final class CommandReadSamParameters extends Command {
+final class CommandReadParameters extends Command {
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
   private static final int SW_DATA_NOT_SIGNED_WARNING = 0x6200;
@@ -45,13 +45,13 @@ final class CommandReadSamParameters extends Command {
    * @param context The command context.
    * @since 0.9.0
    */
-  CommandReadSamParameters(CommandContextDto context) {
+  CommandReadParameters(CommandContextDto context) {
 
-    super(CommandRef.READ_SAM_PARAMETERS, 48, context);
+    super(CommandRef.READ_PARAMETERS, 48, context);
 
     byte cla = context.getTargetSam().getClassByte();
-    byte p1 = 0x00;
-    byte p2 = (byte) (0xA0);
+    final byte p1 = 0x00;
+    final byte p2 = (byte) (0xA0);
 
     setApduRequest(
         new ApduRequestAdapter(
