@@ -14,6 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.LegacySamConstants.RECORD_CHOSEN_BY_THE_SAM;
 
+import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
@@ -36,6 +37,73 @@ final class CommandWriteKey extends Command {
   private byte cipheringKeyKvc;
   private byte[] writeKeyCommandData; // either ciphered or plain data block
   private byte[] arbitraryDiversifier;
+
+  private static final Map<Integer, StatusProperties> STATUS_TABLE;
+
+  static {
+    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
+    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
+    m.put(
+        0x6985,
+        new StatusProperties(
+            "Preconditions not satisfied:\n"
+                + "- The SAM is locked.\n"
+                + "- Lock secret and LockedLock=1 at last reset.\n"
+                + "- CipherEnableBit of PAR1 is 0.\n"
+                + "- Dynamic mode ciphering and the outgoing challenge is unavailable.\n"
+                + "- System key and SystemLockEnableBit=1.\n"
+                + "- Work key and WorkKeysLockEnableBit=1.\n"
+                + "- Work key and no empty record in the Work Key File.\n"
+                + "- Plain lock secret loading and PlainWriteDisabled=1 at last reset.\n"
+                + "- Plain work key loading and PlainWorkKeyInputEnableBit=0.\n"
+                + "- Work key loading by record number reference and record is not empty.\n"
+                + "- Static mode and StaticCipherEnableBit=0",
+            AccessForbiddenException.class));
+    m.put(
+        0x6900,
+        new StatusProperties(
+            "An event counter cannot be incremented", CounterOverflowException.class));
+    m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
+    m.put(
+        0x6A00,
+        new StatusProperties(
+            "P1 or P2 incorrect:\n"
+                + "- Incorrect data reference (P2≠01h to 7Eh, C0h, E0h and F0h).\n"
+                + "- Ciphered data and random value (P1=%01xxxxxx).\n"
+                + "- System key and plain data (P1=%1xxxxxxx and P2=C0h).\n"
+                + "- Random value for system or lock secret (P2=C0h or E0h and P1=%x1xxxxxx).",
+            IllegalParameterException.class));
+    m.put(
+        0x6A80,
+        new StatusProperties(
+            "Incorrect plain or decrypted data:\n"
+                + "- P2 different from P2 in command header.\n"
+                + "- Ciphered mode and incorrect decrypted data.\n"
+                + "- Received parameters incorrect (unknown ALG).\n"
+                + "- Incorrect KIF for a system key (KIF≠%1xxxxxxx).\n"
+                + "- Incorrect KIF for the lock secret (KIF≠EFh).\n"
+                + "- Ciphered system or work key writing: PAR7 to PAR10 bytes not all null.\n"
+                + "- Work key already exists.\n"
+                + "- Work key, given KIF=E1h or FDh, and SystemLockEnableBit =1.\n"
+                + "- CAAD Transfer Control data present and PAR6≤80h or >87h.\n"
+                + "- CAAD Transfer Control data do not match CAAD record indicated by PAR6–80h",
+            IncorrectInputDataException.class));
+    m.put(
+        0x6A83,
+        new StatusProperties(
+            "Record not found:\n"
+                + "- Deciphering key not found.\n"
+                + "- CAAD Transfer Control data present and target CAAD record empty",
+            DataAccessException.class));
+    m.put(
+        0x6A87,
+        new StatusProperties(
+            "Lc inconsistent with P1 or P2:\n"
+                + "- Plain data and CAAD Transfer Control data present (Lc=50h).\n"
+                + "- Not a work key and CAAD Transfer Control data present (Lc=50h).",
+            IncorrectInputDataException.class));
+    STATUS_TABLE = m;
+  }
 
   /**
    * Constructor
@@ -232,7 +300,6 @@ final class CommandWriteKey extends Command {
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
-    // TODO set the new parameters in LegacySamAdapter
     setResponseAndCheckStatus(apduResponse);
   }
 
