@@ -16,7 +16,7 @@ import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the Give Random APDU command.
+ * Builds the SAM Generate Key APDU command.
  *
  * @since 0.9.0
  */
