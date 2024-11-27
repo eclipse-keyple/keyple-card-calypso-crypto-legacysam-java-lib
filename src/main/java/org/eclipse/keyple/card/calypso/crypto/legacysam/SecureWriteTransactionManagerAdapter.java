@@ -83,7 +83,7 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
   }
 
   private SecureWriteTransactionManager prepareTransferSystemKeyInternal(
-      SystemKeyType systemKeyType, byte kvc, byte[] systemKeyParameters, boolean diversified) {
+      SystemKeyType systemKeyType, byte kvc, byte[] systemKeyParameters, boolean isDiversified) {
 
     Assert.getInstance()
         .notNull(systemKeyType, "systemKeyType")
@@ -101,7 +101,7 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
     addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
 
     addTargetSamCommand(
-        new CommandWriteKey(getContext(), systemKeyType, kvc, systemKeyParameters, diversified));
+        new CommandWriteKey(getContext(), systemKeyType, kvc, systemKeyParameters, isDiversified));
 
     return this;
   }
@@ -184,12 +184,7 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
    */
   @Override
   public SecureWriteTransactionManager prepareTransferLock(byte lockIndex, byte lockParameters) {
-    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
-      addTargetSamCommand(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
-    }
-    addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
-    addTargetSamCommand(new CommandWriteKey(getContext(), lockIndex, lockParameters, false));
-    return this;
+    return prepareTransferLockInternal(lockIndex, lockParameters, false);
   }
 
   /**
@@ -200,7 +195,18 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
   @Override
   public SecureWriteTransactionManager prepareTransferLockDiversified(
       byte lockIndex, byte lockParameters) {
-    throw new UnsupportedOperationException("Not yet implemented");
+    return prepareTransferLockInternal(lockIndex, lockParameters, true);
+  }
+
+  private SecureWriteTransactionManager prepareTransferLockInternal(
+      byte lockIndex, byte lockParameters, boolean isDiversified) {
+    if (getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.KEY_MANAGEMENT) == null) {
+      addTargetSamCommand(new CommandReadKeyParameters(getContext(), SystemKeyType.KEY_MANAGEMENT));
+    }
+    addTargetSamCommand(new CommandGetChallenge(getContext(), 8));
+    addTargetSamCommand(
+        new CommandWriteKey(getContext(), lockIndex, lockParameters, isDiversified));
+    return this;
   }
 
   /**
