@@ -33,6 +33,10 @@ final class CommandWriteKey extends Command {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
     m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
     m.put(
+        0x6900,
+        new StatusProperties(
+            "An event counter cannot be incremented", CounterOverflowException.class));
+    m.put(
         0x6985,
         new StatusProperties(
             "Preconditions not satisfied:\n"
@@ -48,10 +52,6 @@ final class CommandWriteKey extends Command {
                 + "- Work key loading by record number reference and record is not empty.\n"
                 + "- Static mode and StaticCipherEnableBit=0",
             AccessForbiddenException.class));
-    m.put(
-        0x6900,
-        new StatusProperties(
-            "An event counter cannot be incremented", CounterOverflowException.class));
     m.put(0x6988, new StatusProperties("Incorrect signature", SecurityDataException.class));
     m.put(
         0x6A00,
