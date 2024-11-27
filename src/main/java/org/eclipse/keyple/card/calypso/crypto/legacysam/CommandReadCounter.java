@@ -42,7 +42,7 @@ final class CommandReadCounter extends Command {
   }
 
   /**
-   * Instantiate a new CmdSamReadEventCounter
+   * Constructor
    *
    * @param context The command context.
    * @param counterFileRecordNumber The number of the counter file record to read (in range [0..2].
