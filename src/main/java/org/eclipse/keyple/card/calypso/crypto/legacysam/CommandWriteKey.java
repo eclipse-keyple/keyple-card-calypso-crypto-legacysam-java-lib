@@ -321,6 +321,7 @@ final class CommandWriteKey extends Command {
    * @param lockParameters The lock permissions parameters.
    * @param lockValue The lock value.
    * @return A 48-byte byte array representing the plain data block.
+   * @since 0.9.0
    */
   static byte[] buildPlainLockDataBlock(byte lockIndex, byte lockParameters, byte[] lockValue) {
 
