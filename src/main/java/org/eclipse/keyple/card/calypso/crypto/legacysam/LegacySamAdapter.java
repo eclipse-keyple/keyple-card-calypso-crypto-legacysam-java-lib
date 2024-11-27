@@ -50,8 +50,9 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private final SortedMap<Integer, Integer> counterCeilings = new TreeMap<>();
   private final Map<SystemKeyType, KeyParameterAdapter> systemKeyParameterMap =
       new HashMap<>(); // NOSONAR JSON serializer
-  private final Map<Integer, KeyParameterAdapter> workKeyParameterByRecordNumber = new HashMap<>();
-  private final Map<Short, KeyParameterAdapter> workKeyParameterByKifKvc = new HashMap<>();
+  private final Map<Integer, KeyParameterAdapter> workKeyParameterByRecordNumberMap =
+      new HashMap<>();
+  private final Map<Short, KeyParameterAdapter> workKeyParameterByKifKvcMap = new HashMap<>();
   private byte[] challenge;
   private byte[] caCertificate;
   private SamParametersAdapter samParameters;
@@ -439,7 +440,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.9.0
    */
   void setWorkKeyParameter(int recordNumber, KeyParameterAdapter keyParameter) {
-    workKeyParameterByRecordNumber.put(recordNumber, keyParameter);
+    workKeyParameterByRecordNumberMap.put(recordNumber, keyParameter);
   }
 
   /**
@@ -450,7 +451,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    * @since 0.9.0
    */
   void setWorkKeyParameter(Short kifKvc, KeyParameterAdapter keyParameter) {
-    workKeyParameterByKifKvc.put(kifKvc, keyParameter);
+    workKeyParameterByKifKvcMap.put(kifKvc, keyParameter);
   }
 
   /**
@@ -460,7 +461,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    */
   @Override
   public KeyParameter getWorkKeyParameter(int recordNumber) {
-    return workKeyParameterByRecordNumber.get(recordNumber);
+    return workKeyParameterByRecordNumberMap.get(recordNumber);
   }
 
   /**
@@ -470,7 +471,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
    */
   @Override
   public KeyParameter getWorkKeyParameter(byte kif, byte kvc) {
-    return workKeyParameterByKifKvc.get((short) ((kif << 8) | (kvc & 0xFF)));
+    return workKeyParameterByKifKvcMap.get((short) ((kif << 8) | (kvc & 0xFF)));
   }
 
   /**
