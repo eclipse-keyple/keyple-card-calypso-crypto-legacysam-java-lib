@@ -220,16 +220,11 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
     Assert.getInstance()
         .notNull(lockValue, "lockValue")
         .isEqual(lockValue.length, LegacySamConstants.LOCK_VALUE_LENGTH, "lockValue.length");
-    byte[] lockFile = new byte[LegacySamConstants.LOCK_FILE_SIZE];
-    lockFile[0] = LegacySamConstants.LOCK_KIF;
-    lockFile[1] = lockIndex;
-    lockFile[7] = lockParameters;
-    System.arraycopy(lockValue, 0, lockFile, 13, LegacySamConstants.LOCK_VALUE_LENGTH);
-    byte[] plainDataBlock = new byte[LegacySamConstants.KEY_DATA_BLOCK_SIZE];
-    System.arraycopy(lockFile, 0, plainDataBlock, 8, LegacySamConstants.LOCK_FILE_SIZE);
-    plainDataBlock[37] = LegacySamConstants.TARGET_IS_LOCK_FILE;
-    plainDataBlock[45] = (byte) 0x80;
-    addTargetSamCommand(new CommandWriteKey(getContext(), plainDataBlock));
+
+    addTargetSamCommand(
+        new CommandWriteKey(
+            getContext(),
+            CommandWriteKey.buildPlainLockDataBlock(lockIndex, lockParameters, lockValue)));
     return this;
   }
 

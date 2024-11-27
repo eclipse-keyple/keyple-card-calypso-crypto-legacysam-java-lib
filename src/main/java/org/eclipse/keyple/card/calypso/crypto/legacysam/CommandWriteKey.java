@@ -312,4 +312,28 @@ final class CommandWriteKey extends Command {
   Map<Integer, StatusProperties> getStatusTable() {
     return STATUS_TABLE;
   }
+
+  /**
+   * Builds a plain data block for a lock file using the provided lock index, lock parameters, and
+   * lock value.
+   *
+   * @param lockIndex The index of the lock file.
+   * @param lockParameters The lock permissions parameters.
+   * @param lockValue The lock value.
+   * @return A 48-byte byte array representing the plain data block.
+   */
+  static byte[] buildPlainLockDataBlock(byte lockIndex, byte lockParameters, byte[] lockValue) {
+
+    byte[] lockFile = new byte[LegacySamConstants.LOCK_FILE_SIZE];
+    lockFile[0] = LegacySamConstants.LOCK_KIF;
+    lockFile[1] = lockIndex;
+    lockFile[7] = lockParameters;
+    System.arraycopy(lockValue, 0, lockFile, 13, LegacySamConstants.LOCK_VALUE_LENGTH);
+
+    byte[] plainDataBlock = new byte[LegacySamConstants.KEY_DATA_BLOCK_SIZE];
+    System.arraycopy(lockFile, 0, plainDataBlock, 8, LegacySamConstants.LOCK_FILE_SIZE);
+    plainDataBlock[37] = LegacySamConstants.TARGET_IS_LOCK_FILE;
+    plainDataBlock[45] = (byte) 0x80;
+    return plainDataBlock;
+  }
 }
