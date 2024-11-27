@@ -26,7 +26,7 @@ import org.eclipse.keypop.card.ApduResponseApi;
  * @since 0.9.0
  */
 final class CommandWriteSamParameters extends Command {
-  private final transient byte[] plainData = new byte[30]; // NOSONAR
+
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
 
   static {
@@ -58,6 +58,8 @@ final class CommandWriteSamParameters extends Command {
             "Record not found: deciphering key not found", DataAccessException.class));
     STATUS_TABLE = m;
   }
+
+  private final transient byte[] plainData = new byte[30]; // NOSONAR
 
   /**
    * Constructor
