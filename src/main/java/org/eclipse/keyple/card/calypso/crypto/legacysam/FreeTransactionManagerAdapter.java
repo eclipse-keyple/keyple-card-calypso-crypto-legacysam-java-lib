@@ -372,15 +372,15 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
             LegacySamConstants.MAX_COUNTER_NUMBER,
             "counterNumber");
     for (Command command : getTargetSamCommands()) {
-      if (command instanceof CommandReadEventCounter
-          && ((CommandReadEventCounter) command).getCounterFileRecordNumber()
+      if (command instanceof CommandReadCounter
+          && ((CommandReadCounter) command).getCounterFileRecordNumber()
               == LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]) {
         // already scheduled
         return this;
       }
     }
     addTargetSamCommand(
-        new CommandReadEventCounter(
+        new CommandReadCounter(
             getContext(), LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber]));
     addTargetSamCommand(
         new CommandReadCeilings(
@@ -397,7 +397,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   @Override
   public FreeTransactionManagerAdapter prepareReadAllCountersStatus() {
     for (int i = 0; i < 3; i++) {
-      addTargetSamCommand(new CommandReadEventCounter(getContext(), i));
+      addTargetSamCommand(new CommandReadCounter(getContext(), i));
       addTargetSamCommand(new CommandReadCeilings(getContext(), i));
     }
     return this;
@@ -503,7 +503,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
 
     // read counters
     for (Integer counterFileRecordNumber : counterFileRecordNumbers) {
-      commands.add(new CommandReadEventCounter(getContext(), counterFileRecordNumber));
+      commands.add(new CommandReadCounter(getContext(), counterFileRecordNumber));
     }
     processTargetSamCommands(commands);
 

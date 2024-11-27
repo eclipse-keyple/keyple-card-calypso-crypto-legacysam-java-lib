@@ -34,7 +34,7 @@ final class CommandSvCheck extends Command {
   }
 
   /**
-   * Instantiates a new CommandSvCheck to authenticate a card SV transaction.
+   * Constructor
    *
    * @param context The command context.
    * @param svCardSignature null if the operation is to abort the SV transaction, a 3 or 6-byte

@@ -43,7 +43,7 @@ final class CommandReadCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamReadCeilings.
+   * Constructor
    *
    * @param context The command context.
    * @param ceilingFileRecordNumber The number of the counter file record to read (in range [0..2].

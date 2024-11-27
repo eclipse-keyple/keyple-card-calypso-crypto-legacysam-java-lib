@@ -40,7 +40,7 @@ final class CommandReadParameters extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamReadCeilings.
+   * Constructor
    *
    * @param context The command context.
    * @since 0.9.0

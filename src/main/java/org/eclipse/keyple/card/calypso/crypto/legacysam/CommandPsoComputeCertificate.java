@@ -56,7 +56,7 @@ final class CommandPsoComputeCertificate extends Command {
   private final LegacyCardCertificateComputationDataAdapter data;
 
   /**
-   * Instantiates a new instance based on the provided "Card Public Key Data" data object.
+   * Constructor
    *
    * <p>The "Card Public Key Data" data object (tag DF25) is a byte array containing the certificate
    * metadata and optionally the card ECC public key.

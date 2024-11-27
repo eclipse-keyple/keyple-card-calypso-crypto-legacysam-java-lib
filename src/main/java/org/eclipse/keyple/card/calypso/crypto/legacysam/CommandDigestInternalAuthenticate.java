@@ -48,7 +48,7 @@ final class CommandDigestInternalAuthenticate extends Command {
   private byte[] terminalSignature;
 
   /**
-   * Instantiates a new CommandDigestInternalAuthenticate.
+   * Constructor
    *
    * @param context The command context.
    * @since 2.3.1

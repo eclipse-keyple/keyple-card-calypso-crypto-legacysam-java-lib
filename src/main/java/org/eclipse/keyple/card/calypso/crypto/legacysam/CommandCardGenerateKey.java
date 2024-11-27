@@ -48,8 +48,7 @@ final class CommandCardGenerateKey extends Command {
   private byte[] cipheredData;
 
   /**
-   * Instantiates a new CmdSamDigestUpdate and generate the ciphered data for a key ciphered by
-   * another.
+   * Constructor
    *
    * <p>If bot KIF and KVC of the ciphering are equal to 0, the source key is ciphered with the null
    * key.

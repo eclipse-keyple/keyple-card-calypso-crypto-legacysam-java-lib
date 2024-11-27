@@ -60,7 +60,7 @@ final class CommandWriteSamParameters extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a single ceiling value.
+   * Constructor
    *
    * @param context The command context.
    * @param samParameters The SAM parameters to write.

@@ -34,7 +34,7 @@ final class CommandGiveRandom extends Command {
   }
 
   /**
-   * Instantiates a new CommandGiveRandom.
+   * Constructor
    *
    * @param context The command context.
    * @param random The random data.

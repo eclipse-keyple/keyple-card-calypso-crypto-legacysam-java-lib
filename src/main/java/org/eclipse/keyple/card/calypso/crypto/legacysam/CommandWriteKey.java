@@ -38,7 +38,7 @@ final class CommandWriteKey extends Command {
   private byte[] arbitraryDiversifier;
 
   /**
-   * Instantiates a new CommandWriteKey for transferring a system key.
+   * Constructor
    *
    * @param context The command context.
    * @param systemKeyType The type of the system key to transfer.
@@ -65,7 +65,7 @@ final class CommandWriteKey extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteKey for transferring a work key.
+   * Constructor
    *
    * @param context The command context.
    * @param kif The KIF of the key to transfer.
@@ -86,7 +86,8 @@ final class CommandWriteKey extends Command {
     super(CommandRef.WRITE_KEY, 0, context);
 
     cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
-    targetKeyReference = targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
+    targetKeyReference =
+        targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -94,7 +95,7 @@ final class CommandWriteKey extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteKey for transferring a work key.
+   * Constructor
    *
    * @param context The command context.
    * @param kif The KIF of the key to transfer.
@@ -115,7 +116,8 @@ final class CommandWriteKey extends Command {
     super(CommandRef.WRITE_KEY, 0, context);
 
     cipheringKeyType = SystemKeyType.KEY_MANAGEMENT;
-    targetKeyReference = targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
+    targetKeyReference =
+        targetRecordNumber == 0 ? RECORD_CHOSEN_BY_THE_SAM : (byte) targetRecordNumber;
     sourceKeyKif = kif;
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
@@ -124,7 +126,7 @@ final class CommandWriteKey extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteKey for transferring a lock file.
+   * Constructor
    *
    * @param context The command context.
    * @param lockIndex The index of the lock file.
@@ -149,7 +151,7 @@ final class CommandWriteKey extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteKey for writing a lock file in plain mode.
+   * Constructor
    *
    * @param context The command context.
    * @param plainLockDataBlock A 48-byte byte array representing the lock data block including the

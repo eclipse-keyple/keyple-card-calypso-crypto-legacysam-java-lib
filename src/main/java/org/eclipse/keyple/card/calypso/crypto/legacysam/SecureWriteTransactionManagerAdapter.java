@@ -114,7 +114,8 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKey(
       byte kif, byte kvc, byte[] workKeyParameters, int targetRecordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, targetRecordNumber, false, null);
+    return prepareTransferWorkKeyInternal(
+        kif, kvc, workKeyParameters, targetRecordNumber, false, null);
   }
 
   /**
@@ -125,7 +126,8 @@ public class SecureWriteTransactionManagerAdapter extends CommonTransactionManag
   @Override
   public SecureWriteTransactionManager prepareTransferWorkKeyDiversified(
       byte kif, byte kvc, byte[] workKeyParameters, int targetRecordNumber) {
-    return prepareTransferWorkKeyInternal(kif, kvc, workKeyParameters, targetRecordNumber, true, null);
+    return prepareTransferWorkKeyInternal(
+        kif, kvc, workKeyParameters, targetRecordNumber, true, null);
   }
 
   /**

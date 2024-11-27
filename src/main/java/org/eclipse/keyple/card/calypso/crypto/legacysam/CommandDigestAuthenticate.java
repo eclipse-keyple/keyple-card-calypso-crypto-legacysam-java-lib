@@ -36,7 +36,7 @@ final class CommandDigestAuthenticate extends Command {
   }
 
   /**
-   * Instantiates a new CommandDigestAuthenticate .
+   * Constructor
    *
    * @param context The command context.
    * @param signature the signature.

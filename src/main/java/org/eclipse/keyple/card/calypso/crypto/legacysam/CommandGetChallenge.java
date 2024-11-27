@@ -34,7 +34,7 @@ final class CommandGetChallenge extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamGetChallenge.
+   * Constructor
    *
    * @param context The command context.
    * @param expectedResponseLength the expected response length.

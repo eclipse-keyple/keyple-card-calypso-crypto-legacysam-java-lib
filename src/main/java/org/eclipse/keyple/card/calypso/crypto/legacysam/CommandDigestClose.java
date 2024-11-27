@@ -36,7 +36,7 @@ final class CommandDigestClose extends Command {
   private byte[] mac;
 
   /**
-   * Instantiates a new CommandDigestClose .
+   * Constructor
    *
    * @param context The command context.
    * @param expectedResponseLength the expected response length.

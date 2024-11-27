@@ -43,7 +43,7 @@ final class CommandDigestInit extends Command {
   }
 
   /**
-   * Instantiates a new CommandDigestInit.
+   * Constructor
    *
    * @param context The command context.
    * @param verificationMode the verification mode.

@@ -46,8 +46,7 @@ final class CommandCardCipherPin extends Command {
   private byte[] cipheredData;
 
   /**
-   * Instantiates a new CommandCardCipherPin and generate the ciphered data for a "Verify PIN" or
-   * Change PIN card command.
+   * Constructor
    *
    * <p>In the case of a PIN verification, only the current PIN must be provided (newPin must be set
    * to null).

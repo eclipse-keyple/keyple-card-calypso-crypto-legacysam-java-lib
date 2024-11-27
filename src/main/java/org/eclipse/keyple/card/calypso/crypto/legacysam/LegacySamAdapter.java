@@ -57,7 +57,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   private SamParametersAdapter samParameters;
 
   /**
-   * Constructor.
+   * Constructor
    *
    * <p>Create a {@link LegacySamAdapter} just containing the {@link ProductType}.
    *
@@ -71,7 +71,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
   }
 
   /**
-   * Constructor.
+   * Constructor
    *
    * <p>Create the initial content from the data received in response to the card selection.
    *

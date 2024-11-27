@@ -41,7 +41,7 @@ final class CommandDigestUpdateMultiple extends Command {
   }
 
   /**
-   * Instantiates a new CommandDigestUpdateMultiple.
+   * Constructor
    *
    * @param context The command context.
    * @param digestData the digest data.

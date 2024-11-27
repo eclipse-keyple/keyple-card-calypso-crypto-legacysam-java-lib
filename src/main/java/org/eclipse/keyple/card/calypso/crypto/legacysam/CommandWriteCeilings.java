@@ -72,7 +72,7 @@ final class CommandWriteCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a single ceiling value in static mode.
+   * Constructor
    *
    * @param context The command context.
    * @param targetSamContext The target SAM context.
@@ -103,7 +103,7 @@ final class CommandWriteCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a single ceiling value in dynamic mode.
+   * Constructor
    *
    * @param context The command context.
    * @param counterNumber The number of the counter whose ceiling is to be written (in range
@@ -116,8 +116,7 @@ final class CommandWriteCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a record of 9 ceiling values in static
-   * mode.
+   * Constructor
    *
    * @param context The command context.
    * @param targetSamContext The target SAM context.
@@ -148,8 +147,7 @@ final class CommandWriteCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a record of 9 ceiling values in dynamic
-   * mode.
+   * Constructor
    *
    * @param context The command context.
    * @param counterNumber The number of the counter whose ceiling is to be written (in range

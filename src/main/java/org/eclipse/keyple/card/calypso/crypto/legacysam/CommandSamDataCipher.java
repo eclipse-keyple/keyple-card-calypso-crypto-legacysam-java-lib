@@ -57,7 +57,7 @@ final class CommandSamDataCipher extends Command {
   private final byte[] cipheredData = new byte[48];
 
   /**
-   * Instantiates a new instance to cipher a data record.
+   * Constructor
    *
    * @param context The command context.
    * @param recordNumber The targeted record number (in range [1..7], ignored when DataType is

@@ -50,7 +50,7 @@ final class CommandReadKeyParameters extends Command {
   private int recordNumber;
 
   /**
-   * Instantiates a new instance to read the parameters of a system key.
+   * Constructor
    *
    * @param context The command context.
    * @param systemKeyType The type of the system key.
@@ -91,7 +91,7 @@ final class CommandReadKeyParameters extends Command {
   }
 
   /**
-   * Instantiates a new instance to read the parameters of a key identified by its KIF and KVC.
+   * Constructor
    *
    * @param context The command context.
    * @param kif The KIF of the key.
@@ -116,7 +116,7 @@ final class CommandReadKeyParameters extends Command {
   }
 
   /**
-   * Instantiates a new instance to read the parameters of a key identified by its record number.
+   * Constructor
    *
    * @param context The command context.
    * @param recordNumber the record number
