@@ -33,7 +33,7 @@ import org.eclipse.keypop.card.spi.CardRequestSpi;
  *
  * @since 0.4.0
  */
-class SymmetricCryptoCardTransactionManagerFactoryAdapter
+final class SymmetricCryptoCardTransactionManagerFactoryAdapter
     implements SymmetricCryptoCardTransactionManagerFactory,
         SymmetricCryptoCardTransactionManagerFactorySpi {
 

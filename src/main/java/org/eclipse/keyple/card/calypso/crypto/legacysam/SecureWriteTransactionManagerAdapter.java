@@ -22,7 +22,7 @@ import org.eclipse.keypop.card.ProxyReaderApi;
  *
  * @since 0.9.0
  */
-public class SecureWriteTransactionManagerAdapter extends CommonTransactionManagerAdapter
+final class SecureWriteTransactionManagerAdapter extends CommonTransactionManagerAdapter
     implements SecureWriteTransactionManager {
 
   /**
