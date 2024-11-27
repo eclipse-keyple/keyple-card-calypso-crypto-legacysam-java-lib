@@ -11,6 +11,7 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.HexUtil;
@@ -58,22 +59,15 @@ final class LegacySamConstants {
   static final byte DYNAMIC_MODE_CIPHERING = (byte) 0x00;
   static final byte STATIC_MODE_CIPHERING = (byte) 0x08;
 
-  /** Mapper for SystemKeyType to kif values. */
-  static class SystemKeyTypeKifMapper {
-    private static final Map<SystemKeyType, Byte> kifMap = new EnumMap<>(SystemKeyType.class);
+  static final Map<SystemKeyType, Byte> SYSTEM_KEY_TYPE_KIF_MAP;
 
-    private SystemKeyTypeKifMapper() {}
-
-    static {
-      kifMap.put(SystemKeyType.PERSONALIZATION, (byte) 0xE1);
-      kifMap.put(SystemKeyType.KEY_MANAGEMENT, (byte) 0xFD);
-      kifMap.put(SystemKeyType.RELOADING, (byte) 0xE7);
-      kifMap.put(SystemKeyType.AUTHENTICATION, (byte) 0xFA);
-    }
-
-    public static byte getKif(SystemKeyType keyType) {
-      return kifMap.get(keyType);
-    }
+  static {
+    Map<SystemKeyType, Byte> map = new EnumMap<>(SystemKeyType.class);
+    map.put(SystemKeyType.PERSONALIZATION, (byte) 0xE1);
+    map.put(SystemKeyType.KEY_MANAGEMENT, (byte) 0xFD);
+    map.put(SystemKeyType.RELOADING, (byte) 0xE7);
+    map.put(SystemKeyType.AUTHENTICATION, (byte) 0xFA);
+    SYSTEM_KEY_TYPE_KIF_MAP = Collections.unmodifiableMap(map);
   }
 
   /**

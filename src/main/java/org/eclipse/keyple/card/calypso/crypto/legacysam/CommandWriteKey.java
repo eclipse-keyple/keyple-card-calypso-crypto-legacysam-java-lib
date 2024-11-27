@@ -126,7 +126,7 @@ final class CommandWriteKey extends Command {
 
     cipheringKeyType = SystemKeyType.PERSONALIZATION;
     targetKeyReference = LegacySamConstants.TARGET_IS_SYSTEM_KEY_FILE;
-    sourceKeyKif = LegacySamConstants.SystemKeyTypeKifMapper.getKif(systemKeyType);
+    sourceKeyKif = LegacySamConstants.SYSTEM_KEY_TYPE_KIF_MAP.get(systemKeyType);
     sourceKeyKvc = kvc;
     this.keyParameters = keyParameters;
     isTransferredObjectDiversified = isTransferredKeyDiversified;

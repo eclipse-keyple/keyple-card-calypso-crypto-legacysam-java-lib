@@ -356,7 +356,8 @@ final class LegacySamSelectionExtensionAdapter
    */
   @Override
   public LegacySamSelectionExtension prepareReadSamParameters() {
-    return null;
+    commands.add(new CommandReadParameters(context));
+    return this;
   }
 
   /**
@@ -378,7 +379,10 @@ final class LegacySamSelectionExtensionAdapter
    */
   @Override
   public LegacySamSelectionExtension prepareReadWorkKeyParameters(int recordNumber) {
-    return null;
+    Assert.getInstance()
+        .isInRange(recordNumber, MIN_KEY_RECORD_NUMBER, MAX_KEY_RECORD_NUMBER, "recordNumber");
+    commands.add(new CommandReadKeyParameters(context, recordNumber));
+    return this;
   }
 
   /**
@@ -388,7 +392,8 @@ final class LegacySamSelectionExtensionAdapter
    */
   @Override
   public LegacySamSelectionExtension prepareReadWorkKeyParameters(byte kif, byte kvc) {
-    return null;
+    commands.add(new CommandReadKeyParameters(context, kif, kvc));
+    return this;
   }
 
   /**
