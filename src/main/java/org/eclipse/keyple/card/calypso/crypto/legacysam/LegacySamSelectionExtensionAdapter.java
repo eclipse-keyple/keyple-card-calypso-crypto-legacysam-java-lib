@@ -53,7 +53,7 @@ final class LegacySamSelectionExtensionAdapter
   private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
   private static final String MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET =
       "A setting to unlock the SAM has already been set";
-  private LegacySamAdapter legacySamAdapter;
+  private final LegacySamAdapter legacySamAdapter;
   private final CommandContextDto context;
   private final List<Command> commands;
   private CardReader targetSamReader;
@@ -127,7 +127,6 @@ final class LegacySamSelectionExtensionAdapter
   public SmartCardSpi parse(CardSelectionResponseApi cardSelectionResponseApi)
       throws ParseException {
     try {
-      legacySamAdapter = new LegacySamAdapter(LegacySam.ProductType.SAM_C1);
       legacySamAdapter.parseSelectionResponse(cardSelectionResponseApi);
       CardResponseApi cardResponse = getCardResponse(cardSelectionResponseApi);
       parseCardResponse(cardResponse);
