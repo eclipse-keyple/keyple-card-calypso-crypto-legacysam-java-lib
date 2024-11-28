@@ -1,1 +1,0 @@
-typeSearchIndex = [{"l":"All Classes and Interfaces","u":"allclasses-index.html"},{"p":"org.eclipse.keyple.card.calypso.crypto.legacysam","l":"ContextSetting"},{"p":"org.eclipse.keyple.card.calypso.crypto.legacysam","l":"LegacySamExtensionService"},{"p":"org.eclipse.keyple.card.calypso.crypto.legacysam","l":"LegacySamUtil"}];updateSearchResults();
