@@ -27,7 +27,7 @@ import org.slf4j.LoggerFactory;
  *
  * @since 0.1.0
  */
-class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExtension {
+final class LegacySamResourceProfileExtensionAdapter implements CardResourceProfileExtension {
 
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamResourceProfileExtensionAdapter.class);

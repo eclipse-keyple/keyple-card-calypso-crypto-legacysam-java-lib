@@ -46,7 +46,7 @@ final class CommandDigestUpdate extends Command {
   private byte[] processedData;
 
   /**
-   * Instantiates a new CommandDigestUpdate.
+   * Constructor
    *
    * @param context The command context.
    * @param encryptedSession the encrypted session flag, true if encrypted.

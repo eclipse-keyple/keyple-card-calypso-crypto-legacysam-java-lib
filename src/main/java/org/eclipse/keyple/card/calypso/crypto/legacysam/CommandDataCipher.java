@@ -58,7 +58,7 @@ final class CommandDataCipher extends Command {
   private final BasicSignatureVerificationDataAdapter signatureVerificationData;
 
   /**
-   * Instantiates a new instance based on the provided data.
+   * Constructor
    *
    * @param context The command context.
    * @param signatureComputationData The signature computation data (optional).

@@ -60,7 +60,7 @@ abstract class Command {
   private final transient List<Command> controlSamCommands = new ArrayList<>(2); // NOSONAR
 
   /**
-   * Constructor dedicated for the building of referenced Calypso commands
+   * Constructor
    *
    * @param commandRef A command reference from the Calypso command table.
    * @param le The value of the LE field.

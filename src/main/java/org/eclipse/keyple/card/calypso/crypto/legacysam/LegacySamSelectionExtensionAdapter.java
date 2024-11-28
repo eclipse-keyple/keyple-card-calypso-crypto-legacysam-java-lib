@@ -351,12 +351,47 @@ final class LegacySamSelectionExtensionAdapter
   /**
    * {@inheritDoc}
    *
+   * @since 0.9.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadSamParameters() {
+    commands.add(new CommandReadParameters(context));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
    * @since 0.4.0
    */
   @Override
   public LegacySamSelectionExtension prepareReadSystemKeyParameters(SystemKeyType systemKeyType) {
     Assert.getInstance().notNull(systemKeyType, "systemKeyType");
     commands.add(new CommandReadKeyParameters(context, systemKeyType));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadWorkKeyParameters(int recordNumber) {
+    Assert.getInstance()
+        .isInRange(recordNumber, MIN_KEY_RECORD_NUMBER, MAX_KEY_RECORD_NUMBER, "recordNumber");
+    commands.add(new CommandReadKeyParameters(context, recordNumber));
+    return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public LegacySamSelectionExtension prepareReadWorkKeyParameters(byte kif, byte kvc) {
+    commands.add(new CommandReadKeyParameters(context, kif, kvc));
     return this;
   }
 
@@ -378,7 +413,7 @@ final class LegacySamSelectionExtensionAdapter
       }
     }
     commands.add(new CommandReadCounter(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
-    commands.add(new CommandReadCounterCeiling(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
+    commands.add(new CommandReadCeilings(context, COUNTER_TO_RECORD_LOOKUP[counterNumber]));
 
     return this;
   }
@@ -392,7 +427,7 @@ final class LegacySamSelectionExtensionAdapter
   public LegacySamSelectionExtension prepareReadAllCountersStatus() {
     for (int i = 0; i < 3; i++) {
       commands.add(new CommandReadCounter(context, i));
-      commands.add(new CommandReadCounterCeiling(context, i));
+      commands.add(new CommandReadCeilings(context, i));
     }
     return this;
   }

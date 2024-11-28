@@ -55,7 +55,7 @@ final class CommandPsoVerifySignature extends Command {
   private final TraceableSignatureVerificationDataAdapter data;
 
   /**
-   * Instantiates a new instance based on the provided signature verification data.
+   * Constructor
    *
    * @param context The command context.
    * @param data The signature verification data.

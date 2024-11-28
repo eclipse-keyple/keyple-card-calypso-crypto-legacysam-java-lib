@@ -49,7 +49,7 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
   private final DtoAdapters.KeyPairContainerAdapter keyPairContainer;
 
   /**
-   * Instantiates a new instance.
+   * Constructor
    *
    * <p>The OID of the key to generate is "06082A8648CE3D030107" (P-256 curve as referenced in FIPS
    * PUB 186-4 publication).

@@ -49,14 +49,15 @@ final class CommandSamDataCipher extends Command {
         new StatusProperties("Incorrect P1 (!=%0xxxxx0) or P2", IllegalParameterException.class));
     m.put(
         0x6A83,
-        new StatusProperties("Record not found: key to read not found", DataAccessException.class));
+        new StatusProperties(
+            "Record not found: ciphering key not found", DataAccessException.class));
     STATUS_TABLE = m;
   }
 
   private final byte[] cipheredData = new byte[48];
 
   /**
-   * Instantiates a new instance to cipher a data record.
+   * Constructor
    *
    * @param context The command context.
    * @param recordNumber The targeted record number (in range [1..7], ignored when DataType is

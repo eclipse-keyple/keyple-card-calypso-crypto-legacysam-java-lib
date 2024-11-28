@@ -13,6 +13,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
@@ -26,6 +27,8 @@ import org.eclipse.keypop.card.ApduResponseApi;
  */
 final class CommandReadKeyParameters extends Command {
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
+  private static final int SW_KEY_NOT_FOUND = 0x6A83;
+  private static final int SW_DATA_NOT_SIGNED_WARNING = 0x6200;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
@@ -38,14 +41,16 @@ final class CommandReadKeyParameters extends Command {
     m.put(
         0x6A83,
         new StatusProperties("Record not found: key to read not found", DataAccessException.class));
-    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed", null));
+    m.put(0x6200, new StatusProperties("Correct execution with warning: data not signed"));
     STATUS_TABLE = m;
   }
 
   private SystemKeyType systemKeyType;
+  private Short kifKvc;
+  private int recordNumber;
 
   /**
-   * Instantiates a new instance to read the parameters of a system key.
+   * Constructor
    *
    * @param context The command context.
    * @param systemKeyType The type of the system key.
@@ -78,16 +83,20 @@ final class CommandReadKeyParameters extends Command {
     }
     byte[] dataIn = {0x00, 0x00};
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING)
+            .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
+    addSubName(this.systemKeyType.name());
   }
 
   /**
-   * Instantiates a new instance to read the parameters of a key identified by its KIF and KVC.
+   * Constructor
    *
    * @param context The command context.
    * @param kif The KIF of the key.
-   * @param kvc The KIF of the key.
-   * @since 0.3.0
+   * @param kvc The KVC of the key.
+   * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, byte kif, byte kvc) {
 
@@ -98,16 +107,20 @@ final class CommandReadKeyParameters extends Command {
     final byte p1 = 0;
     final byte p2 = (byte) 0xF0;
     byte[] dataIn = {kif, kvc};
+    kifKvc = (short) ((kif << 8) | (kvc & 0xFF));
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
+    addSubName("Work key");
   }
 
   /**
-   * Instantiates a new instance to read the parameters of a key identified by its record number.
+   * Constructor
    *
    * @param context The command context.
    * @param recordNumber the record number
-   * @since 0.3.0
+   * @since 0.9.0
    */
   CommandReadKeyParameters(CommandContextDto context, int recordNumber) {
 
@@ -118,8 +131,13 @@ final class CommandReadKeyParameters extends Command {
     final byte p1 = 0;
     byte p2 = (byte) recordNumber;
     byte[] dataIn = {0x00, 0x00};
+    this.recordNumber = recordNumber;
 
-    setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null)));
+    setApduRequest(
+        new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, dataIn, null))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING)
+            .addSuccessfulStatusWord(SW_KEY_NOT_FOUND));
+    addSubName("Work key");
   }
 
   /**
@@ -159,13 +177,20 @@ final class CommandReadKeyParameters extends Command {
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
-    setResponseAndCheckStatus(apduResponse);
+    try {
+      setResponseAndCheckStatus(apduResponse);
+    } catch (DataAccessException e) {
+      return;
+    }
+    KeyParameterAdapter keyParameterAdapter =
+        new KeyParameterAdapter(Arrays.copyOfRange(apduResponse.getApdu(), 8, 21));
+    LegacySamAdapter legacySamAdapter = getContext().getTargetSam();
     if (systemKeyType != null) {
-      byte[] keyParameter = new byte[13];
-      System.arraycopy(apduResponse.getApdu(), 8, keyParameter, 0, 13);
-      getContext()
-          .getTargetSam()
-          .setSystemKeyParameter(systemKeyType, new KeyParameterAdapter(keyParameter));
+      legacySamAdapter.setSystemKeyParameter(systemKeyType, keyParameterAdapter);
+    } else if (kifKvc != null) {
+      legacySamAdapter.setWorkKeyParameter(kifKvc, keyParameterAdapter);
+    } else {
+      legacySamAdapter.setWorkKeyParameter(recordNumber, keyParameterAdapter);
     }
   }
 }

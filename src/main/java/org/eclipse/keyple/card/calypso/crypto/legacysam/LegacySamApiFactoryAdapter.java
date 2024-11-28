@@ -25,7 +25,7 @@ import org.eclipse.keypop.reader.CardReader;
  *
  * @since 0.4.0
  */
-class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
+final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
   private static final String MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API =
       "The provided 'samReader' must implement 'ProxyReaderApi'";
   private static final String MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER =
@@ -93,6 +93,31 @@ class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
           MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
     }
     return new FreeTransactionManagerAdapter((ProxyReaderApi) samReader, (LegacySamAdapter) sam);
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.9.0
+   */
+  @Override
+  public SecureWriteTransactionManager createSecureWriteTransactionManager(
+      CardReader samReader, LegacySam sam, SecuritySetting securitySetting) {
+
+    if (!(samReader instanceof ProxyReaderApi)) {
+      throw new IllegalArgumentException(
+          MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
+    }
+    if (!(sam instanceof LegacySamAdapter)) {
+      throw new IllegalArgumentException(
+          MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
+    }
+    Assert.getInstance().notNull(securitySetting, "securitySetting");
+    return new SecureWriteTransactionManagerAdapter(
+        (ProxyReaderApi) samReader,
+        (LegacySamAdapter) sam,
+        ((SecuritySettingAdapter) securitySetting).getControlSamReader(),
+        ((SecuritySettingAdapter) securitySetting).getControlSam());
   }
 
   /**

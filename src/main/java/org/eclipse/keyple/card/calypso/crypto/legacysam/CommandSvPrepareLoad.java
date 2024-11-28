@@ -46,7 +46,7 @@ final class CommandSvPrepareLoad extends Command {
   private final SvCommandSecurityDataApi data;
 
   /**
-   * Instantiates a new CommandSvPrepareLoad to prepare a load transaction.
+   * Constructor
    *
    * <p>Build the SvPrepareLoad APDU from the SvGet command and response, the SvReload partial
    * command

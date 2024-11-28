@@ -24,11 +24,12 @@ import org.eclipse.keypop.card.ApduResponseApi;
  *
  * @since 0.1.0
  */
-final class CommandReadCounterCeiling extends Command {
+final class CommandReadCeilings extends Command {
 
   private final int ceilingFileRecordNumber;
 
   private static final Map<Integer, StatusProperties> STATUS_TABLE;
+  private static final int SW_DATA_NOT_SIGNED_WARNING = 0x6200;
 
   static {
     Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
@@ -42,13 +43,13 @@ final class CommandReadCounterCeiling extends Command {
   }
 
   /**
-   * Instantiates a new CmdSamReadCeilings.
+   * Constructor
    *
    * @param context The command context.
    * @param ceilingFileRecordNumber The number of the counter file record to read (in range [0..2].
    * @since 0.1.0
    */
-  CommandReadCounterCeiling(CommandContextDto context, int ceilingFileRecordNumber) {
+  CommandReadCeilings(CommandContextDto context, int ceilingFileRecordNumber) {
 
     super(CommandRef.READ_CEILINGS, 48, context);
 
@@ -59,7 +60,9 @@ final class CommandReadCounterCeiling extends Command {
 
     setApduRequest(
         new ApduRequestAdapter(
-            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, null, (byte) 0x00)));
+                ApduUtil.build(
+                    cla, getCommandRef().getInstructionByte(), p1, p2, null, (byte) 0x00))
+            .addSuccessfulStatusWord(SW_DATA_NOT_SIGNED_WARNING));
   }
 
   /**

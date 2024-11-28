@@ -54,7 +54,7 @@ final class CommandPsoComputeSignature extends Command {
   private final TraceableSignatureComputationDataAdapter data;
 
   /**
-   * Instantiates a new instance based on the provided signature computation data.
+   * Constructor
    *
    * @param context The command context.
    * @param data The signature computation data.

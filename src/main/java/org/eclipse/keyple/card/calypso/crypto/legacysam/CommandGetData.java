@@ -42,7 +42,7 @@ final class CommandGetData extends Command {
   private final LegacySamConstants.TagInfo tagInfo;
 
   /**
-   * Instantiates a new CmdSamGetChallenge.
+   * Constructor
    *
    * @param context The command context.
    * @param tag The tag to retrieve the data for.

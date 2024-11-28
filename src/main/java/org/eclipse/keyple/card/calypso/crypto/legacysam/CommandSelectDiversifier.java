@@ -38,7 +38,7 @@ final class CommandSelectDiversifier extends Command {
   }
 
   /**
-   * Instantiates a new CommandSelectDiversifier.
+   * Constructor
    *
    * @param context The command context.
    * @param diversifier The key diversifier.

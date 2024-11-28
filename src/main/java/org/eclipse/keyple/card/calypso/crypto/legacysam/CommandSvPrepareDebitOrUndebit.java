@@ -46,7 +46,7 @@ final class CommandSvPrepareDebitOrUndebit extends Command {
   private final SvCommandSecurityDataApi data;
 
   /**
-   * Instantiates a new CmdSamSvPrepareDebit to prepare a debit or cancel transaction.
+   * Constructor
    *
    * @param context The command context.
    * @param data The SV input/output command data.

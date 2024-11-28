@@ -29,7 +29,8 @@ import org.eclipse.keypop.card.ApduResponseApi;
  */
 final class CommandWriteCeilings extends Command {
   private final transient TargetSamContextDto targetSamContext; // NOSONAR
-  private final transient byte[] plainData = new byte[30]; // NOSONAR
+  private final transient byte[] plainData =
+      new byte[LegacySamConstants.PLAIN_CEILING_DATA_BLOCK_SIZE]; // NOSONAR
   private final transient Map<Integer, CounterIncrementAccess> // NOSONAR
       counterNumberToManualCounterIncrementAuthorizedMap = new HashMap<>();
   private final transient int counterFileRecordNumber; // NOSONAR
@@ -71,7 +72,7 @@ final class CommandWriteCeilings extends Command {
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a single ceiling value.
+   * Constructor
    *
    * @param context The command context.
    * @param targetSamContext The target SAM context.
@@ -92,13 +93,30 @@ final class CommandWriteCeilings extends Command {
     counterFileRecordNumber = -1;
 
     // build the plain data block to be ciphered later
-    plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+    // If targetSamContext is null (dynamic mode), get the KVC from the LegacySam.
+    plainData[0] =
+        targetSamContext == null
+            ? getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.RELOADING).getKvc()
+            : targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
     plainData[1] = (byte) counterNumber;
     ByteArrayUtil.copyBytes(ceilingValue, plainData, 2, 3);
   }
 
   /**
-   * Instantiates a new CommandWriteCeilings for writing a record of 9 ceiling values.
+   * Constructor
+   *
+   * @param context The command context.
+   * @param counterNumber The number of the counter whose ceiling is to be written (in range
+   *     [0..26]).
+   * @param ceilingValue The ceiling value.
+   * @since 0.9.0
+   */
+  CommandWriteCeilings(CommandContextDto context, int counterNumber, int ceilingValue) {
+    this(context, null, counterNumber, ceilingValue);
+  }
+
+  /**
+   * Constructor
    *
    * @param context The command context.
    * @param targetSamContext The target SAM context.
@@ -119,8 +137,31 @@ final class CommandWriteCeilings extends Command {
     this.targetSamContext = targetSamContext;
     counterFileRecordNumber = LegacySamConstants.COUNTER_TO_RECORD_LOOKUP[counterNumber];
 
-    plainData[0] = targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+    // If targetSamContext is null (dynamic mode), get the KVC from the LegacySam.
+    plainData[0] =
+        targetSamContext == null
+            ? getContext().getTargetSam().getSystemKeyParameter(SystemKeyType.RELOADING).getKvc()
+            : targetSamContext.getSystemKeyTypeToKvcMap().get(SystemKeyType.RELOADING);
+
     addCounter(counterNumber, ceilingValue, counterIncrementAccess);
+  }
+
+  /**
+   * Constructor
+   *
+   * @param context The command context.
+   * @param counterNumber The number of the counter whose ceiling is to be written (in range
+   *     [0..26]).
+   * @param ceilingValue The ceiling value.
+   * @param counterIncrementAccess The counter incrementation configuration.
+   * @since 0.1.0
+   */
+  public CommandWriteCeilings(
+      CommandContextDto context,
+      int counterNumber,
+      int ceilingValue,
+      CounterIncrementAccess counterIncrementAccess) {
+    this(context, null, counterNumber, ceilingValue, counterIncrementAccess);
   }
 
   /**
@@ -174,8 +215,16 @@ final class CommandWriteCeilings extends Command {
         new CommandContextDto(getContext().getControlSam(), null, null);
     // add commands
     addControlSamCommand(
-        new CommandSelectDiversifier(controlSamContext, targetSamContext.getSerialNumber()));
-    addControlSamCommand(new CommandGiveRandom(controlSamContext, computeChallenge()));
+        new CommandSelectDiversifier(
+            controlSamContext,
+            targetSamContext == null
+                ? getContext().getTargetSam().getSerialNumber()
+                : targetSamContext.getSerialNumber()));
+    byte[] challenge =
+        targetSamContext == null
+            ? getContext().getTargetSam().popChallenge()
+            : LegacySamUtil.computeStaticModeChallenge(targetSamContext, SystemKeyType.RELOADING);
+    addControlSamCommand(new CommandGiveRandom(controlSamContext, challenge));
     if (counterFileRecordNumber != -1) {
       computePlainData();
     }
@@ -190,8 +239,11 @@ final class CommandWriteCeilings extends Command {
     addControlSamCommand(commandSamDataCipher);
     processControlSamCommand();
     final byte cla = (byte) 0x80;
-    final byte inst = (byte) 0xD8;
-    byte p1 = targetSamContext.isDynamicMode() ? (byte) 0x00 : (byte) 0x08;
+    final byte inst = CommandRef.WRITE_CEILINGS.getInstructionByte();
+    byte p1 =
+        targetSamContext == null
+            ? LegacySamConstants.DYNAMIC_MODE_CIPHERING
+            : LegacySamConstants.STATIC_MODE_CIPHERING;
     setApduRequest(
         new ApduRequestAdapter(
             ApduUtil.build(
@@ -199,8 +251,10 @@ final class CommandWriteCeilings extends Command {
                 inst,
                 p1,
                 counterFileRecordNumber == -1
-                    ? (byte) 0xB8
-                    : (byte) (0xB1 + counterFileRecordNumber),
+                    ? LegacySamConstants.SINGLE_CEILING_REFERENCE
+                    : (byte)
+                        (LegacySamConstants.FIRST_EVENT_CEILING_RECORD_REFERENCE
+                            + counterFileRecordNumber),
                 commandSamDataCipher.getCipheredData(),
                 null)));
   }
@@ -226,32 +280,6 @@ final class CommandWriteCeilings extends Command {
       }
     }
     ByteArrayUtil.copyBytes(configBits, plainData, 28, 2);
-  }
-
-  /** Computes the challenge to be sent to the control SAM from the target SAM context. */
-  private byte[] computeChallenge() {
-
-    // compute the challenge
-    byte[] challenge = new byte[8];
-    if (targetSamContext.getSystemKeyTypeToCounterNumberMap() != null) {
-      Integer reloadingKeyCounterNumber =
-          targetSamContext.getSystemKeyTypeToCounterNumberMap().get(SystemKeyType.RELOADING);
-      if (reloadingKeyCounterNumber != null) {
-        ByteArrayUtil.copyBytes(
-            targetSamContext.getCounterNumberToCounterValueMap().get(reloadingKeyCounterNumber),
-            challenge,
-            5,
-            3);
-        // increment counter
-        targetSamContext
-            .getCounterNumberToCounterValueMap()
-            .put(
-                reloadingKeyCounterNumber,
-                targetSamContext.getCounterNumberToCounterValueMap().get(reloadingKeyCounterNumber)
-                    + 1);
-      }
-    }
-    return challenge;
   }
 
   /**

@@ -1,5 +1,5 @@
 /* **************************************************************************************
- * Copyright (c) 2019 Calypso Networks Association https://calypsonet.org/
+ * Copyright (c) 2024 Calypso Networks Association https://calypsonet.org/
  *
  * See the NOTICE file(s) distributed with this work for additional information
  * regarding copyright ownership.
@@ -11,39 +11,16 @@
  ************************************************************************************** */
 package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
-import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.keyple.core.util.ApduUtil;
 import org.eclipse.keypop.card.ApduResponseApi;
 
 /**
- * Builds the Give Random APDU command.
+ * Builds the SAM Generate Key APDU command.
  *
- * @since 2.0.1
+ * @since 0.9.0
  */
-final class CommandCardGenerateKey extends Command {
-
-  private static final Map<Integer, StatusProperties> STATUS_TABLE;
-
-  static {
-    Map<Integer, StatusProperties> m = new HashMap<>(Command.STATUS_TABLE);
-    m.put(0x6700, new StatusProperties("Incorrect Lc", IllegalParameterException.class));
-    m.put(
-        0x6985,
-        new StatusProperties("Preconditions not satisfied", AccessForbiddenException.class));
-    m.put(0x6A00, new StatusProperties("Incorrect P1 or P2", IllegalParameterException.class));
-    m.put(
-        0x6A80,
-        new StatusProperties(
-            "Incorrect incoming data: unknown or incorrect format",
-            IncorrectInputDataException.class));
-    m.put(
-        0x6A83,
-        new StatusProperties(
-            "Record not found: ciphering key or key to cipher not found",
-            DataAccessException.class));
-    STATUS_TABLE = m;
-  }
+final class CommandSamGenerateKey extends Command {
 
   private byte[] cipheredData;
 
@@ -54,58 +31,50 @@ final class CommandCardGenerateKey extends Command {
    * key.
    *
    * @param context The command context.
-   * @param cipheringKif The KIF of the ciphering key.
+   * @param targetKeyReference The target key reference.
    * @param cipheringKvc The KVC of the ciphering key.
    * @param sourceKif The KIF of the source key.
    * @param sourceKvc The KVC of the source key.
-   * @since 2.0.1
+   * @param isTransferredObjectDiversified true if the transferred object (key or lock) is
+   *     diversified.
+   * @param arbitraryDiversifier null or the 8-byte diversifier to use.
+   * @since 0.9.0
    */
-  CommandCardGenerateKey(
+  CommandSamGenerateKey(
       DtoAdapters.CommandContextDto context,
-      byte cipheringKif,
+      byte targetKeyReference,
       byte cipheringKvc,
       byte sourceKif,
-      byte sourceKvc) {
+      byte sourceKvc,
+      byte[] keyParameters,
+      boolean isTransferredObjectDiversified,
+      byte[] arbitraryDiversifier) {
 
-    super(CommandRef.CARD_GENERATE_KEY, 0, context);
+    super(CommandRef.SAM_GENERATE_KEY, 48, context);
 
     byte cla = context.getTargetSam().getClassByte();
 
-    byte p1;
-    byte p2;
-    byte[] data;
-
-    if (cipheringKif == 0 && cipheringKvc == 0) {
-      // case where the source key is ciphered by the null key
-      p1 = (byte) 0xFF;
-      p2 = (byte) 0x00;
-
-      data = new byte[3];
-      data[0] = sourceKif;
-      data[1] = sourceKvc;
-      data[2] = (byte) 0x90;
-    } else {
-      p1 = (byte) 0xFF;
-      p2 = (byte) 0xFF;
-
-      data = new byte[5];
-      data[0] = cipheringKif;
-      data[1] = cipheringKvc;
-      data[2] = sourceKif;
-      data[3] = sourceKvc;
-      data[4] = (byte) 0x90;
+    byte p1 = (byte) (isTransferredObjectDiversified ? 0x01 : 0x00);
+    byte[] dataIn = new byte[arbitraryDiversifier == null ? 13 : 13 + 8];
+    dataIn[0] = cipheringKvc;
+    dataIn[1] = sourceKif;
+    dataIn[2] = sourceKvc;
+    System.arraycopy(keyParameters, 0, dataIn, 3, 10);
+    if (arbitraryDiversifier != null) {
+      System.arraycopy(arbitraryDiversifier, 0, dataIn, 13, 8);
     }
 
     setApduRequest(
         new DtoAdapters.ApduRequestAdapter(
-            ApduUtil.build(cla, getCommandRef().getInstructionByte(), p1, p2, data, null)));
+            ApduUtil.build(
+                cla, getCommandRef().getInstructionByte(), p1, targetKeyReference, dataIn, null)));
   }
 
   /**
    * Gets the 32 bytes of ciphered data.
    *
    * @return the ciphered data byte array or null if the operation failed
-   * @since 2.0.1
+   * @since 0.9.0
    */
   byte[] getCipheredData() {
     return cipheredData;
@@ -114,7 +83,7 @@ final class CommandCardGenerateKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.4.0
+   * @since 0.9.0
    */
   @Override
   void finalizeRequest() {
@@ -124,7 +93,7 @@ final class CommandCardGenerateKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.4.0
+   * @since 0.9.0
    */
   @Override
   boolean isControlSamRequiredToFinalizeRequest() {
@@ -134,7 +103,7 @@ final class CommandCardGenerateKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 0.4.0
+   * @since 0.9.0
    */
   @Override
   void parseResponse(ApduResponseApi apduResponse) throws CommandException {
@@ -145,7 +114,7 @@ final class CommandCardGenerateKey extends Command {
   /**
    * {@inheritDoc}
    *
-   * @since 2.0.1
+   * @since 0.9.0
    */
   @Override
   Map<Integer, StatusProperties> getStatusTable() {
