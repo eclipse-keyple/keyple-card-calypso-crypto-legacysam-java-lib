@@ -17,7 +17,7 @@ The full documentation, including the **user guide**, **download information** a
 
 ## API documentation
 
-API documentation & class diagram is available online: [eclipse-keyple.github.io/keyple-card-calypso-crypto-legacysam-java-lib](https://eclipse-keyple.github.io/keyple-card-calypso-crypto-legacysam-java-lib)
+API documentation & class diagram is available online: [docs.keyple.org/keyple-card-calypso-crypto-legacysam-java-lib](https://docs.keyple.org/keyple-card-calypso-crypto-legacysam-java-lib)
 
 ## Examples
 
