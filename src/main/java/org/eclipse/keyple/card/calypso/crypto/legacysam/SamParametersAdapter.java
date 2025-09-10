@@ -18,7 +18,7 @@ import org.eclipse.keypop.calypso.crypto.legacysam.sam.SamParameters;
  *
  * @since 0.9.0
  */
-public class SamParametersAdapter implements SamParameters {
+class SamParametersAdapter implements SamParameters {
   private final byte[] samParameters;
 
   SamParametersAdapter(byte[] samParameters) {
