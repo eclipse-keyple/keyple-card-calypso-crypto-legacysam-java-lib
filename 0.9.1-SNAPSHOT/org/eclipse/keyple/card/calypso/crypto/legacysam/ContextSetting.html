@@ -97,8 +97,8 @@ loadScripts(document, 'script');</script>
 <div class="col-first even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="ContextSetting.html" title="interface in org.eclipse.keyple.card.calypso.crypto.legacysam">ContextSetting</a></code></div>
 <div class="col-second even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3"><code><a href="#setContactReaderPayloadCapacity(int)" class="member-name-link">setContactReaderPayloadCapacity</a><wbr>(int&nbsp;payloadCapacity)</code></div>
 <div class="col-last even-row-color method-summary-table method-summary-table-tab2 method-summary-table-tab3">
-<div class="block">Defines the maximum size of APDUs that the library can generate when communicating with a
- contact card.</div>
+<div class="block">Defines the maximum size of APDUs payload (**Lc** field value) that the library can generate
+ when communicating with a contact card.</div>
 </div>
 </div>
 </div>
@@ -118,13 +118,23 @@ loadScripts(document, 'script');</script>
 <section class="detail" id="setContactReaderPayloadCapacity(int)">
 <h3>setContactReaderPayloadCapacity</h3>
 <div class="member-signature"><span class="return-type"><a href="ContextSetting.html" title="interface in org.eclipse.keyple.card.calypso.crypto.legacysam">ContextSetting</a></span>&nbsp;<span class="element-name">setContactReaderPayloadCapacity</span><wbr><span class="parameters">(int&nbsp;payloadCapacity)</span></div>
-<div class="block">Defines the maximum size of APDUs that the library can generate when communicating with a
- contact card.</div>
+<div class="block">Defines the maximum size of APDUs payload (**Lc** field value) that the library can generate
+ when communicating with a contact card.
+
+ <p>As an example, here are the values to be set for communication with the SAM when used in HSP
+ mode:
+
+ <ul>
+   <li>SAM-C1 in HSP mode, set <code>payloadCapacity</code> to 248.
+   <li>SAM-E1 in HSP mode, set <code>payloadCapacity</code> to 239.
+ </ul></div>
 <dl class="notes">
 <dt>Parameters:</dt>
 <dd><code>payloadCapacity</code> - A positive integer lower than 255.</dd>
 <dt>Returns:</dt>
-<dd>The object instance.</dd>
+<dd>The current instance.</dd>
+<dt>Throws:</dt>
+<dd><code><a href="https://docs.oracle.com/en/java/javase/17/docs/api/java.base/java/lang/IllegalArgumentException.html" title="class or interface in java.lang" class="external-link">IllegalArgumentException</a></code> - If payloadCapacity is out of range.</dd>
 <dt>Since:</dt>
 <dd>0.4.0</dd>
 </dl>
