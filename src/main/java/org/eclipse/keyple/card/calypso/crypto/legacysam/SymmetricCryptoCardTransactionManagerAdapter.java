@@ -792,7 +792,9 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         return;
       }
       // CL-SAM-DUPDATE.1
-      if (sam.getProductType() == LegacySam.ProductType.SAM_C1) {
+      // CL-SAM-DMULTI.2
+      if (sam.getProductType() == LegacySam.ProductType.SAM_C1
+          || sam.getProductType() == LegacySam.ProductType.SAM_S1E1) {
         // Digest Update Multiple
         byte[] buffer = new byte[255];
         int i = 0;
