@@ -6,6 +6,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 ### Changed
+- The **Digest Update Multiple** command is now also used for **SAM S1E1**.
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
 
 ## [0.9.0] - 2024-11-29
