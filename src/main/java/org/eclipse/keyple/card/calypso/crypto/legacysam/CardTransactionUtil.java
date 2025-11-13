@@ -139,17 +139,4 @@ class CardTransactionUtil {
         + JsonUtil.toJson(transactionAuditData)
         + "}";
   }
-
-  /**
-   * Maps a ChannelControl provided by the Reader layer to a ChannelControl provided by the Card
-   * layer.
-   *
-   * @param channelControl The ChannelControl provided by the Reader layer.
-   * @return The corresponding ChannelControl provided by the Card layer.
-   * @since 0.10.0
-   */
-  static org.eclipse.keypop.card.ChannelControl mapToInternalChannelControl(
-      org.eclipse.keypop.reader.ChannelControl channelControl) {
-    return org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name());
-  }
 }

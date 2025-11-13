@@ -95,7 +95,7 @@ final class CommandExecutor {
         transmitCardRequest(
             cardRequest,
             samReader,
-            CardTransactionUtil.mapToInternalChannelControl(channelControl));
+            org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name()));
     // Retrieve the list of R-APDUs
     List<ApduResponseApi> apduResponses = cardResponse.getApduResponses();
     // If there are more responses than requests, then we are unable to fill the card image. In this
