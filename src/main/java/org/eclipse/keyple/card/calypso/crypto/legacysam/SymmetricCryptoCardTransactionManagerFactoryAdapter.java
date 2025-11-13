@@ -23,7 +23,6 @@ import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransa
 import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransactionManagerSpi;
 import org.eclipse.keypop.card.ApduResponseApi;
 import org.eclipse.keypop.card.CardResponseApi;
-import org.eclipse.keypop.card.ChannelControl;
 import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
@@ -122,7 +121,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
       // Transmit the commands to the SAM
       CardResponseApi cardResponse =
           CardTransactionUtil.transmitCardRequest(
-              cardRequest, ChannelControl.KEEP_OPEN, samReader, sam, transactionAuditData);
+              cardRequest, samReader, sam, transactionAuditData);
 
       ApduResponseApi apduResponse =
           cardResponse.getApduResponses().get(0); // Assuming only one response.

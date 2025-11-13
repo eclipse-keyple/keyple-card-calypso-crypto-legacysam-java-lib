@@ -91,11 +91,7 @@ final class CommandExecutor {
     // Wrap the list of C-APDUs into a card request
     CardRequestSpi cardRequest = new DtoAdapters.CardRequestAdapter(apduRequests, true);
     // Transmit the commands to the card
-    CardResponseApi cardResponse =
-        transmitCardRequest(
-            cardRequest,
-            samReader,
-            org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name()));
+    CardResponseApi cardResponse = transmitCardRequest(cardRequest, samReader, channelControl);
     // Retrieve the list of R-APDUs
     List<ApduResponseApi> apduResponses = cardResponse.getApduResponses();
     // If there are more responses than requests, then we are unable to fill the card image. In this
@@ -159,12 +155,12 @@ final class CommandExecutor {
    * @return The card response.
    */
   private static CardResponseApi transmitCardRequest(
-      CardRequestSpi cardRequest,
-      ProxyReaderApi samReader,
-      org.eclipse.keypop.card.ChannelControl channelControl) {
+      CardRequestSpi cardRequest, ProxyReaderApi samReader, ChannelControl channelControl) {
     CardResponseApi cardResponse;
     try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, channelControl);
+      cardResponse =
+          samReader.transmitCardRequest(
+              cardRequest, org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name()));
     } catch (ReaderBrokenCommunicationException e) {
       throw new ReaderCommunicationException(
           MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);

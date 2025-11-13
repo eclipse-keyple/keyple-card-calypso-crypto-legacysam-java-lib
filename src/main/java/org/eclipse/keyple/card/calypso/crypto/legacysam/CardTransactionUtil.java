@@ -61,7 +61,6 @@ class CardTransactionUtil {
    * Transmits a card request, processes and converts any exceptions.
    *
    * @param cardRequest The card request to transmit.
-   * @param channelControl The channel control.
    * @param samReader The SAM reader.
    * @param sam The SAM.
    * @param transactionAuditData The list of transaction audit data.
@@ -71,14 +70,13 @@ class CardTransactionUtil {
    */
   static CardResponseApi transmitCardRequest(
       CardRequestSpi cardRequest,
-      ChannelControl channelControl,
       ProxyReaderApi samReader,
       LegacySamAdapter sam,
       List<byte[]> transactionAuditData)
       throws SymmetricCryptoIOException {
     CardResponseApi cardResponse;
     try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, channelControl);
+      cardResponse = samReader.transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
     } catch (ReaderBrokenCommunicationException e) {
       saveTransactionAuditData(cardRequest, e.getCardResponse(), transactionAuditData);
       throw new SymmetricCryptoIOException(

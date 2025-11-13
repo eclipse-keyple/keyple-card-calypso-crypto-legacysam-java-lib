@@ -387,7 +387,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       // Transmit the commands to the SAM
       CardResponseApi cardResponse =
           CardTransactionUtil.transmitCardRequest(
-              cardRequest, ChannelControl.KEEP_OPEN, samReader, sam, transactionAuditData);
+              cardRequest, samReader, sam, transactionAuditData);
 
       // Retrieve the list of R-APDUs
       List<ApduResponseApi> apduResponses =
