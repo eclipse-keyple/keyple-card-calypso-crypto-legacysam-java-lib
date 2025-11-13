@@ -14,12 +14,12 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.keyple.core.util.json.JsonUtil;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.ReaderIOException;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SamIOException;
 import org.eclipse.keypop.calypso.crypto.symmetric.SymmetricCryptoIOException;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.CardCommunicationException;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,23 +61,29 @@ class CardTransactionUtil {
    * Transmits a card request, processes and converts any exceptions.
    *
    * @param cardRequest The card request to transmit.
+   * @param channelControl The channel control.
+   * @param samReader The SAM reader.
+   * @param sam The SAM.
+   * @param transactionAuditData The list of transaction audit data.
    * @return The card response.
+   * @throws SymmetricCryptoIOException If a communication error occurs.
    * @since 2.0.0
    */
   static CardResponseApi transmitCardRequest(
       CardRequestSpi cardRequest,
+      ChannelControl channelControl,
       ProxyReaderApi samReader,
       LegacySamAdapter sam,
       List<byte[]> transactionAuditData)
       throws SymmetricCryptoIOException {
     CardResponseApi cardResponse;
     try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, ChannelControl.KEEP_OPEN);
+      cardResponse = samReader.transmitCardRequest(cardRequest, channelControl);
     } catch (ReaderBrokenCommunicationException e) {
       saveTransactionAuditData(cardRequest, e.getCardResponse(), transactionAuditData);
       throw new SymmetricCryptoIOException(
           MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS,
-          new ReaderIOException(
+          new ReaderCommunicationException(
               MSG_SAM_READER_COMMUNICATION_ERROR
                   + MSG_WHILE_TRANSMITTING_COMMANDS
                   + getTransactionAuditDataAsString(transactionAuditData, sam),
@@ -86,7 +92,7 @@ class CardTransactionUtil {
       saveTransactionAuditData(cardRequest, e.getCardResponse(), transactionAuditData);
       throw new SymmetricCryptoIOException(
           MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS,
-          new SamIOException(
+          new CardCommunicationException(
               MSG_SAM_COMMUNICATION_ERROR
                   + MSG_WHILE_TRANSMITTING_COMMANDS
                   + getTransactionAuditDataAsString(transactionAuditData, sam),
@@ -132,5 +138,18 @@ class CardTransactionUtil {
         + ",\"apdus\":"
         + JsonUtil.toJson(transactionAuditData)
         + "}";
+  }
+
+  /**
+   * Maps a ChannelControl provided by the Calypso layer to a ChannelControl provided by the Card
+   * layer.
+   *
+   * @param channelControl The ChannelControl provided by the Calypso layer.
+   * @return The corresponding ChannelControl provided by the Card layer.
+   * @since 0.10.0
+   */
+  static org.eclipse.keypop.card.ChannelControl mapToInternalChannelControl(
+      org.eclipse.keypop.reader.ChannelControl channelControl) {
+    return org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name());
   }
 }

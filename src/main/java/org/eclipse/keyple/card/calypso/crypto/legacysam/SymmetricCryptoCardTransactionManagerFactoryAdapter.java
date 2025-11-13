@@ -27,6 +27,7 @@ import org.eclipse.keypop.card.CardResponseApi;
 import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.ChannelControl;
 
 /**
  * Adapter of {@link SymmetricCryptoCardTransactionManagerFactory}.
@@ -84,7 +85,9 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
   @Override
   public void preInitTerminalSessionContext()
       throws SymmetricCryptoException, SymmetricCryptoIOException {
-    processCommand(new CommandGetChallenge(new DtoAdapters.CommandContextDto(sam, null, null), 8));
+    processCommand(
+        new CommandGetChallenge(new DtoAdapters.CommandContextDto(sam, null, null), 8),
+        ChannelControl.KEEP_OPEN);
   }
 
   /**
@@ -107,7 +110,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
         transactionAuditData);
   }
 
-  private void processCommand(Command command)
+  private void processCommand(Command command, ChannelControl channelControl)
       throws SymmetricCryptoException, SymmetricCryptoIOException {
     List<byte[]> transactionAuditData = new ArrayList<>();
     try {
@@ -121,7 +124,11 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
       // Transmit the commands to the SAM
       CardResponseApi cardResponse =
           CardTransactionUtil.transmitCardRequest(
-              cardRequest, samReader, sam, transactionAuditData);
+              cardRequest,
+              CardTransactionUtil.mapToInternalChannelControl(channelControl),
+              samReader,
+              sam,
+              transactionAuditData);
 
       ApduResponseApi apduResponse =
           cardResponse.getApduResponses().get(0); // Assuming only one response.

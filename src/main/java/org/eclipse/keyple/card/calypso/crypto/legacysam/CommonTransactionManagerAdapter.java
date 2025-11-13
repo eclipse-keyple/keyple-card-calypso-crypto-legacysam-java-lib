@@ -16,6 +16,7 @@ import static org.eclipse.keyple.card.calypso.crypto.legacysam.DtoAdapters.*;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.keypop.card.*;
+import org.eclipse.keypop.reader.ChannelControl;
 
 /**
  * Abstract class of all transaction manager adapters.
@@ -90,8 +91,22 @@ abstract class CommonTransactionManagerAdapter {
    * @since 0.3.0
    */
   final void processTargetSamCommands(boolean closePhysicalChannel) {
+    processTargetSamCommands(
+        closePhysicalChannel
+            ? org.eclipse.keypop.reader.ChannelControl.CLOSE_AFTER
+            : org.eclipse.keypop.reader.ChannelControl.KEEP_OPEN);
+  }
+
+  /**
+   * Executes all previously added commands for the target SAM. If a command needs to be finalized,
+   * especially with the help of a control SAM, then it will be.
+   *
+   * @param channelControl The channel control.
+   * @since 0.10.0
+   */
+  final void processTargetSamCommands(ChannelControl channelControl) {
     try {
-      CommandExecutor.processCommands(targetSamCommands, targetSamReader, closePhysicalChannel);
+      CommandExecutor.processCommands(targetSamCommands, targetSamReader, channelControl);
     } finally {
       targetSamCommands.clear();
     }
@@ -105,9 +120,21 @@ abstract class CommonTransactionManagerAdapter {
    * @since 0.3.0
    */
   final void processTargetSamCommandsAlreadyFinalized(boolean closePhysicalChannel) {
+    processTargetSamCommandsAlreadyFinalized(
+        closePhysicalChannel ? ChannelControl.CLOSE_AFTER : ChannelControl.KEEP_OPEN);
+  }
+
+  /**
+   * Executes all previously added commands for the target SAM when they are already finalized (in
+   * an asynchronous operation for example).
+   *
+   * @param channelControl The channel control.
+   * @since 0.10.0
+   */
+  final void processTargetSamCommandsAlreadyFinalized(ChannelControl channelControl) {
     try {
       CommandExecutor.processCommandsAlreadyFinalized(
-          targetSamCommands, targetSamReader, closePhysicalChannel);
+          targetSamCommands, targetSamReader, channelControl);
     } finally {
       targetSamCommands.clear();
     }
@@ -124,6 +151,6 @@ abstract class CommonTransactionManagerAdapter {
    * @since 0.3.0
    */
   final void processTargetSamCommands(List<? extends Command> commands) {
-    CommandExecutor.processCommands(commands, targetSamReader, false);
+    CommandExecutor.processCommands(commands, targetSamReader, ChannelControl.KEEP_OPEN);
   }
 }

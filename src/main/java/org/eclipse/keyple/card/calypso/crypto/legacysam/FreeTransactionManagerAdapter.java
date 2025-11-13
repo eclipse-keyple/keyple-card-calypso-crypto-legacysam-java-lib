@@ -24,6 +24,10 @@ import org.eclipse.keypop.calypso.crypto.legacysam.GetDataTag;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.*;
 import org.eclipse.keypop.card.ProxyReaderApi;
+import org.eclipse.keypop.reader.CardCommunicationException;
+import org.eclipse.keypop.reader.ChannelControl;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
 
 /**
  * Adapter of {@link FreeTransactionManagerAdapter}.
@@ -527,12 +531,32 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 0.1.0
+   * @since 0.10.0
    */
   @Override
-  public FreeTransactionManagerAdapter processCommands() {
-    processTargetSamCommands(false);
+  public FreeTransactionManagerAdapter processCommands(ChannelControl channelControl) {
+    processTargetSamCommands(channelControl);
     return this;
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.1.0
+   * @deprecated Use {@link #processCommands(org.eclipse.keypop.reader.ChannelControl)} instead.
+   */
+  @Deprecated
+  @Override
+  public FreeTransactionManagerAdapter processCommands() {
+    try {
+      return processCommands(ChannelControl.KEEP_OPEN);
+    } catch (ReaderCommunicationException e) {
+      throw new ReaderIOException(e.getMessage(), e);
+    } catch (CardCommunicationException e) {
+      throw new SamIOException(e.getMessage(), e);
+    } catch (InvalidCardResponseException e) {
+      throw new UnexpectedCommandStatusException(e.getMessage(), e);
+    }
   }
 
   /**

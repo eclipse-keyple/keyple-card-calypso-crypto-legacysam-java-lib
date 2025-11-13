@@ -28,6 +28,7 @@ import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.eclipse.keypop.reader.CardReader;
+import org.eclipse.keypop.reader.ChannelControl;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -527,19 +528,21 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureComputationData data =
         new BasicSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(CIPHER_MESSAGE), (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data).processCommands();
+    samTransactionManager.prepareComputeSignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data.getSignature()).isEqualTo(HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE));
@@ -555,19 +558,21 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureComputationData data =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data).processCommands();
+    samTransactionManager.prepareComputeSignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data.getSignature()).isEqualTo(HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE));
@@ -585,7 +590,8 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureComputationData data1 =
@@ -597,13 +603,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE));
@@ -623,7 +630,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_9000, R_PSO_COMPUTE_SIGNATURE_DEFAULT, R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureComputationData data1 =
@@ -635,13 +643,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE));
@@ -673,7 +682,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureComputationData data1 =
@@ -691,13 +701,14 @@ public final class FreeTransactionManagerAdapterTest {
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
         .prepareComputeSignature(data3)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE));
@@ -728,7 +739,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureComputationData data1 =
@@ -746,13 +758,14 @@ public final class FreeTransactionManagerAdapterTest {
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
         .prepareComputeSignature(data3)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE));
@@ -775,7 +788,8 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureComputationData data1 =
@@ -789,13 +803,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE));
@@ -817,7 +832,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_9000, R_PSO_COMPUTE_SIGNATURE_DEFAULT, R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureComputationData data1 =
@@ -831,13 +847,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE));
@@ -854,20 +871,22 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureComputationData data =
         new BasicSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(CIPHER_MESSAGE), (byte) 1, (byte) 2)
             .setSignatureSize(3); // Signature size = 3
-    samTransactionManager.prepareComputeSignature(data).processCommands();
+    samTransactionManager.prepareComputeSignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data.getSignature())
@@ -891,7 +910,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_PSO_COMPUTE_SIGNATURE_SAM_TRACEABILITY_FULL);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureComputationData data1 =
@@ -907,13 +927,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareComputeSignature(data1)
         .prepareComputeSignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(data1.getSignature()).isEqualTo(HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE));
@@ -1283,7 +1304,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data =
@@ -1293,13 +1315,14 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2);
-    samTransactionManager.prepareVerifySignature(data).processCommands();
+    samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1313,7 +1336,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data =
@@ -1323,13 +1347,14 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2);
-    samTransactionManager.prepareVerifySignature(data).processCommands();
+    samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1344,7 +1369,8 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data1 =
@@ -1364,13 +1390,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1385,7 +1412,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data1 =
@@ -1405,13 +1433,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1438,7 +1467,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data1 =
@@ -1468,13 +1498,14 @@ public final class FreeTransactionManagerAdapterTest {
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
         .prepareVerifySignature(data3)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1495,7 +1526,8 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_9000, R_9000, R_9000, R_9000, R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data1 =
@@ -1525,13 +1557,14 @@ public final class FreeTransactionManagerAdapterTest {
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
         .prepareVerifySignature(data3)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1547,7 +1580,8 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data1 =
@@ -1569,13 +1603,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1592,7 +1627,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data1 =
@@ -1614,13 +1650,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1637,7 +1674,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data1 =
@@ -1661,13 +1699,14 @@ public final class FreeTransactionManagerAdapterTest {
     samTransactionManager
         .prepareVerifySignature(data1)
         .prepareVerifySignature(data2)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -1679,7 +1718,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data =
@@ -1689,7 +1729,7 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2);
-    samTransactionManager.prepareVerifySignature(data).processCommands();
+    samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     assertThat(data.isSignatureValid()).isTrue();
   }
@@ -1703,7 +1743,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data =
@@ -1713,7 +1754,7 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(CIPHER_MESSAGE_SIGNATURE_3_BYTES),
                 (byte) 1,
                 (byte) 2);
-    samTransactionManager.prepareVerifySignature(data).processCommands();
+    samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     assertThat(data.isSignatureValid()).isTrue();
   }
@@ -1727,7 +1768,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_9000);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data =
@@ -1737,7 +1779,7 @@ public final class FreeTransactionManagerAdapterTest {
                 HexUtil.toByteArray(PSO_MESSAGE_SIGNATURE),
                 (byte) 1,
                 (byte) 2);
-    samTransactionManager.prepareVerifySignature(data).processCommands();
+    samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
 
     assertThat(data.isSignatureValid()).isTrue();
   }
@@ -1751,7 +1793,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_DATA_CIPHER_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     BasicSignatureVerificationData data =
@@ -1762,7 +1805,7 @@ public final class FreeTransactionManagerAdapterTest {
                 (byte) 1,
                 (byte) 2);
     try {
-      samTransactionManager.prepareVerifySignature(data).processCommands();
+      samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
       shouldHaveThrown(InvalidSignatureException.class);
     } catch (InvalidSignatureException e) {
     }
@@ -1778,7 +1821,8 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse = createCardResponse(R_9000, R_INCORRECT_SIGNATURE);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     TraceableSignatureVerificationData data =
@@ -1789,7 +1833,7 @@ public final class FreeTransactionManagerAdapterTest {
                 (byte) 1,
                 (byte) 2);
     try {
-      samTransactionManager.prepareVerifySignature(data).processCommands();
+      samTransactionManager.prepareVerifySignature(data).processCommands(ChannelControl.KEEP_OPEN);
       shouldHaveThrown(InvalidSignatureException.class);
     } catch (InvalidSignatureException e) {
     }
@@ -1810,17 +1854,19 @@ public final class FreeTransactionManagerAdapterTest {
         createCardResponse(R_READ_EVENT_COUNTER_0_8, R_READ_EVENT_CEILING_0_8);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     samTransactionManager.prepareReadCounterStatus(4);
-    samTransactionManager.processCommands();
+    samTransactionManager.processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(sam.getCounter(4)).isEqualTo(0x144444);
@@ -1850,20 +1896,22 @@ public final class FreeTransactionManagerAdapterTest {
             R_READ_EVENT_CEILING_18_26);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     samTransactionManager.prepareReadCounterStatus(1);
     samTransactionManager.prepareReadCounterStatus(4);
     samTransactionManager.prepareReadCounterStatus(11);
     samTransactionManager.prepareReadCounterStatus(22);
-    samTransactionManager.processCommands();
+    samTransactionManager.processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     assertThat(sam.getCounter(1)).isEqualTo(0x111111);
@@ -1898,7 +1946,8 @@ public final class FreeTransactionManagerAdapterTest {
             R_READ_SYSTEM_KEY_PARAMETER_AUTHENTICATION);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse);
 
     samTransactionManager
@@ -1906,13 +1955,14 @@ public final class FreeTransactionManagerAdapterTest {
         .prepareReadSystemKeyParameters(SystemKeyType.KEY_MANAGEMENT)
         .prepareReadSystemKeyParameters(SystemKeyType.RELOADING)
         .prepareReadSystemKeyParameters(SystemKeyType.AUTHENTICATION)
-        .processCommands();
+        .processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
 
     for (SystemKeyType type : systemKeyTypes) {
@@ -1962,14 +2012,16 @@ public final class FreeTransactionManagerAdapterTest {
             R_READ_SYSTEM_KEY_PARAMETER_RELOADING);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequestKeyParam)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequestKeyParam)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponseKeyParam);
 
     CardRequestSpi cardRequestEventCounter = createCardRequest(C_READ_EVENT_COUNTER_0_8);
     CardResponseApi cardResponseEventCounter = createCardResponse(R_READ_EVENT_COUNTER_0_8);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequestEventCounter)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequestEventCounter)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponseEventCounter);
 
     String targetSamContext = samTransactionManager.exportTargetSamContextForAsyncTransaction();
@@ -2011,31 +2063,35 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse2 = createCardResponse(R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest1)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest1)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse1);
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest2)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest2)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse2);
 
     TraceableSignatureComputationData data1 =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data1).processCommands();
+    samTransactionManager.prepareComputeSignature(data1).processCommands(ChannelControl.KEEP_OPEN);
 
     TraceableSignatureComputationData data2 =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data2).processCommands();
+    samTransactionManager.prepareComputeSignature(data2).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest1)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest1)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest2)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest2)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 
@@ -2050,17 +2106,21 @@ public final class FreeTransactionManagerAdapterTest {
     CardResponseApi cardResponse2 = createCardResponse(R_PSO_COMPUTE_SIGNATURE_DEFAULT);
 
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest1)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest1)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse1);
     when(samReader.transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest2)), any(ChannelControl.class)))
+            argThat(new CardRequestMatcher(cardRequest2)),
+            any(org.eclipse.keypop.card.ChannelControl.class)))
         .thenReturn(cardResponse2);
 
     try {
       TraceableSignatureComputationData data1 =
           new TraceableSignatureComputationDataAdapter()
               .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2);
-      samTransactionManager.prepareComputeSignature(data1).processCommands();
+      samTransactionManager
+          .prepareComputeSignature(data1)
+          .processCommands(ChannelControl.KEEP_OPEN);
       shouldHaveThrown(UnexpectedCommandStatusException.class);
     } catch (UnexpectedCommandStatusException e) {
     }
@@ -2068,17 +2128,19 @@ public final class FreeTransactionManagerAdapterTest {
     TraceableSignatureComputationData data2 =
         new TraceableSignatureComputationDataAdapter()
             .setData(HexUtil.toByteArray(PSO_MESSAGE), (byte) 1, (byte) 2);
-    samTransactionManager.prepareComputeSignature(data2).processCommands();
+    samTransactionManager.prepareComputeSignature(data2).processCommands(ChannelControl.KEEP_OPEN);
 
     InOrder inOrder = inOrder(samReader);
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest1)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest1)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     inOrder
         .verify(samReader)
         .transmitCardRequest(
-            argThat(new CardRequestMatcher(cardRequest2)), any(ChannelControl.class));
+            argThat(new CardRequestMatcher(cardRequest2)),
+            any(org.eclipse.keypop.card.ChannelControl.class));
     verifyNoMoreInteractions(samReader);
   }
 

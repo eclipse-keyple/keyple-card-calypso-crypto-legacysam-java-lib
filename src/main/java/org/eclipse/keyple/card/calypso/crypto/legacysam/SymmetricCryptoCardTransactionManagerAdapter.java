@@ -27,6 +27,7 @@ import org.eclipse.keypop.calypso.crypto.symmetric.spi.*;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.ChannelControl;
 
 /**
  * Adapter of {@link SymmetricCryptoCardTransactionManagerSpi} and {@link
@@ -112,7 +113,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       CommandGetChallenge cmd =
           new CommandGetChallenge(getContext(), isExtendedModeRequired ? 8 : 4);
       samCommands.add(cmd);
-      processCommands();
+      processCommands(ChannelControl.KEEP_OPEN);
       return sam.popChallenge();
     } else {
       return isExtendedModeRequired ? challenge : Arrays.copyOf(challenge, 4);
@@ -158,7 +159,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       // We then prepare the command for encryption.
       CommandDigestUpdate samCommand = digestManager.prepareCommandForEncryption(cardApdu);
       // Process commands.
-      processCommands();
+      processCommands(ChannelControl.KEEP_OPEN);
       // Return the encrypted/decrypted value.
       return samCommand.getProcessedData();
     } else {
@@ -180,7 +181,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
     digestManager = null;
     CommandDigestClose cmdSamDigestClose =
         (CommandDigestClose) samCommands.get(samCommands.size() - 1);
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
     return cmdSamDigestClose.getMac();
   }
 
@@ -199,7 +200,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         new CommandDigestInternalAuthenticate(getContext());
     samCommands.add(cmdSamDigestInternalAuthenticate);
     // Process commands.
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
     // Return the terminal session MAC.
     return cmdSamDigestInternalAuthenticate.getTerminalSignature();
   }
@@ -234,7 +235,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       throws SymmetricCryptoIOException, SymmetricCryptoException {
     samCommands.add(new CommandDigestAuthenticate(getContext(), cardSessionMac));
     try {
-      processCommands();
+      processCommands(ChannelControl.KEEP_OPEN);
       return true;
     } catch (InvalidCardMacException e) {
       return false;
@@ -255,7 +256,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
     } else {
       samCommands.add(new CommandSvPrepareDebitOrUndebit(getContext(), svCommandSecurityData));
     }
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
   }
 
   /**
@@ -268,7 +269,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       throws SymmetricCryptoIOException, SymmetricCryptoException {
     samCommands.add(new CommandSvCheck(getContext(), cardSvMac));
     try {
-      processCommands();
+      processCommands(ChannelControl.KEEP_OPEN);
       return true;
     } catch (InvalidCardMacException e) {
       return false;
@@ -328,7 +329,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         new CommandCardCipherPin(
             getContext(), pinCipheringKif, pinCipheringKvc, currentPin, newPin);
     samCommands.add(cmd);
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
     return cmd.getCipheredData();
   }
 
@@ -350,7 +351,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         new CommandCardGenerateKey(
             getContext(), issuerKeyKif, issuerKeyKvc, targetKeyKif, targetKeyKvc);
     samCommands.add(cmd);
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
     return cmd.getCipheredData();
   }
 
@@ -361,10 +362,11 @@ final class SymmetricCryptoCardTransactionManagerAdapter
    */
   @Override
   public void synchronize() throws SymmetricCryptoIOException, SymmetricCryptoException {
-    processCommands();
+    processCommands(ChannelControl.KEEP_OPEN);
   }
 
-  private void processCommands() throws SymmetricCryptoException, SymmetricCryptoIOException {
+  private void processCommands(ChannelControl channelControl)
+      throws SymmetricCryptoException, SymmetricCryptoIOException {
     // If there are pending SAM commands and the secure session is open and the "Digest Init"
     // command is not already executed, then we need to flush the session pending commands by
     // executing the pending "digest" commands "BEFORE" the other SAM commands to make sure that
@@ -386,7 +388,11 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       // Transmit the commands to the SAM
       CardResponseApi cardResponse =
           CardTransactionUtil.transmitCardRequest(
-              cardRequest, samReader, sam, transactionAuditData);
+              cardRequest,
+              CardTransactionUtil.mapToInternalChannelControl(channelControl),
+              samReader,
+              sam,
+              transactionAuditData);
 
       // Retrieve the list of R-APDUs
       List<ApduResponseApi> apduResponses =

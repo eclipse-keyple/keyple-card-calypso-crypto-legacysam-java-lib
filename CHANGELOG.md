@@ -5,14 +5,29 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+### Changed
+- Added `processCommands` methods using `org.eclipse.keypop.reader.ChannelControl` from Reader API in transaction
+  managers to replace deprecated methods using Calypso Card API.
+### Deprecated
+- `FreeTransactionManager.processCommands()` method.
+  Use `processCommands(org.eclipse.keypop.reader.ChannelControl)` instead.
+- `SecureWriteTransactionManager.processCommands()` method.
+  Use `processCommands(org.eclipse.keypop.reader.ChannelControl)` instead.
+- `AsyncTransactionExecutorManager.processCommands()` method.
+  Use `processCommands(org.eclipse.keypop.reader.ChannelControl)` instead.
+- `AsyncTransactionCreatorManager.processCommands()` method.
+  Use `processCommands(org.eclipse.keypop.reader.ChannelControl)` instead.
+### Upgraded
+- Keypop Reader API `2.0.1` -> `2.1.0`
+- Keypop Calypso Card API `2.1.2` -> `2.2.0`
+- Keypop Calypso Crypto Legacy SAM API `0.7.0` -> `0.8.0`
 
 ## [0.9.1] - 2025-11-13
 ### Changed
+- Added `processCommands` methods using `org.eclipse.keypop.reader.ChannelControl` from Reader API in transaction
+  managers to replace deprecated methods using Calypso Card API.
 - The **Digest Update Multiple** command is now also used for **SAM S1E1**.
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
-### Upgraded
-- Keypop Calypso Card API `2.1.0` -> `2.1.2`
-- Keyple Common API `2.0.1` -> `2.0.2` (documentation improvements)
 
 ## [0.9.0] - 2024-11-29
 ### Upgraded
