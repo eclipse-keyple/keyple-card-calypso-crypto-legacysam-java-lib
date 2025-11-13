@@ -5,9 +5,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [0.9.1] - 2025-11-13
 ### Changed
 - The **Digest Update Multiple** command is now also used for **SAM S1E1**.
 - Migrated the CI pipeline from Jenkins to GitHub Actions.
+### Upgraded
+- Keypop Calypso Card API `2.1.0` -> `2.1.2`
+- Keyple Common API `2.0.1` -> `2.0.2` (documentation improvements)
 
 ## [0.9.0] - 2024-11-29
 ### Upgraded
@@ -93,7 +98,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.0...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.1...HEAD
+[0.9.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.1...0.8.0
 [0.7.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.0...0.7.1
