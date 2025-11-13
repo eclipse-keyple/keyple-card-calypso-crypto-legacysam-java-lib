@@ -310,17 +310,6 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
-   */
-  @Override
-  public SecureWriteTransactionManager processCommands(ChannelControl channelControl) {
-    processTargetSamCommands(channelControl);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @since 0.9.0
    * @deprecated Use {@link #processCommands(org.eclipse.keypop.reader.ChannelControl)} instead.
    */
@@ -336,5 +325,16 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
     } catch (InvalidCardResponseException e) {
       throw new UnexpectedCommandStatusException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.10.0
+   */
+  @Override
+  public SecureWriteTransactionManager processCommands(ChannelControl channelControl) {
+    processTargetSamCommands(channelControl);
+    return this;
   }
 }

@@ -73,17 +73,6 @@ final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionMana
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
-   */
-  @Override
-  public AsyncTransactionExecutorManager processCommands(ChannelControl channelControl) {
-    processTargetSamCommandsAlreadyFinalized(channelControl);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @since 0.3.0
    * @deprecated Use {@link #processCommands(org.eclipse.keypop.reader.ChannelControl)} instead.
    */
@@ -99,5 +88,16 @@ final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionMana
     } catch (InvalidCardResponseException e) {
       throw new UnexpectedCommandStatusException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.10.0
+   */
+  @Override
+  public AsyncTransactionExecutorManager processCommands(ChannelControl channelControl) {
+    processTargetSamCommandsAlreadyFinalized(channelControl);
+    return this;
   }
 }

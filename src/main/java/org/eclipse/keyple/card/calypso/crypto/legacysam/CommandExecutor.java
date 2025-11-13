@@ -14,12 +14,12 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.eclipse.keypop.reader.CardCommunicationException;
 import org.eclipse.keypop.reader.ChannelControl;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
 import org.eclipse.keypop.reader.ReaderCommunicationException;
 
 /**
@@ -116,7 +116,7 @@ final class CommandExecutor {
       try {
         command.parseResponse(apduResponses.get(i));
       } catch (CommandException e) {
-        throw new UnexpectedCommandStatusException(
+        throw new InvalidCardResponseException(
             MSG_SAM_COMMAND_ERROR
                 + "while processing responses to SAM commands: "
                 + command.getCommandRef(),

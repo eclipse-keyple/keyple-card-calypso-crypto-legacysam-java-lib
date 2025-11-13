@@ -87,20 +87,6 @@ abstract class CommonTransactionManagerAdapter {
    * Executes all previously added commands for the target SAM. If a command needs to be finalized,
    * especially with the help of a control SAM, then it will be.
    *
-   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
-   * @since 0.3.0
-   */
-  final void processTargetSamCommands(boolean closePhysicalChannel) {
-    processTargetSamCommands(
-        closePhysicalChannel
-            ? org.eclipse.keypop.reader.ChannelControl.CLOSE_AFTER
-            : org.eclipse.keypop.reader.ChannelControl.KEEP_OPEN);
-  }
-
-  /**
-   * Executes all previously added commands for the target SAM. If a command needs to be finalized,
-   * especially with the help of a control SAM, then it will be.
-   *
    * @param channelControl The channel control.
    * @since 0.10.0
    */
@@ -110,18 +96,6 @@ abstract class CommonTransactionManagerAdapter {
     } finally {
       targetSamCommands.clear();
     }
-  }
-
-  /**
-   * Executes all previously added commands for the target SAM when they are already finalized (in
-   * an asynchronous operation for example).
-   *
-   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
-   * @since 0.3.0
-   */
-  final void processTargetSamCommandsAlreadyFinalized(boolean closePhysicalChannel) {
-    processTargetSamCommandsAlreadyFinalized(
-        closePhysicalChannel ? ChannelControl.CLOSE_AFTER : ChannelControl.KEEP_OPEN);
   }
 
   /**

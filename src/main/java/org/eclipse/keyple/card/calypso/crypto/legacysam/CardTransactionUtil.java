@@ -141,10 +141,10 @@ class CardTransactionUtil {
   }
 
   /**
-   * Maps a ChannelControl provided by the Calypso layer to a ChannelControl provided by the Card
+   * Maps a ChannelControl provided by the Reader layer to a ChannelControl provided by the Card
    * layer.
    *
-   * @param channelControl The ChannelControl provided by the Calypso layer.
+   * @param channelControl The ChannelControl provided by the Reader layer.
    * @return The corresponding ChannelControl provided by the Card layer.
    * @since 0.10.0
    */

@@ -24,10 +24,10 @@ import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransa
 import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransactionManagerSpi;
 import org.eclipse.keypop.card.ApduResponseApi;
 import org.eclipse.keypop.card.CardResponseApi;
+import org.eclipse.keypop.card.ChannelControl;
 import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
-import org.eclipse.keypop.reader.ChannelControl;
 
 /**
  * Adapter of {@link SymmetricCryptoCardTransactionManagerFactory}.
@@ -85,9 +85,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
   @Override
   public void preInitTerminalSessionContext()
       throws SymmetricCryptoException, SymmetricCryptoIOException {
-    processCommand(
-        new CommandGetChallenge(new DtoAdapters.CommandContextDto(sam, null, null), 8),
-        ChannelControl.KEEP_OPEN);
+    processCommand(new CommandGetChallenge(new DtoAdapters.CommandContextDto(sam, null, null), 8));
   }
 
   /**
@@ -110,7 +108,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
         transactionAuditData);
   }
 
-  private void processCommand(Command command, ChannelControl channelControl)
+  private void processCommand(Command command)
       throws SymmetricCryptoException, SymmetricCryptoIOException {
     List<byte[]> transactionAuditData = new ArrayList<>();
     try {
@@ -124,11 +122,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
       // Transmit the commands to the SAM
       CardResponseApi cardResponse =
           CardTransactionUtil.transmitCardRequest(
-              cardRequest,
-              CardTransactionUtil.mapToInternalChannelControl(channelControl),
-              samReader,
-              sam,
-              transactionAuditData);
+              cardRequest, ChannelControl.KEEP_OPEN, samReader, sam, transactionAuditData);
 
       ApduResponseApi apduResponse =
           cardResponse.getApduResponses().get(0); // Assuming only one response.

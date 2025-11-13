@@ -29,6 +29,7 @@ import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.eclipse.keypop.reader.CardReader;
 import org.eclipse.keypop.reader.ChannelControl;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.ArgumentMatcher;
@@ -2121,8 +2122,8 @@ public final class FreeTransactionManagerAdapterTest {
       samTransactionManager
           .prepareComputeSignature(data1)
           .processCommands(ChannelControl.KEEP_OPEN);
-      shouldHaveThrown(UnexpectedCommandStatusException.class);
-    } catch (UnexpectedCommandStatusException e) {
+      shouldHaveThrown(InvalidCardResponseException.class);
+    } catch (InvalidCardResponseException e) {
     }
 
     TraceableSignatureComputationData data2 =

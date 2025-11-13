@@ -531,17 +531,6 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
-   */
-  @Override
-  public FreeTransactionManagerAdapter processCommands(ChannelControl channelControl) {
-    processTargetSamCommands(channelControl);
-    return this;
-  }
-
-  /**
-   * {@inheritDoc}
-   *
    * @since 0.1.0
    * @deprecated Use {@link #processCommands(org.eclipse.keypop.reader.ChannelControl)} instead.
    */
@@ -557,6 +546,17 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     } catch (InvalidCardResponseException e) {
       throw new UnexpectedCommandStatusException(e.getMessage(), e);
     }
+  }
+
+  /**
+   * {@inheritDoc}
+   *
+   * @since 0.10.0
+   */
+  @Override
+  public FreeTransactionManagerAdapter processCommands(ChannelControl channelControl) {
+    processTargetSamCommands(channelControl);
+    return this;
   }
 
   /**
