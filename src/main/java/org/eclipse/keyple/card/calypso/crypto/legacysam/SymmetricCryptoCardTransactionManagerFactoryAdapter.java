@@ -17,7 +17,6 @@ import java.util.List;
 import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.card.transaction.spi.SymmetricCryptoCardTransactionManagerFactory;
 import org.eclipse.keypop.calypso.crypto.legacysam.sam.LegacySam;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
 import org.eclipse.keypop.calypso.crypto.symmetric.SymmetricCryptoException;
 import org.eclipse.keypop.calypso.crypto.symmetric.SymmetricCryptoIOException;
 import org.eclipse.keypop.calypso.crypto.symmetric.spi.SymmetricCryptoCardTransactionManagerFactorySpi;
@@ -28,6 +27,7 @@ import org.eclipse.keypop.card.ChannelControl;
 import org.eclipse.keypop.card.ProxyReaderApi;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
 
 /**
  * Adapter of {@link SymmetricCryptoCardTransactionManagerFactory}.
@@ -152,7 +152,7 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
               + CardTransactionUtil.getTransactionAuditDataAsString(transactionAuditData, sam);
 
       throw new SymmetricCryptoException(
-          errorMessage, new UnexpectedCommandStatusException(detailedErrorMessage, e));
+          errorMessage, new InvalidCardResponseException(detailedErrorMessage, e));
     }
   }
 }

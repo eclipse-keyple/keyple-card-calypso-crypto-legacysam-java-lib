@@ -27,6 +27,7 @@ import org.eclipse.keypop.calypso.crypto.symmetric.spi.*;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
 
 /**
  * Adapter of {@link SymmetricCryptoCardTransactionManagerSpi} and {@link
@@ -438,7 +439,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
                   + " ["
                   + sw
                   + "]",
-              new UnexpectedCommandStatusException(
+              new InvalidCardResponseException(
                   CardTransactionUtil.MSG_SAM_COMMAND_ERROR
                       + "while processing responses to SAM commands: "
                       + commandRef
