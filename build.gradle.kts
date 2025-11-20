@@ -20,7 +20,7 @@ dependencies {
     isChanging = true
   }
   implementation("org.eclipse.keypop:keypop-calypso-crypto-symmetric-java-api:0.1.1")
-  implementation("org.eclipse.keypop:keypop-calypso-crypto-legacysam-java-api:0.8.0-SNAPSHOT") {
+  implementation("org.eclipse.keypop:keypop-calypso-crypto-legacysam-java-api:1.0.0-SNAPSHOT") {
     isChanging = true
   }
   implementation("org.eclipse.keyple:keyple-common-java-api:2.0.2")
