@@ -14,12 +14,13 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.ReaderIOException;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.SamIOException;
-import org.eclipse.keypop.calypso.crypto.legacysam.transaction.UnexpectedCommandStatusException;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
+import org.eclipse.keypop.reader.CardCommunicationException;
+import org.eclipse.keypop.reader.ChannelControl;
+import org.eclipse.keypop.reader.InvalidCardResponseException;
+import org.eclipse.keypop.reader.ReaderCommunicationException;
 
 /**
  * Utility class to factorize command management.
@@ -41,24 +42,24 @@ final class CommandExecutor {
    * reader, and finalizes any commands that require it.
    *
    * @param commands A non-null list of {@link Command}.
-   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
+   * @param channelControl The channel control.
    * @since 0.3.0
    */
   static void processCommands(
-      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, ChannelControl channelControl) {
     if (commands.isEmpty()) {
       return;
     }
     List<Command> cardRequestCommands = new ArrayList<>();
     for (Command command : commands) {
       if (command.isControlSamRequiredToFinalizeRequest()) {
-        executeCommands(cardRequestCommands, samReader, false);
+        executeCommands(cardRequestCommands, samReader, ChannelControl.KEEP_OPEN);
         cardRequestCommands.clear();
       }
       command.finalizeRequest();
       cardRequestCommands.add(command);
     }
-    executeCommands(cardRequestCommands, samReader, closePhysicalChannel);
+    executeCommands(cardRequestCommands, samReader, channelControl);
   }
 
   /**
@@ -66,35 +67,31 @@ final class CommandExecutor {
    * without finalizing it.
    *
    * @param commands A non-null list of {@link Command}.
-   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
+   * @param channelControl The channel control.
    * @since 0.3.0
    */
   static void processCommandsAlreadyFinalized(
-      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, ChannelControl channelControl) {
     if (commands.isEmpty()) {
       return;
     }
-    executeCommands(commands, samReader, closePhysicalChannel);
+    executeCommands(commands, samReader, channelControl);
   }
 
   /**
    * Executes the provided commands.
    *
    * @param commands The commands.
-   * @param closePhysicalChannel True if the physical channel must be closed after the operation.
+   * @param channelControl True if the physical channel must be closed after the operation.
    */
   private static void executeCommands(
-      List<? extends Command> commands, ProxyReaderApi samReader, boolean closePhysicalChannel) {
+      List<? extends Command> commands, ProxyReaderApi samReader, ChannelControl channelControl) {
     // Retrieve the list of C-APDUs
     List<ApduRequestSpi> apduRequests = getApduRequests(commands);
     // Wrap the list of C-APDUs into a card request
     CardRequestSpi cardRequest = new DtoAdapters.CardRequestAdapter(apduRequests, true);
     // Transmit the commands to the card
-    CardResponseApi cardResponse =
-        transmitCardRequest(
-            cardRequest,
-            samReader,
-            closePhysicalChannel ? ChannelControl.CLOSE_AFTER : ChannelControl.KEEP_OPEN);
+    CardResponseApi cardResponse = transmitCardRequest(cardRequest, samReader, channelControl);
     // Retrieve the list of R-APDUs
     List<ApduResponseApi> apduResponses = cardResponse.getApduResponses();
     // If there are more responses than requests, then we are unable to fill the card image. In this
@@ -115,7 +112,7 @@ final class CommandExecutor {
       try {
         command.parseResponse(apduResponses.get(i));
       } catch (CommandException e) {
-        throw new UnexpectedCommandStatusException(
+        throw new InvalidCardResponseException(
             MSG_SAM_COMMAND_ERROR
                 + "while processing responses to SAM commands: "
                 + command.getCommandRef(),
@@ -161,12 +158,15 @@ final class CommandExecutor {
       CardRequestSpi cardRequest, ProxyReaderApi samReader, ChannelControl channelControl) {
     CardResponseApi cardResponse;
     try {
-      cardResponse = samReader.transmitCardRequest(cardRequest, channelControl);
+      cardResponse =
+          samReader.transmitCardRequest(
+              cardRequest, org.eclipse.keypop.card.ChannelControl.valueOf(channelControl.name()));
     } catch (ReaderBrokenCommunicationException e) {
-      throw new ReaderIOException(
+      throw new ReaderCommunicationException(
           MSG_SAM_READER_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
     } catch (CardBrokenCommunicationException e) {
-      throw new SamIOException(MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
+      throw new CardCommunicationException(
+          MSG_SAM_COMMUNICATION_ERROR + MSG_WHILE_TRANSMITTING_COMMANDS, e);
     } catch (UnexpectedStatusWordException e) {
       cardResponse = e.getCardResponse();
     }
