@@ -88,7 +88,7 @@ abstract class CommonTransactionManagerAdapter {
    * especially with the help of a control SAM, then it will be.
    *
    * @param channelControl The channel control.
-   * @since 0.10.0
+   * @since 1.0.0
    */
   final void processTargetSamCommands(ChannelControl channelControl) {
     try {
@@ -103,7 +103,7 @@ abstract class CommonTransactionManagerAdapter {
    * an asynchronous operation for example).
    *
    * @param channelControl The channel control.
-   * @since 0.10.0
+   * @since 1.0.0
    */
   final void processTargetSamCommandsAlreadyFinalized(ChannelControl channelControl) {
     try {

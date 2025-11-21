@@ -164,7 +164,7 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
    * called, this method always throws an exception.
    *
    * @throws UnsupportedOperationException Always.
-   * @since 0.10.0
+   * @since 1.0.0
    */
   @Override
   public AsyncTransactionCreatorManager processCommands(ChannelControl channelControl) {

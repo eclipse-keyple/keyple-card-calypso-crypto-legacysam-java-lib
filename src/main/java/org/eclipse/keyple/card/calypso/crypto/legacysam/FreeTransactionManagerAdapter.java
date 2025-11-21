@@ -551,7 +551,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
+   * @since 1.0.0
    */
   @Override
   public FreeTransactionManagerAdapter processCommands(ChannelControl channelControl) {

@@ -330,7 +330,7 @@ final class SecureWriteTransactionManagerAdapter extends CommonTransactionManage
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
+   * @since 1.0.0
    */
   @Override
   public SecureWriteTransactionManager processCommands(ChannelControl channelControl) {

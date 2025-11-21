@@ -93,7 +93,7 @@ final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionMana
   /**
    * {@inheritDoc}
    *
-   * @since 0.10.0
+   * @since 1.0.0
    */
   @Override
   public AsyncTransactionExecutorManager processCommands(ChannelControl channelControl) {
