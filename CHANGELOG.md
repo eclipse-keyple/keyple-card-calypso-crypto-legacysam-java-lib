@@ -5,6 +5,8 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
 ## [Unreleased]
+
+## [1.0.0] - 2025-11-21
 ### Changed
 - Added `processCommands` methods using `org.eclipse.keypop.reader.ChannelControl` from Reader API in transaction
   managers to replace deprecated methods using Calypso Card API.
@@ -114,7 +116,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.1...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.0...HEAD
+[1.0.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.1...1.0.0
 [0.9.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.8.0...0.9.0
 [0.8.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.7.1...0.8.0
