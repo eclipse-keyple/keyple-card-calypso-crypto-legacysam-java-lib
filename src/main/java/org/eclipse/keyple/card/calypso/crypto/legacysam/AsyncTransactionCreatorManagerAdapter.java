@@ -35,7 +35,7 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
   /**
    * Constructs a new instance with the specified target SAM context and security settings.
    *
-   * @param targetSamContextJson The target SAM context as a JSon String.
+   * @param targetSamContextJson The target SAM context as a JSON String.
    * @param securitySetting An instance of {@link SecuritySetting}.
    * @since 0.3.0
    */
@@ -153,7 +153,7 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
   @Override
   public AsyncTransactionCreatorManager processCommands() {
     throw new UnsupportedOperationException(
-        "processCommands() is not allowed during the creation of an asynchronous transaction");
+        "'processCommands' is not allowed during the creation of an asynchronous transaction");
   }
 
   /**
@@ -169,6 +169,6 @@ final class AsyncTransactionCreatorManagerAdapter extends CommonTransactionManag
   @Override
   public AsyncTransactionCreatorManager processCommands(ChannelControl channelControl) {
     throw new UnsupportedOperationException(
-        "processCommands(ChannelControl) is not allowed during the creation of an asynchronous transaction");
+        "'processCommands' is not allowed during the creation of an asynchronous transaction");
   }
 }

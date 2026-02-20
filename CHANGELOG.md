@@ -6,6 +6,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.1] - 2026-02-20
+### Changed
+- Normalized logging and error messages using Keyple coding standards.
+### Upgraded
+- `keyple-service-resource-java-lib` from `3.1.0` to `3.1.1` (source code not impacted)
+- `keyple-util-java-lib` from `2.4.0` to `2.4.1` (source code not impacted)
+- `slf4j-api` from `1.7.32` to `1.7.36` (`compileOnly`)
+
 ## [1.0.0] - 2025-11-21
 ### Changed
 - Added `processCommands` methods using `org.eclipse.keypop.reader.ChannelControl` from Reader API in transaction
@@ -116,7 +124,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.0...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.1...HEAD
+[1.0.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.1...1.0.0
 [0.9.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.0...0.9.1
 [0.9.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.8.0...0.9.0

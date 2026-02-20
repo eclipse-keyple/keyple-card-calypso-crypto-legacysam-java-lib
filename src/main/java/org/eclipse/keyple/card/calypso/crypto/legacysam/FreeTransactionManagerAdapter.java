@@ -82,7 +82,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     Assert.getInstance().notNull(keyPairContainer, "keyPairContainer");
     if (!(keyPairContainer instanceof KeyPairContainerAdapter)) {
       throw new IllegalArgumentException(
-          "The provided keyPairContainer must be an instance of 'KeyPairContainerAdapter'");
+          "Cannot cast 'keyPairContainer' to KeyPairContainerAdapter");
     }
     addTargetSamCommand(new CommandCardGenerateAsymmetricKeyPair(getContext(), keyPairContainer));
     return this;
@@ -99,7 +99,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
     Assert.getInstance().notNull(data, "data");
     if (!(data instanceof LegacyCardCertificateComputationDataAdapter)) {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'LegacyCardCertificateComputationDataAdapter'");
+          "Cannot cast 'data' to LegacyCardCertificateComputationDataAdapter");
     }
     addTargetSamCommand(new CommandPsoComputeCertificate(getContext(), data));
     return this;
@@ -194,8 +194,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'BasicSignatureComputationDataAdapter'"
-              + " or 'TraceableSignatureComputationDataAdapter'");
+          "Cannot cast 'data' to BasicSignatureComputationDataAdapter or TraceableSignatureComputationDataAdapter");
     }
     return this;
   }
@@ -294,9 +293,10 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
         // Is SAM revoked ?
         if (dataAdapter.getSamRevocationService().isSamRevoked(samSerialNumber, samCounterValue)) {
           throw new SamRevokedException(
-              String.format(
-                  "SAM with serial number [%s] and counter value [%d] is revoked",
-                  HexUtil.toHex(samSerialNumber), samCounterValue));
+              "SAM is revoked. Serial number: "
+                  + HexUtil.toHex(samSerialNumber)
+                  + "h, Counter value: "
+                  + samCounterValue);
         }
       }
 
@@ -305,7 +305,7 @@ final class FreeTransactionManagerAdapter extends CommonTransactionManagerAdapte
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'SignatureVerificationDataAdapter'");
+          "Cannot cast 'data' to BasicSignatureVerificationDataAdapter or TraceableSignatureVerificationDataAdapter");
     }
     return this;
   }

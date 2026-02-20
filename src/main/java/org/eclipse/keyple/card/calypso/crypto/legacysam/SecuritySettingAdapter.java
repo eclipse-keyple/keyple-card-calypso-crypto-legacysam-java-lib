@@ -40,11 +40,13 @@ final class SecuritySettingAdapter implements SecuritySetting {
         .isTrue(controlSam.getProductType() != LegacySam.ProductType.UNKNOWN, "productType");
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
-          "The provided 'samReader' must implement 'ProxyReaderApi'");
+          "Cannot cast 'samReader' to ProxyReaderApi. Actual type: "
+              + samReader.getClass().getName());
     }
     if (!(controlSam instanceof LegacySamAdapter)) {
       throw new IllegalArgumentException(
-          "The provided 'controlSam' must be an instance of 'LegacySamAdapter'");
+          "Cannot cast 'controlSam' to LegacySamAdapter. Actual type: "
+              + controlSam.getClass().getName());
     }
     controlSamReader = (ProxyReaderApi) samReader;
     this.controlSam = (LegacySamAdapter) controlSam;

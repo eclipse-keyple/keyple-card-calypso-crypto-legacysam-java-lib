@@ -20,8 +20,6 @@ import org.eclipse.keypop.card.spi.ApduRequestSpi;
 import org.eclipse.keypop.card.spi.CardRequestSpi;
 import org.eclipse.keypop.reader.CardCommunicationException;
 import org.eclipse.keypop.reader.ReaderCommunicationException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Util to build and transmit APDU requests.
@@ -29,14 +27,13 @@ import org.slf4j.LoggerFactory;
  * @since 2.0.0
  */
 class CardTransactionUtil {
-  private static final Logger logger = LoggerFactory.getLogger(CardTransactionUtil.class);
+
   /* Prefix/suffix used to compose exception messages */
   private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
-      "A communication error with the SAM reader occurred ";
-  private static final String MSG_SAM_COMMUNICATION_ERROR =
-      "A communication error with the SAM occurred ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands";
-  static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
+      "Failed to communicate with SAM reader";
+  private static final String MSG_SAM_COMMUNICATION_ERROR = "Failed to communicate with SAM";
+  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = " while transmitting commands.";
+  static final String MSG_FAILED_TO_PROCESS_SAM_RESPONSE = "Failed to process SAM response.";
 
   private CardTransactionUtil() {}
 

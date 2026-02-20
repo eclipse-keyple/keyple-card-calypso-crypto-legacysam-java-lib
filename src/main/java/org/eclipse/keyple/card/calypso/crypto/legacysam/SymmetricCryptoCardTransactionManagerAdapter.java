@@ -39,8 +39,8 @@ final class SymmetricCryptoCardTransactionManagerAdapter
     implements SymmetricCryptoCardTransactionManagerSpi, CardTransactionLegacySamExtension {
 
   private static final String MSG_SAM_INCONSISTENT_DATA =
-      "The number of SAM commands/responses does not match: nb commands = ";
-  private static final String MSG_SAM_NB_RESPONSES = ", nb responses = ";
+      "The number of commands/responses does not match. Expected ";
+  private static final String MSG_SAM_NB_RESPONSES = " responses, got ";
   private static final String MSG_INPUT_OUTPUT_DATA = "input/output data";
   private static final String MSG_SIGNATURE_SIZE = "signature size";
   private static final String MSG_KEY_DIVERSIFIER_SIZE_IS_IN_RANGE_1_8 =
@@ -319,7 +319,7 @@ final class SymmetricCryptoCardTransactionManagerAdapter
       if (kif == null || kvc == null) {
         String msg = newPin == null ? "verification" : "modification";
         throw new IllegalStateException(
-            String.format("No KIF or KVC defined for the PIN %s ciphering key", msg));
+            "KIF and KVC should be set for the PIN " + msg + " ciphering key");
       }
       pinCipheringKif = kif;
       pinCipheringKvc = kvc;
@@ -433,19 +433,17 @@ final class SymmetricCryptoCardTransactionManagerAdapter
                   ? HexUtil.toHex(samCommands.get(i).getApduResponse().getStatusWord())
                   : "null";
           throw new SymmetricCryptoException(
-              CardTransactionUtil.MSG_SAM_COMMAND_ERROR
-                  + "while processing responses to SAM commands: "
+              CardTransactionUtil.MSG_FAILED_TO_PROCESS_SAM_RESPONSE
+                  + " Command: "
                   + commandRef
-                  + " ["
-                  + sw
-                  + "]",
+                  + ", SW: "
+                  + sw,
               new InvalidCardResponseException(
-                  CardTransactionUtil.MSG_SAM_COMMAND_ERROR
-                      + "while processing responses to SAM commands: "
+                  CardTransactionUtil.MSG_FAILED_TO_PROCESS_SAM_RESPONSE
+                      + " Command: "
                       + commandRef
-                      + " ["
+                      + ", SW: "
                       + sw
-                      + "]"
                       + CardTransactionUtil.getTransactionAuditDataAsString(
                           transactionAuditData, sam),
                   e));
@@ -576,8 +574,8 @@ final class SymmetricCryptoCardTransactionManagerAdapter
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'BasicSignatureComputationDataAdapter'"
-              + " or 'TraceableSignatureComputationDataAdapter'");
+          "Cannot cast 'data' to BasicSignatureComputationDataAdapter or TraceableSignatureComputationDataAdapter. Actual type: "
+              + data.getClass().getName());
     }
     return this;
   }
@@ -677,9 +675,10 @@ final class SymmetricCryptoCardTransactionManagerAdapter
         // Is SAM revoked ?
         if (dataAdapter.getSamRevocationService().isSamRevoked(samSerialNumber, samCounterValue)) {
           throw new SamRevokedException(
-              String.format(
-                  "SAM with serial number [%s] and counter value [%d] is revoked",
-                  HexUtil.toHex(samSerialNumber), samCounterValue));
+              "SAM is revoked. Serial number: "
+                  + HexUtil.toHex(samSerialNumber)
+                  + "h, Counter value: "
+                  + samCounterValue);
         }
       }
 
@@ -688,7 +687,8 @@ final class SymmetricCryptoCardTransactionManagerAdapter
 
     } else {
       throw new IllegalArgumentException(
-          "The provided data must be an instance of 'CommonSignatureVerificationDataAdapter'");
+          "Cannot cast 'data' to BasicSignatureVerificationDataAdapter or TraceableSignatureVerificationDataAdapter. Actual type: "
+              + data.getClass().getName());
     }
     return this;
   }

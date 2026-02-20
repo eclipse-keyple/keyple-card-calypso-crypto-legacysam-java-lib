@@ -49,7 +49,9 @@ final class CommandGiveRandom extends Command {
     byte p2 = 0x00;
 
     if (random == null || random.length != 8) {
-      throw new IllegalArgumentException("Random value should be an 8 bytes long");
+      throw new IllegalArgumentException(
+          "Random value is an incorrect length. Expected 8 bytes, got "
+              + (random != null ? random.length : "null"));
     }
     setApduRequest(
         new ApduRequestAdapter(

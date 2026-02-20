@@ -101,7 +101,8 @@ final class CommandGetData extends Command {
     byte[] header = tagInfo.getHeader();
     for (int i = 0; i < header.length; i++) {
       if (dataOut[i] != header[i]) {
-        throw new DataAccessException("Inconsistent BER-TLV tag");
+        throw new DataAccessException(
+            "Inconsistent BER-TLV tag. Expected: " + header[i] + "h, Actual: " + dataOut[i] + "h");
       }
     }
     getContext()

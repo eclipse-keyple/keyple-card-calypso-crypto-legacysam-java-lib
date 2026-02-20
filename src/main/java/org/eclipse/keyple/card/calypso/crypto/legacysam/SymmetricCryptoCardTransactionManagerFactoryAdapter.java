@@ -135,19 +135,17 @@ final class SymmetricCryptoCardTransactionManagerFactoryAdapter
               : "null";
 
       String errorMessage =
-          CardTransactionUtil.MSG_SAM_COMMAND_ERROR
-              + "while processing response to SAM command: "
+          CardTransactionUtil.MSG_FAILED_TO_PROCESS_SAM_RESPONSE
+              + " Command: "
               + commandRef
-              + "["
-              + sw
-              + "]";
+              + ", SW: "
+              + sw;
       String detailedErrorMessage =
-          CardTransactionUtil.MSG_SAM_COMMAND_ERROR
-              + "while processing response to SAM command: "
+          CardTransactionUtil.MSG_FAILED_TO_PROCESS_SAM_RESPONSE
+              + " Command: "
               + commandRef
-              + "["
+              + ", SW: "
               + sw
-              + "]"
               + CardTransactionUtil.getTransactionAuditDataAsString(transactionAuditData, sam);
 
       throw new SymmetricCryptoException(

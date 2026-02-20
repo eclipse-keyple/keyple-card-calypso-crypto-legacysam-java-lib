@@ -26,10 +26,10 @@ import org.eclipse.keypop.reader.CardReader;
  * @since 0.4.0
  */
 final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
-  private static final String MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API =
-      "The provided 'samReader' must implement 'ProxyReaderApi'";
-  private static final String MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER =
-      "The provided 'sam' must be an instance of 'LegacySamAdapter'";
+  private static final String MSG_CANNOT_CAST_SAM_READER_TO_PROXY_READER_API =
+      "Cannot cast 'samReader' to ProxyReaderApi. Actual type: ";
+  private static final String MSG_CANNOT_CAST_SAM_TO_LEGACY_SAM_ADAPTER =
+      "Cannot cast 'sam' to LegacySamAdapter. Actual type: ";
   private final ContextSetting contextSetting;
 
   LegacySamApiFactoryAdapter(ContextSettingAdapter contextSetting) {
@@ -56,11 +56,11 @@ final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
       createSymmetricCryptoCardTransactionManagerFactory(CardReader samReader, LegacySam sam) {
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
+          MSG_CANNOT_CAST_SAM_READER_TO_PROXY_READER_API + samReader.getClass().getName());
     }
     if (!(sam instanceof LegacySamAdapter)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
+          MSG_CANNOT_CAST_SAM_TO_LEGACY_SAM_ADAPTER + sam.getClass().getName());
     }
     return new SymmetricCryptoCardTransactionManagerFactoryAdapter(
         (ProxyReaderApi) samReader, (LegacySamAdapter) sam, (ContextSettingAdapter) contextSetting);
@@ -86,11 +86,11 @@ final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
 
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
+          MSG_CANNOT_CAST_SAM_READER_TO_PROXY_READER_API + samReader.getClass().getName());
     }
     if (!(sam instanceof LegacySamAdapter)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
+          MSG_CANNOT_CAST_SAM_TO_LEGACY_SAM_ADAPTER + sam.getClass().getName());
     }
     return new FreeTransactionManagerAdapter((ProxyReaderApi) samReader, (LegacySamAdapter) sam);
   }
@@ -106,11 +106,11 @@ final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
 
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
+          MSG_CANNOT_CAST_SAM_READER_TO_PROXY_READER_API + samReader.getClass().getName());
     }
     if (!(sam instanceof LegacySamAdapter)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
+          MSG_CANNOT_CAST_SAM_TO_LEGACY_SAM_ADAPTER + sam.getClass().getName());
     }
     Assert.getInstance().notNull(securitySetting, "securitySetting");
     return new SecureWriteTransactionManagerAdapter(
@@ -145,11 +145,11 @@ final class LegacySamApiFactoryAdapter implements LegacySamApiFactory {
 
     if (!(samReader instanceof ProxyReaderApi)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_READER_MUST_IMPLEMENT_PROXY_READER_API);
+          MSG_CANNOT_CAST_SAM_READER_TO_PROXY_READER_API + samReader.getClass().getName());
     }
     if (!(sam instanceof LegacySamAdapter)) {
       throw new IllegalArgumentException(
-          MSG_THE_PROVIDED_SAM_MUST_BE_AN_INSTANCE_OF_LEGACY_SAM_ADAPTER);
+          MSG_CANNOT_CAST_SAM_TO_LEGACY_SAM_ADAPTER + sam.getClass().getName());
     }
     Assert.getInstance().notNull(samCommands, "samCommands");
     return new AsyncTransactionExecutorManagerAdapter(

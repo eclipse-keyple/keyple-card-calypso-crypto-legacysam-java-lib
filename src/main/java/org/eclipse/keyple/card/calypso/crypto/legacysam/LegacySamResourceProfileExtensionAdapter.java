@@ -78,7 +78,7 @@ final class LegacySamResourceProfileExtensionAdapter implements CardResourceProf
     try {
       samCardSelectionResult = samCardSelectionManager.processCardSelectionScenario(reader);
     } catch (Exception e) {
-      logger.error("SAM selection failed: {}", e.getMessage(), e);
+      logger.error("SAM selection failed", e);
     }
 
     return samCardSelectionResult != null ? samCardSelectionResult.getActiveSmartCard() : null;

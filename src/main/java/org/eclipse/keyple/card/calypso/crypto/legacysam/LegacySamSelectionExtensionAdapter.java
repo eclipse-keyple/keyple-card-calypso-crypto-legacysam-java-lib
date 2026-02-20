@@ -50,7 +50,6 @@ final class LegacySamSelectionExtensionAdapter
   private static final Logger logger =
       LoggerFactory.getLogger(LegacySamSelectionExtensionAdapter.class);
   private static final int SW_NOT_LOCKED = 0x6985;
-  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
   private static final String MSG_UNLOCK_SETTING_HAS_ALREADY_BEEN_SET =
       "A setting to unlock the SAM has already been set";
   private final LegacySamAdapter legacySamAdapter;
@@ -131,13 +130,13 @@ final class LegacySamSelectionExtensionAdapter
       CardResponseApi cardResponse = getCardResponse(cardSelectionResponseApi);
       parseCardResponse(cardResponse);
     } catch (Exception e) {
-      throw new ParseException("Invalid SAM response: " + e.getMessage(), e);
+      throw new ParseException("Invalid SAM response", e);
     }
     if (legacySamAdapter.getProductType() == LegacySam.ProductType.UNKNOWN
         && cardSelectionResponseApi.getSelectApplicationResponse() == null
         && cardSelectionResponseApi.getPowerOnData() == null) {
       throw new ParseException(
-          "Unable to create a LegacySam: no power-on data and no FCI provided");
+          "No power-on data and no FCI provided. Unable to create a LegacySam instance");
     }
     return legacySamAdapter;
   }
@@ -158,7 +157,7 @@ final class LegacySamSelectionExtensionAdapter
         || unlockSettingType == UnlockSettingType.DYNAMIC_MODE_PROVIDER) {
 
       if (targetSamReader == null) {
-        throw new IllegalStateException("targetSamReader is not set");
+        throw new IllegalStateException("'targetSamReader' is not set. Unable to unlock the SAM");
       }
 
       byte[] unlockData;
@@ -197,12 +196,14 @@ final class LegacySamSelectionExtensionAdapter
    */
   private void parseCardResponse(CardResponseApi cardResponse) {
     List<ApduResponseApi> apduResponses =
-        cardResponse != null
-            ? cardResponse.getApduResponses()
-            : Collections.<ApduResponseApi>emptyList();
+        cardResponse != null ? cardResponse.getApduResponses() : Collections.emptyList();
 
     if (commands.size() != apduResponses.size()) {
-      throw new IllegalStateException("Mismatch in the number of requests/responses");
+      throw new IllegalStateException(
+          "The number of commands/responses does not match. Expected "
+              + commands.size()
+              + " responses, got "
+              + apduResponses.size());
     }
     if (!commands.isEmpty()) {
       parseApduResponses(commands, apduResponses);
@@ -222,9 +223,9 @@ final class LegacySamSelectionExtensionAdapter
     // desynchronized exception.
     if (apduResponses.size() > commands.size()) {
       throw new InconsistentDataException(
-          "The number of commands/responses does not match: nb commands = "
+          "The number of commands/responses does not match. Expected "
               + commands.size()
-              + ", nb responses = "
+              + " responses, got "
               + apduResponses.size());
     }
     // We go through all the responses (and not the requests) because there may be fewer in the
@@ -237,10 +238,15 @@ final class LegacySamSelectionExtensionAdapter
         if (e instanceof AccessForbiddenException && commands.get(i) instanceof CommandUnlock) {
           logger.warn("SAM not locked or already unlocked");
         } else {
+          String sw =
+              commands.get(i).getApduResponse() != null
+                  ? HexUtil.toHex(commands.get(i).getApduResponse().getStatusWord())
+                  : "null";
           throw new InvalidCardResponseException(
-              MSG_SAM_COMMAND_ERROR
-                  + "while processing responses to SAM commands: "
-                  + commands.get(i).getCommandRef(),
+              "Failed to process SAM response. Command: "
+                  + commands.get(i).getCommandRef()
+                  + ", SW: "
+                  + sw,
               e);
         }
       }
@@ -249,9 +255,9 @@ final class LegacySamSelectionExtensionAdapter
     // throw a desynchronized exception.
     if (apduResponses.size() < commands.size()) {
       throw new InconsistentDataException(
-          "The number of commands/responses does not match: nb commands = "
+          "The number of commands/responses does not match. Expected "
               + commands.size()
-              + ", nb responses = "
+              + " responses, got "
               + apduResponses.size());
     }
   }

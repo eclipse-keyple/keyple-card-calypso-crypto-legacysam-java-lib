@@ -120,7 +120,12 @@ final class CommandCardGenerateAsymmetricKeyPair extends Command {
       byte[] header = LegacySamConstants.TagInfo.GENERATED_CARD_ECC_KEY_PAIR.getHeader();
       for (int i = 0; i < header.length; i++) {
         if (dataOut[i] != header[i]) {
-          throw new DataAccessException("Inconsistent BER-TLV tag");
+          throw new DataAccessException(
+              "Inconsistent BER-TLV tag. Expected: "
+                  + HexUtil.toHex(header[i])
+                  + "h, Actual: "
+                  + HexUtil.toHex(dataOut[i])
+                  + "h");
         }
       }
       keyPairContainer.setKeyPair(Arrays.copyOfRange(dataOut, header.length, dataOut.length));

@@ -55,7 +55,9 @@ final class CommandDigestUpdateMultiple extends Command {
     byte p2 = (byte) 0x00;
 
     if (digestData == null || digestData.length > 255) {
-      throw new IllegalArgumentException("Digest data null or too long!");
+      throw new IllegalArgumentException(
+          "Digest data is null or too long. Expected 0-255 bytes, got "
+              + (digestData != null ? digestData.length : "null"));
     }
 
     setApduRequest(

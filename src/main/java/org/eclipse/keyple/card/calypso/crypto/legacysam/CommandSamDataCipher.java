@@ -93,7 +93,7 @@ final class CommandSamDataCipher extends Command {
         p2 = (byte) 0xA0;
         break;
       default:
-        throw new IllegalArgumentException("Invalid DataType: " + dataType);
+        throw new IllegalArgumentException("Unsupported DataType: " + dataType);
     }
     setApduRequest(new ApduRequestAdapter(ApduUtil.build(cla, inst, p1, p2, plainData, null)));
   }

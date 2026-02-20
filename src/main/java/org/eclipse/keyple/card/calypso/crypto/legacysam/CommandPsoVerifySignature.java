@@ -100,7 +100,7 @@ final class CommandPsoVerifySignature extends Command {
     }
     opMode <<= 4;
     // Y: Signature size (in bytes)
-    opMode |= signatureSize;
+    opMode |= (byte) signatureSize;
     dataIn[3] = opMode;
 
     // TraceOffset (optional): Bit offset in MessageIn of the SAM traceability data.

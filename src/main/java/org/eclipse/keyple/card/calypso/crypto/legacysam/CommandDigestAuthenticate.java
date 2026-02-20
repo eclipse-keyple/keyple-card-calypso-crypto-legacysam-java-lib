@@ -48,11 +48,11 @@ final class CommandDigestAuthenticate extends Command {
     super(CommandRef.DIGEST_AUTHENTICATE, 0, context);
 
     if (signature == null) {
-      throw new IllegalArgumentException("Signature can't be null");
+      throw new IllegalArgumentException("Signature cannot be null");
     }
     if (signature.length != 4 && signature.length != 8 && signature.length != 16) {
       throw new IllegalArgumentException(
-          "Signature is not the right length : length is " + signature.length);
+          "Signature is not the right length. Expected: 4|8|16, Actual: " + signature.length);
     }
     byte cla = context.getTargetSam().getClassByte();
     byte p1 = 0x00;

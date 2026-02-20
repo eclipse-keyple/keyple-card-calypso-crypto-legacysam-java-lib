@@ -67,10 +67,11 @@ final class CommandDigestInit extends Command {
     super(CommandRef.DIGEST_INIT, 0, context);
 
     if (workKif == 0x00 || workKvc == 0x00) {
-      throw new IllegalArgumentException("Bad kif or kvc!");
+      throw new IllegalArgumentException(
+          "KIF or KVC is not set. KIF: " + workKif + ", KVC: " + workKvc + "]");
     }
     if (digestData == null) {
-      throw new IllegalArgumentException("Digest data is null!");
+      throw new IllegalArgumentException("Digest data cannot be null");
     }
     byte cla = context.getTargetSam().getClassByte();
     byte p1 = 0x00;

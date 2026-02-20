@@ -46,7 +46,8 @@ final class CommandSvCheck extends Command {
     super(CommandRef.SV_CHECK, 0, context);
 
     if (svCardSignature != null && (svCardSignature.length != 3 && svCardSignature.length != 6)) {
-      throw new IllegalArgumentException("Invalid svCardSignature");
+      throw new IllegalArgumentException(
+          "Invalid SV card signature. Expected 3 or 6 bytes, got " + svCardSignature.length);
     }
 
     byte cla = context.getTargetSam().getClassByte();

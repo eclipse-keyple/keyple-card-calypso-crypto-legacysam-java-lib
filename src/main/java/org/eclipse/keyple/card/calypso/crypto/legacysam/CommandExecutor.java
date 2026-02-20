@@ -13,6 +13,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.transaction.InconsistentDataException;
 import org.eclipse.keypop.card.*;
 import org.eclipse.keypop.card.spi.ApduRequestSpi;
@@ -29,17 +30,15 @@ import org.eclipse.keypop.reader.ReaderCommunicationException;
  */
 final class CommandExecutor {
   private static final String MSG_SAM_READER_COMMUNICATION_ERROR =
-      "A communication error with the SAM reader occurred ";
-  private static final String MSG_SAM_COMMUNICATION_ERROR =
-      "A communication error with the SAM occurred ";
-  private static final String MSG_SAM_COMMAND_ERROR = "A SAM command error occurred ";
-  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = "while transmitting commands";
+      "Failed to communicate with SAM reader";
+  private static final String MSG_SAM_COMMUNICATION_ERROR = "Failed to communicate with SAM";
+  private static final String MSG_WHILE_TRANSMITTING_COMMANDS = " while transmitting commands.";
 
   private CommandExecutor() {}
 
   /**
-   * Requests the execution of all commands provided by the SAM inserted in the supplied card
-   * reader, and finalizes any commands that require it.
+   * Requests the execution of all commands provided by the SAM inserted in the supplied card reader
+   * and finalizes any commands that require it.
    *
    * @param commands A non-null list of {@link Command}.
    * @param channelControl The channel control.
@@ -99,9 +98,9 @@ final class CommandExecutor {
     // desynchronized exception.
     if (apduResponses.size() > commands.size()) {
       throw new InconsistentDataException(
-          "The number of commands/responses does not match: nb commands = "
+          "The number of commands/responses does not match. Expected "
               + commands.size()
-              + ", nb responses = "
+              + " responses, got "
               + apduResponses.size());
     }
     // We go through all the responses (and not the requests) because there may be fewer in the
@@ -112,10 +111,12 @@ final class CommandExecutor {
       try {
         command.parseResponse(apduResponses.get(i));
       } catch (CommandException e) {
+        String sw =
+            command.getApduResponse() != null
+                ? HexUtil.toHex(command.getApduResponse().getStatusWord())
+                : "null";
         throw new InvalidCardResponseException(
-            MSG_SAM_COMMAND_ERROR
-                + "while processing responses to SAM commands: "
-                + command.getCommandRef(),
+            "Failed to process SAM response. Command: " + command.getCommandRef() + ", SW: " + sw,
             e);
       }
     }
@@ -123,9 +124,9 @@ final class CommandExecutor {
     // throw a desynchronized exception.
     if (apduResponses.size() < commands.size()) {
       throw new InconsistentDataException(
-          "The number of commands/responses does not match: nb commands = "
+          "The number of commands/responses does not match. Expected "
               + commands.size()
-              + ", nb responses = "
+              + " responses, got "
               + apduResponses.size());
     }
   }

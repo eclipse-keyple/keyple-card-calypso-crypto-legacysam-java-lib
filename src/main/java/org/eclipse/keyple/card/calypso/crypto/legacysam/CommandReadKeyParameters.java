@@ -79,7 +79,7 @@ final class CommandReadKeyParameters extends Command {
         p2 = (byte) 0xC4;
         break;
       default:
-        throw new IllegalStateException("Unexpected value: " + systemKeyType);
+        throw new IllegalStateException("Unexpected SystemKeyType: " + systemKeyType);
     }
     byte[] dataIn = {0x00, 0x00};
 

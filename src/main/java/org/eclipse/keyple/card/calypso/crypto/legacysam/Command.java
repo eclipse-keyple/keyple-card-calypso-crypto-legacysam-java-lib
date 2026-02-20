@@ -101,16 +101,6 @@ abstract class Command {
   }
 
   /**
-   * Gets the name of this APDU command.
-   *
-   * @return A not empty string.
-   * @since 0.1.0
-   */
-  final String getName() {
-    return name;
-  }
-
-  /**
    * Sets the command {@link ApduRequestAdapter}.
    *
    * @param apduRequest The APDU request.
@@ -233,9 +223,10 @@ abstract class Command {
       // SW is successful, then check the response length (CL-CSS-RESPLE.1)
       if (le != 0 && apduResponse.getDataOut().length != le) {
         throw new UnexpectedResponseLengthException(
-            String.format(
-                "Incorrect APDU response length (expected: %d, actual: %d)",
-                le, apduResponse.getDataOut().length));
+            "Incorrect APDU response length. Expected: "
+                + le
+                + ", Actual: "
+                + apduResponse.getDataOut().length);
       }
       // SW and response length are correct.
       return;

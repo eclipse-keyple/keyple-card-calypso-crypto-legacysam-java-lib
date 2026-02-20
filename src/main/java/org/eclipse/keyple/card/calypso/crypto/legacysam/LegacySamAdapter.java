@@ -140,7 +140,7 @@ final class LegacySamAdapter implements LegacySam, SmartCardSpi {
       System.arraycopy(atrSubElements, 6, serialNumber, 0, 4);
       if (logger.isTraceEnabled()) {
         logger.trace(
-            "SAM {}, SERIAL_NUMBER={}h, PLATFORM={}h, APP_TYPE={}h, APP_SUBTYPE={}h, SW_ISSUER={}h, SW_VERSION={}h, SW_REVISION={}h",
+            "Legacy SAM matched [productType={}, serialNumber={}h, platform={}h, applicationType={}h, applicationSubType={}h, softwareIssuer={}h, softwareVersion={}h, softwareRevision={}h]",
             samProductType.name(),
             HexUtil.toHex(serialNumber),
             HexUtil.toHex(platform),

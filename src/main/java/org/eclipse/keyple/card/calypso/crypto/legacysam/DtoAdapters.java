@@ -14,6 +14,7 @@ package org.eclipse.keyple.card.calypso.crypto.legacysam;
 import java.time.LocalDate;
 import java.util.*;
 import org.eclipse.keyple.core.util.Assert;
+import org.eclipse.keyple.core.util.HexUtil;
 import org.eclipse.keyple.core.util.json.JsonUtil;
 import org.eclipse.keypop.calypso.crypto.legacysam.SystemKeyType;
 import org.eclipse.keypop.calypso.crypto.legacysam.spi.LegacySamRevocationServiceSpi;
@@ -559,14 +560,22 @@ final class DtoAdapters {
     }
 
     /**
-     * Converts the APDU request into a string where the data is encoded in a json format.
+     * {@inheritDoc}
      *
-     * @return A not empty String
      * @since 0.1.0
      */
     @Override
     public String toString() {
-      return "APDU_REQUEST = " + JsonUtil.toJson(this);
+      return "ApduRequestAdapter{"
+          + "apdu='"
+          + HexUtil.toHex(apdu)
+          + '\''
+          + ", successfulStatusWords="
+          + JsonUtil.toJson(successfulStatusWords)
+          + ", info='"
+          + info
+          + '\''
+          + '}';
     }
   }
 
@@ -618,14 +627,18 @@ final class DtoAdapters {
     }
 
     /**
-     * Converts the card request into a string where the data is encoded in a json format.
+     * {@inheritDoc}
      *
-     * @return A not empty String
      * @since 0.1.0
      */
     @Override
     public String toString() {
-      return "CARD_REQUEST = " + JsonUtil.toJson(this);
+      return "CardRequestAdapter{"
+          + "apduRequests="
+          + apduRequests
+          + ", stopOnUnsuccessfulStatusWord="
+          + stopOnUnsuccessfulStatusWord
+          + '}';
     }
   }
 
@@ -681,7 +694,12 @@ final class DtoAdapters {
      */
     @Override
     public String toString() {
-      return "CARD_SELECTION_REQUEST = " + JsonUtil.toJson(this);
+      return "CardSelectionRequestAdapter{"
+          + "cardRequest="
+          + cardRequest
+          + ", successfulSelectionStatusWords="
+          + JsonUtil.toJson(successfulSelectionStatusWords)
+          + '}';
     }
   }
 

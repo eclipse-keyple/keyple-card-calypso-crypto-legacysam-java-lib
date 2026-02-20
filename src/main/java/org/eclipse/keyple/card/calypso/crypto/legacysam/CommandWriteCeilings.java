@@ -276,7 +276,7 @@ final class CommandWriteCeilings extends Command {
       }
       if (config == CounterIncrementAccess.FREE_COUNTING_ENABLED
           && (i != 0 || counterFileRecordNumber != 0)) {
-        configBits |= 1 << i;
+        configBits |= (short) (1 << i);
       }
     }
     ByteArrayUtil.copyBytes(configBits, plainData, 28, 2);

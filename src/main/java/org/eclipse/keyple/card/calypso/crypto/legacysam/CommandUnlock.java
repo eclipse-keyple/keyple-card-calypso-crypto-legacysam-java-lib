@@ -55,11 +55,12 @@ final class CommandUnlock extends Command {
     byte p2 = 0x00;
 
     if (unlockData == null) {
-      throw new IllegalArgumentException("Unlock data null!");
+      throw new IllegalArgumentException("Unlock data cannot be null");
     }
 
     if (unlockData.length != 8 && unlockData.length != 16) {
-      throw new IllegalArgumentException("Unlock data should be 8 ou 16 bytes long!");
+      throw new IllegalArgumentException(
+          "Unlock data is an incorrect length. Expected 8 or 16 bytes, got " + unlockData.length);
     }
 
     setApduRequest(

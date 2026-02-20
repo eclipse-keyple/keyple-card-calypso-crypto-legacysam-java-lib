@@ -98,7 +98,7 @@ final class CommandPsoComputeSignature extends Command {
     }
     opMode <<= 4;
     // Y: Signature size (in bytes)
-    opMode |= data.getSignatureSize();
+    opMode |= (byte) data.getSignatureSize();
     dataIn[3] = opMode;
 
     // TraceOffset (optional): Bit offset in MessageIn of the SAM traceability data.

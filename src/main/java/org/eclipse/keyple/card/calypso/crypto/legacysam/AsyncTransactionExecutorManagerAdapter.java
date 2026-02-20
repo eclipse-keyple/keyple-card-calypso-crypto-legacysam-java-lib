@@ -65,7 +65,12 @@ final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionMana
         addTargetSamCommand(
             (Command) JsonUtil.getParser().fromJson(commands.get(i), classOfCommand));
       } catch (ClassNotFoundException e) {
-        throw new IllegalStateException("Invalid JSON commands object", e);
+        throw new IllegalStateException(
+            "Class '"
+                + commandsTypes.get(i)
+                + "' not found. Unable to parse JSON object: "
+                + samCommandsJson,
+            e);
       }
     }
   }
