@@ -61,9 +61,19 @@ final class AsyncTransactionExecutorManagerAdapter extends CommonTransactionMana
     for (int i = 0; i < commandsTypes.size(); i++) {
       // check the resulting command class
       try {
-        Class<?> classOfCommand = Class.forName(commandsTypes.get(i));
+        // Only the commands of this library are supported.
+        Class<?> classOfCommand =
+            Class.forName(
+                commandsTypes.get(i),
+                false,
+                AsyncTransactionExecutorManagerAdapter.class.getClassLoader());
+        if (!Command.class.isAssignableFrom(classOfCommand)) {
+          throw new IllegalArgumentException(
+              "Class '" + commandsTypes.get(i) + "' is not a SAM command");
+        }
         addTargetSamCommand(
-            (Command) JsonUtil.getParser().fromJson(commands.get(i), classOfCommand));
+            JsonUtil.getParser()
+                .fromJson(commands.get(i), classOfCommand.asSubclass(Command.class)));
       } catch (ClassNotFoundException e) {
         throw new IllegalStateException(
             "Class '"

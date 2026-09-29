@@ -21,7 +21,7 @@ dependencies {
   implementation("org.eclipse.keypop:keypop-calypso-crypto-legacysam-java-api:1.0.0")
   implementation("org.eclipse.keyple:keyple-common-java-api:2.0.2")
   implementation("org.eclipse.keyple:keyple-service-resource-java-lib:3.1.1")
-  implementation("org.eclipse.keyple:keyple-util-java-lib:2.4.1")
+  implementation("org.eclipse.keyple:keyple-util-java-lib:2.5.0")
   implementation("com.google.code.gson:gson:2.10.1")
   compileOnly("org.slf4j:slf4j-api:1.7.36")
 

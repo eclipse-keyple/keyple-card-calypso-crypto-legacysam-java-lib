@@ -6,6 +6,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.0.2] - 2026-09-29
+### Fixed
+- Improved the validation of the commands provided to
+  `LegacySamApiFactory.createAsyncTransactionExecutorManager(...)`.
+### Upgraded
+- `keyple-util-java-lib` from `2.4.1` to `2.5.0`
+
 ## [1.0.1] - 2026-02-20
 ### Changed
 - Normalized logging and error messages using Keyple coding standards.
@@ -124,7 +131,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [0.1.0] - 2022-12-12
 This is the initial release.
 
-[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.1...HEAD
+[unreleased]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.2...HEAD
+[1.0.2]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.1...1.0.2
 [1.0.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/1.0.0...1.0.1
 [1.0.0]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.1...1.0.0
 [0.9.1]: https://github.com/eclipse-keyple/keyple-card-calypso-crypto-legacysam-java-lib/compare/0.9.0...0.9.1
